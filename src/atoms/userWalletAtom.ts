@@ -4,6 +4,7 @@ import { atom, useAtomValue } from 'jotai'
 import { WalletContextState } from '@solana/wallet-adapter-react'
 import { useHydrateAtoms } from 'jotai/utils'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import { useMemo } from 'react'
 
 const baseUserWalletAtom = atom<
   Promise<WalletContextState> | WalletContextState
@@ -22,8 +23,11 @@ export const useWallet = () => {
   useHydrateAtoms([[userWalletAtom, {}]] as any)
   const { setVisible } = useWalletModal()
   const wallet = useAtomValue(userWalletAtom)
-  return {
-    ...wallet,
-    openModal: () => setVisible(true),
-  }
+  return useMemo(
+    () => ({
+      ...wallet,
+      openModal: () => setVisible(true),
+    }),
+    [wallet, setVisible],
+  )
 }
