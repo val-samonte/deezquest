@@ -4,6 +4,7 @@ import { useWallet } from '@/atoms/userWalletAtom'
 import { Keypair } from '@solana/web3.js'
 import { atom, useAtom } from 'jotai'
 import { useCallback, useState } from 'react'
+import bs58 from 'bs58'
 
 const isSSR = typeof window === 'undefined'
 
@@ -38,12 +39,41 @@ export default function BurnerWalletDemo() {
       if (!name) return
       setBurnerName(name)
 
-      const message = await signMessage(Buffer.from(name, 'utf8'))
-      const kp = Keypair.fromSeed(message.slice(32))
+      // sign 1st half
+      const nonceResponse = await fetch('/api/request_nonce')
+      const nonce = await nonceResponse.text()
+
+      const message = `Please sign to prove your public key ownership\n\n${publicKey?.toBase58()}:${nonce}`
+      const signature = bs58.encode(await signMessage(Buffer.from(message)))
+      const payload = JSON.stringify({ message, signature })
+
+      const seedResponse = await fetch('/api/get_burner_seeds', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: payload,
+      })
+      const { data } = await seedResponse.json()
+      const appSeeds = bs58.decode(data)
+
+      // sign 2nd half
+      const signedMessage = await signMessage(
+        Buffer.from(
+          `Please sign to retrieve your burner account: ${name}`,
+          'utf8',
+        ),
+      )
+
+      const seeds = new Uint8Array(32)
+      seeds.set(appSeeds)
+      seeds.set(signedMessage.slice(0, 16), 16)
+
+      const kp = Keypair.fromSeed(seeds)
 
       setBurnerAccount(kp)
     },
-    [signMessage, setBurnerName],
+    [publicKey, signMessage, setBurnerName],
   )
 
   if (!publicKey) return null

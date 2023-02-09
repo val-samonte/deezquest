@@ -2,7 +2,7 @@ import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 
-const dappKey = Keypair.fromSecretKey(
+export const dappKey = Keypair.fromSecretKey(
   new Uint8Array(bs58.decode(process.env.APP_KEYPAIR ?? '')),
 )
 
@@ -18,16 +18,16 @@ export function verifyNonce(token: string) {
   const currentTime = new Date().getTime()
 
   // token should have 3 parts
-  const part = token.split('.')
-  if (part.length !== 3) return false
+  const parts = token.split('.')
+  if (parts.length !== 3) return false
 
   // verify time expiry (should be less than 5 minutes old)
-  if (parseInt(part[1]) + 300_000 < currentTime) return false
+  if (parseInt(parts[1]) + 300_000 < currentTime) return false
 
   // verify authenticity
-  const data = part[0] + '.' + part[1]
+  const data = parts[0] + '.' + parts[1]
   const signature = sign(Buffer.from(data), dappKey.secretKey)
-  if (part[2] !== bs58.encode(signature).substring(0, 12)) return false
+  if (parts[2] !== bs58.encode(signature).substring(0, 12)) return false
 
   return true
 }
