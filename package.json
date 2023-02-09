@@ -18,6 +18,8 @@
     "@types/node": "18.11.19",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
+    "bs58": "^5.0.0",
+    "encoding": "^0.1.13",
     "eslint": "8.33.0",
     "eslint-config-next": "13.1.6",
     "jotai": "^2.0.0",
