@@ -1,26 +1,38 @@
 'use client'
 
+import { gameBoardAtom, gameFunctions } from '@/atoms/gameStateAtom'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas, Texture } from 'pixi.js'
 import { useLayoutEffect, useMemo, useState } from 'react'
 import { AppContext, Sprite, Stage as PixiStage } from 'react-pixi-fiber'
 
 export default function Stage() {
+  const gameFn = useSetAtom(gameFunctions)
+  const gameBoard = useAtomValue(gameBoardAtom)
   const [dimension, setDimension] = useState({ width: 0, height: 0 })
 
   const tiles = useMemo(() => {
     const tileSize = dimension.width / 8
-    return Array.from(new Array(64)).map((_, i) => ({
-      type: Math.floor(Math.random() * 7),
+    return gameBoard.map((type, i) => ({
+      type: type ?? 0,
       x: (i % 8) * tileSize,
       y: Math.floor(i / 8) * tileSize,
       width: tileSize,
       height: tileSize,
     }))
-  }, [dimension])
+  }, [dimension, gameBoard])
 
   return (
     <div className='w-full h-full flex portrait:flex-col'>
-      <div className='flex-auto'></div>
+      <div className='flex-auto p-3 sm:p-5'>
+        <button
+          onClick={() => gameFn({ type: 'hashToBoard' })}
+          type='button'
+          className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+        >
+          Next Hash
+        </button>
+      </div>
       <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-3 sm:p-5'>
         <div className='landscape:h-full portrait:w-full aspect-square bg-slate-300/10 rounded-xl overflow-hidden backdrop-blur-md'>
           <PixiStage options={{ backgroundAlpha: 0 }}>
