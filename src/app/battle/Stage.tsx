@@ -15,9 +15,12 @@ export default function Stage() {
   const gameTiles = useAtomValue(gameTilesAtom)
   const gameTilesMatches = useAtomValue(gameTilesMatchesAtom)
   const [dimension, setDimension] = useState({ width: 0, height: 0 })
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(
+    null,
+  )
+  const tileSize = useMemo(() => dimension.width / 8, [dimension])
 
   const tiles = useMemo(() => {
-    const tileSize = dimension.width / 8
     return gameTiles.map((type, i) => ({
       alpha: gameTilesMatches[i] === null ? 0.05 : 1,
       type: type ?? 0,
@@ -26,7 +29,7 @@ export default function Stage() {
       width: tileSize,
       height: tileSize,
     }))
-  }, [dimension, gameTiles])
+  }, [tileSize, gameTiles])
 
   return (
     <div className='w-full h-full flex portrait:flex-col'>
@@ -58,6 +61,36 @@ export default function Stage() {
             {tiles.map((props, i) => (
               <DummyTile key={i} {...props} />
             ))}
+            {cursorPos && (
+              <Sprite
+                texture={Texture.from(`/cursor.png`)}
+                width={tileSize}
+                height={tileSize}
+                x={cursorPos.x * tileSize}
+                y={cursorPos.y * tileSize}
+              />
+            )}
+            <Sprite
+              interactive
+              width={dimension.width}
+              height={dimension.height}
+              onpointerdown={(e) => {
+                const x = Math.floor(e.global.x / tileSize)
+                const y = Math.floor(e.global.y / tileSize)
+
+                setCursorPos((curr) => {
+                  if (!curr || !(curr.x === x && curr.y === y)) {
+                    return {
+                      x,
+                      y,
+                    }
+                  }
+                  // check adjacent tiles
+
+                  return null
+                })
+              }}
+            />
           </PixiStage>
         </div>
       </div>

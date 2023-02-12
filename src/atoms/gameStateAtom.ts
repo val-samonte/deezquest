@@ -38,6 +38,9 @@ export const gameFunctions = atom(
 
         break
       }
+      case 'swapNode': {
+        //
+      }
     }
   },
 )
