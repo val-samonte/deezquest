@@ -30,9 +30,14 @@ export default function Stage() {
 
   return (
     <div className='w-full h-full flex portrait:flex-col'>
-      <div className='flex-auto p-3 sm:p-5'>
+      <div className='flex-auto w-full p-3 sm:p-5'>
         <button
-          onClick={() => gameFn({ type: 'hashToBoard' })}
+          onClick={() =>
+            gameFn({
+              type: 'initialBoard',
+              data: { seed: Math.floor(Math.random() * 100000) + '' },
+            })
+          }
           type='button'
           className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
         >
@@ -56,7 +61,7 @@ export default function Stage() {
           </PixiStage>
         </div>
       </div>
-      <div className='flex-auto'></div>
+      <div className='flex-auto w-full p-3 sm:p-5'></div>
     </div>
   )
 }
@@ -76,7 +81,10 @@ function PixiAppHandler({
         onResize(parent.clientWidth, parent.clientHeight)
       }
     }
-    resize()
+
+    setTimeout(() => {
+      resize()
+    })
 
     window.addEventListener('resize', resize)
 

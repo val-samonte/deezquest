@@ -7,28 +7,34 @@ export const gameHashAtom = atom(
 
 export const gameTilesAtom = atom(new Array(64))
 export const gameTilesMatchesAtom = atom(new Array(64))
-
 export const gameTurnCountAtom = atom(0)
 
 export const gameFunctions = atom(
   null,
   (get, set, action: { type: string; data?: any }) => {
     switch (action.type) {
-      case 'hashToBoard': {
-        const hash = get(gameHashAtom)
+      case 'initialBoard': {
+        let hash = crypto
+          .createHash('sha256')
+          .update(Buffer.from(action.data.seed))
+          .digest()
+        let tiles = new Array(64)
+        let iter = 0
 
-        set(gameHashAtom, crypto.createHash('sha256').update(hash).digest())
-        const tiles = new Array(64)
+        while (true) {
+          tiles = hashToTiles(hash)
 
-        for (let i = 0; i < 32; i++) {
-          const byte = hash[i]
-          tiles[i] = (byte & 0xf) % 7
-          tiles[i + 32] = ((byte >> 4) & 0xf) % 7
+          if (!hasMatch(tiles)) {
+            console.log(iter, hash.toString('hex'))
+            break
+          }
+
+          iter++
+          hash = crypto.createHash('sha256').update(hash).digest()
         }
 
         set(gameTilesAtom, tiles)
-
-        set(gameTilesMatchesAtom, getMatches(tiles))
+        set(gameHashAtom, hash)
 
         break
       }
@@ -46,6 +52,29 @@ function hashToTiles(hash: Uint8Array): number[] {
   }
 
   return tiles
+}
+
+function hasMatch(tiles: number[]) {
+  for (let i = 0; i < 64; i++) {
+    const type = tiles[i]
+    const col = i % 8
+    const row = Math.floor(i / 8)
+
+    // vertical
+    if (row < 6) {
+      if (type === tiles[i + 8] && type === tiles[i + 16]) {
+        return true
+      }
+    }
+
+    // horizontal
+    if (col < 6) {
+      if (type === tiles[i + 1] && type === tiles[i + 2]) {
+        return true
+      }
+    }
+  }
+  return false
 }
 
 function getMatches(tiles: number[]) {
