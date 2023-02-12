@@ -71,21 +71,41 @@ export default function Stage() {
               />
             )}
             <Sprite
+              key={'pointer_capture'}
               interactive
               width={dimension.width}
               height={dimension.height}
-              onpointerdown={(e) => {
+              onpointerup={(e) => {
                 const x = Math.floor(e.global.x / tileSize)
                 const y = Math.floor(e.global.y / tileSize)
+                let fired = 0 // TODO: BUG, setCursorPos firing twice
 
                 setCursorPos((curr) => {
+                  fired++
+                  if (curr) {
+                    const distX = Math.abs(curr.x - x)
+                    const distY = Math.abs(curr.y - y)
+                    if (distX + distY === 1) {
+                      // swap
+                      if (fired === 1) {
+                        gameFn({
+                          type: 'swapNode',
+                          data: {
+                            node1: { x: curr.x, y: curr.y },
+                            node2: { x, y },
+                          },
+                        })
+                      }
+                      return null
+                    }
+                  }
+
                   if (!curr || !(curr.x === x && curr.y === y)) {
                     return {
                       x,
                       y,
                     }
                   }
-                  // check adjacent tiles
 
                   return null
                 })

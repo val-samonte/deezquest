@@ -39,7 +39,17 @@ export const gameFunctions = atom(
         break
       }
       case 'swapNode': {
-        //
+        const tiles = get(gameTilesAtom)
+        const node1 = action.data.node1.y * 8 + action.data.node1.x
+        const node2 = action.data.node2.y * 8 + action.data.node2.x
+
+        const cloned = [...tiles]
+        cloned[node1] = tiles[node2]
+        cloned[node2] = tiles[node1]
+
+        // check matches
+
+        set(gameTilesAtom, cloned)
       }
     }
   },
