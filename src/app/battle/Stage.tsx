@@ -1,6 +1,10 @@
 'use client'
 
-import { gameBoardAtom, gameFunctions } from '@/atoms/gameStateAtom'
+import {
+  gameTilesAtom,
+  gameFunctions,
+  gameTilesMatchesAtom,
+} from '@/atoms/gameStateAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas, Texture } from 'pixi.js'
 import { useLayoutEffect, useMemo, useState } from 'react'
@@ -8,19 +12,21 @@ import { AppContext, Sprite, Stage as PixiStage } from 'react-pixi-fiber'
 
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
-  const gameBoard = useAtomValue(gameBoardAtom)
+  const gameTiles = useAtomValue(gameTilesAtom)
+  const gameTilesMatches = useAtomValue(gameTilesMatchesAtom)
   const [dimension, setDimension] = useState({ width: 0, height: 0 })
 
   const tiles = useMemo(() => {
     const tileSize = dimension.width / 8
-    return gameBoard.map((type, i) => ({
+    return gameTiles.map((type, i) => ({
+      alpha: gameTilesMatches[i] === null ? 0.05 : 1,
       type: type ?? 0,
       x: (i % 8) * tileSize,
       y: Math.floor(i / 8) * tileSize,
       width: tileSize,
       height: tileSize,
     }))
-  }, [dimension, gameBoard])
+  }, [dimension, gameTiles])
 
   return (
     <div className='w-full h-full flex portrait:flex-col'>
