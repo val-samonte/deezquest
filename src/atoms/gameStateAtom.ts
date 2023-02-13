@@ -90,9 +90,22 @@ export const gameFunctions = atom(
             tiles: newTiles,
           })
 
-          // todo: patch hole
-
           newTiles = applyGravity(newTiles, depths)
+
+          // stack.push({
+          //   type: GameTransitions.FILL,
+          //   order: ++stackCounter,
+          //   tiles: [...newTiles],
+          // })
+
+          hash = crypto
+            .createHash('sha256')
+            .update(Buffer.concat([Buffer.from('REFILL'), hash]))
+            .digest()
+          const fillers = hashToTiles(hash)
+
+          // todo: patch hole
+          newTiles = fill(newTiles, fillers, depths)
 
           stack.push({
             type: GameTransitions.FILL,
@@ -215,6 +228,22 @@ function applyGravity(tiles: (number | null)[], depths: number[]) {
       const dest = (j + gravity) * 8 + i
       tiles[id] = null
       tiles[dest] = node
+    }
+  }
+
+  return [...tiles]
+}
+
+function fill(
+  tiles: (number | null)[],
+  fillers: (number | null)[],
+  depths: number[],
+) {
+  for (let i = 0; i < 8; i++) {
+    if (depths[i] === 0) continue
+    for (let j = 0; j < depths[i]; j++) {
+      const id = j * 8 + i
+      tiles[id] = fillers[id]
     }
   }
 
