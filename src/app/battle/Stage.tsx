@@ -1,10 +1,15 @@
 'use client'
 
 import { gameFunctions, gameTransitionStackAtom } from '@/atoms/gameStateAtom'
+import { GameTransitions } from '@/constants/GameTransitions'
 import { useAtomValue, useSetAtom } from 'jotai'
+// import dynamic from 'next/dynamic'
 import { Application, ICanvas, Texture } from 'pixi.js'
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { AppContext, Sprite, Stage as PixiStage } from 'react-pixi-fiber'
+import Tile from './Tile'
+
+// const Tile = dynamic(() => import('./Tile'), { ssr: false })
 
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
@@ -31,25 +36,45 @@ export default function Stage() {
 
     if (!stack) return
 
-    // switch (stack.type) {
-    //   case 'LOAD':
-    //   case 'SWAP':
     setTiles(
-      stack.tiles.map((type: any, i: number) => ({
-        alpha: type === null ? 0 : 1,
-        type,
-        x: (i % 8) * tileSize,
-        y: Math.floor(i / 8) * tileSize,
-        width: tileSize,
-        height: tileSize,
-      })),
+      stack.tiles.map((type: any, i: number) => {
+        const props: any = {
+          type,
+          x: (i % 8) * tileSize,
+          y: Math.floor(i / 8) * tileSize,
+          width: tileSize,
+          height: tileSize,
+        }
+
+        switch (stack.type) {
+          case GameTransitions.SWAP: {
+            if (stack.nodes[i]) {
+              const transition = {
+                id: GameTransitions.SWAP,
+                duration: stack.duration,
+                from: {
+                  x: stack.nodes[i].from.x * tileSize,
+                  y: stack.nodes[i].from.y * tileSize,
+                },
+              }
+
+              return {
+                ...props,
+                transition,
+              }
+            }
+
+            break
+          }
+        }
+
+        return props
+      }),
     )
 
     setTimeout(() => {
       setStackCounter(stack.order)
-    }, 1000)
-    // break
-    // }
+    }, stack.duration)
   }, [tileSize, transitionStack, stackCounter])
 
   return (
@@ -80,7 +105,7 @@ export default function Stage() {
               )}
             </AppContext.Consumer>
             {tiles.map((props, i) => (
-              <DummyTile key={i} {...props} />
+              <Tile key={i} {...props} />
             ))}
             {cursorPos && (
               <Sprite
@@ -168,13 +193,4 @@ function PixiAppHandler({
   }, [])
 
   return null
-}
-
-function DummyTile({ type, ...props }: any) {
-  return (
-    <Sprite
-      texture={type !== null ? Texture.from(`/sym_${type}.png`) : undefined}
-      {...props}
-    />
-  )
 }

@@ -69,15 +69,22 @@ export const gameFunctions = atom(
           order: ++stackCounter,
           tiles: [...newTiles],
           nodes: {
-            node1: {
-              ...action.data.node1,
-              id: node1,
+            [node1]: {
+              type: tiles[node1],
+              from: {
+                x: action.data.node2.x,
+                y: action.data.node2.y,
+              },
             },
-            node2: {
-              ...action.data.node2,
-              id: node2,
+            [node2]: {
+              type: tiles[node2],
+              from: {
+                x: action.data.node1.x,
+                y: action.data.node1.y,
+              },
             },
           },
+          duration: 250,
         })
 
         while (hasMatch(newTiles)) {
@@ -87,7 +94,14 @@ export const gameFunctions = atom(
           stack.push({
             type: GameTransitions.DRAIN,
             order: ++stackCounter,
-            tiles: newTiles,
+            tiles: [...newTiles],
+            nodes: matches.reduce((acc, cur, i) => {
+              if (cur !== null) {
+                acc[i] = true
+              }
+              return acc
+            }, {}),
+            duration: 350,
           })
 
           newTiles = applyGravity(newTiles, depths)
@@ -104,13 +118,13 @@ export const gameFunctions = atom(
             .digest()
           const fillers = hashToTiles(hash)
 
-          // todo: patch hole
           newTiles = fill(newTiles, fillers, depths)
 
           stack.push({
             type: GameTransitions.FILL,
             order: ++stackCounter,
             tiles: [...newTiles],
+            duration: 500,
           })
         }
 
@@ -212,9 +226,6 @@ function subtract(tiles: (number | null)[], mask: (number | null)[]) {
 }
 
 function applyGravity(tiles: (number | null)[], depths: number[]) {
-  // start from bottom
-  // every null encounter, increase gravity by 1
-
   for (let i = 0; i < 8; i++) {
     if (depths[i] === 0) continue
     let gravity = 0
