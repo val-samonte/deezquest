@@ -1,10 +1,6 @@
 'use client'
 
-import {
-  gameTilesAtom,
-  gameFunctions,
-  gameTilesMatchesAtom,
-} from '@/atoms/gameStateAtom'
+import { gameTilesAtom, gameFunctions } from '@/atoms/gameStateAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas, Texture } from 'pixi.js'
 import { useLayoutEffect, useMemo, useState } from 'react'
@@ -13,7 +9,6 @@ import { AppContext, Sprite, Stage as PixiStage } from 'react-pixi-fiber'
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
   const gameTiles = useAtomValue(gameTilesAtom)
-  const gameTilesMatches = useAtomValue(gameTilesMatchesAtom)
   const [dimension, setDimension] = useState({ width: 0, height: 0 })
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(
     null,
@@ -22,8 +17,8 @@ export default function Stage() {
 
   const tiles = useMemo(() => {
     return gameTiles.map((type, i) => ({
-      alpha: gameTilesMatches[i] === null ? 0.05 : 1,
-      type: type ?? 0,
+      alpha: type === null ? 0 : 1,
+      type,
       x: (i % 8) * tileSize,
       y: Math.floor(i / 8) * tileSize,
       width: tileSize,
@@ -150,5 +145,10 @@ function PixiAppHandler({
 }
 
 function DummyTile({ type, ...props }: any) {
-  return <Sprite texture={Texture.from(`/sym_${type}.png`)} {...props} />
+  return (
+    <Sprite
+      texture={type !== null ? Texture.from(`/sym_${type}.png`) : undefined}
+      {...props}
+    />
+  )
 }

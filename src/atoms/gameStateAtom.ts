@@ -6,7 +6,6 @@ export const gameHashAtom = atom(
 )
 
 export const gameTilesAtom = atom(new Array(64))
-export const gameTilesMatchesAtom = atom(new Array(64))
 export const gameTurnCountAtom = atom(0)
 
 export const gameFunctions = atom(
@@ -43,13 +42,26 @@ export const gameFunctions = atom(
         const node1 = action.data.node1.y * 8 + action.data.node1.x
         const node2 = action.data.node2.y * 8 + action.data.node2.x
 
-        const cloned = [...tiles]
-        cloned[node1] = tiles[node2]
-        cloned[node2] = tiles[node1]
+        if (tiles[node1] === null || tiles[node2] === null) return
 
-        // check matches
+        let newTiles = [...tiles]
+        newTiles[node1] = tiles[node2]
+        newTiles[node2] = tiles[node1]
 
-        set(gameTilesAtom, cloned)
+        if (!hasMatch(newTiles)) {
+          // push history
+          set(gameTilesAtom, newTiles)
+          return
+        }
+
+        const { matches, depths } = getMatches(newTiles)
+
+        newTiles = subtract(newTiles, matches)
+        // push history
+
+        newTiles = applyGravity(newTiles, depths)
+
+        set(gameTilesAtom, newTiles)
       }
     }
   },
@@ -67,7 +79,7 @@ function hashToTiles(hash: Uint8Array): number[] {
   return tiles
 }
 
-function hasMatch(tiles: number[]) {
+function hasMatch(tiles: (number | null)[]) {
   for (let i = 0; i < 64; i++) {
     const type = tiles[i]
     const col = i % 8
@@ -90,8 +102,9 @@ function hasMatch(tiles: number[]) {
   return false
 }
 
-function getMatches(tiles: number[]) {
+function getMatches(tiles: (number | null)[]) {
   const matches = new Array(64).fill(null)
+  const depths = new Array(8).fill(0)
 
   for (let i = 0; i < 64; i++) {
     const type = tiles[i]
@@ -101,6 +114,10 @@ function getMatches(tiles: number[]) {
     // vertical
     if (row < 6) {
       if (type === tiles[i + 8] && type === tiles[i + 16]) {
+        if (matches[i] === null) depths[col]++
+        if (matches[i + 8] === null) depths[col]++
+        if (matches[i + 16] === null) depths[col]++
+
         matches[i] = type
         matches[i + 8] = type
         matches[i + 16] = type
@@ -110,6 +127,10 @@ function getMatches(tiles: number[]) {
     // horizontal
     if (col < 6) {
       if (type === tiles[i + 1] && type === tiles[i + 2]) {
+        if (matches[i] === null) depths[col]++
+        if (matches[i + 1] === null) depths[col + 1]++
+        if (matches[i + 2] === null) depths[col + 2]++
+
         matches[i] = type
         matches[i + 1] = type
         matches[i + 2] = type
@@ -117,7 +138,43 @@ function getMatches(tiles: number[]) {
     }
   }
 
-  return matches
+  return {
+    matches,
+    depths,
+  }
+}
+
+function subtract(tiles: (number | null)[], mask: (number | null)[]) {
+  const result = new Array(64).fill(null)
+
+  for (let i = 0; i < 64; i++) {
+    if (mask[i] === null) result[i] = tiles[i]
+  }
+
+  return result
+}
+
+function applyGravity(tiles: (number | null)[], depths: number[]) {
+  // start from bottom
+  // every null encounter, increase gravity by 1
+
+  for (let i = 0; i < 8; i++) {
+    if (depths[i] === 0) continue
+    let gravity = 0
+    for (let j = 7; j >= 0; j--) {
+      const id = j * 8 + i
+      if (tiles[id] === null) {
+        gravity++
+        continue
+      }
+      const node = tiles[id]
+      const dest = (j + gravity) * 8 + i
+      tiles[id] = null
+      tiles[dest] = node
+    }
+  }
+
+  return [...tiles]
 }
 
 /*
