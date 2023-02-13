@@ -28,11 +28,12 @@ function Tile({ type, transition, ...props }: any) {
     }
     return {
       to: props,
+      from: props,
     }
   }, [transition, props])
 
   return (
-    <Spring {...transitionProps}>
+    <Spring {...transitionProps} key={type || 'blank'}>
       {(props: any) => (
         <AnimatedSprite
           texture={type !== null ? Texture.from(`/sym_${type}.png`) : undefined}

@@ -84,7 +84,7 @@ export const gameFunctions = atom(
               },
             },
           },
-          duration: 250,
+          duration: 350,
         })
 
         while (hasMatch(newTiles)) {
