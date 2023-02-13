@@ -1,30 +1,56 @@
 'use client'
 
-import { gameTilesAtom, gameFunctions } from '@/atoms/gameStateAtom'
+import { gameFunctions, gameTransitionStackAtom } from '@/atoms/gameStateAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas, Texture } from 'pixi.js'
-import { useLayoutEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { AppContext, Sprite, Stage as PixiStage } from 'react-pixi-fiber'
 
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
-  const gameTiles = useAtomValue(gameTilesAtom)
+
+  const transitionStack = useAtomValue(gameTransitionStackAtom)
+  const [stackCounter, setStackCounter] = useState(-1)
+  const [tiles, setTiles] = useState<any[]>([])
   const [dimension, setDimension] = useState({ width: 0, height: 0 })
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(
     null,
   )
   const tileSize = useMemo(() => dimension.width / 8, [dimension])
 
-  const tiles = useMemo(() => {
-    return gameTiles.map((type, i) => ({
-      alpha: type === null ? 0 : 1,
-      type,
-      x: (i % 8) * tileSize,
-      y: Math.floor(i / 8) * tileSize,
-      width: tileSize,
-      height: tileSize,
-    }))
-  }, [tileSize, gameTiles])
+  useEffect(() => {
+    if (transitionStack.length === 0) return
+
+    let stack: any
+    for (let i = 0; i < transitionStack.length; i++) {
+      if (stackCounter < transitionStack[i].order) {
+        stack = transitionStack[i]
+        break
+      }
+    }
+
+    if (!stack) return
+
+    // switch (stack.type) {
+    //   case 'LOAD':
+    //   case 'SWAP':
+    setTiles(
+      stack.tiles.map((type: any, i: number) => ({
+        alpha: type === null ? 0 : 1,
+        type,
+        x: (i % 8) * tileSize,
+        y: Math.floor(i / 8) * tileSize,
+        width: tileSize,
+        height: tileSize,
+      })),
+    )
+
+    setTimeout(() => {
+      setStackCounter(stack.order)
+    }, 1000)
+    // break
+    // }
+  }, [tileSize, transitionStack, stackCounter])
 
   return (
     <div className='w-full h-full flex portrait:flex-col'>

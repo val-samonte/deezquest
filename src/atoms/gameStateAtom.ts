@@ -1,16 +1,22 @@
 import { atom } from 'jotai'
 import crypto from 'crypto'
+import { GameTransitions } from '@/constants/GameTransitions'
 
 export const gameHashAtom = atom(
   crypto.createHash('sha256').update(Buffer.from('')).digest(),
 )
 
-export const gameTilesAtom = atom(new Array(64))
 export const gameTurnCountAtom = atom(0)
+
+export const gameTransitionStackAtom = atom<any[]>([])
+export const gameTransitionStackCounterAtom = atom(0)
 
 export const gameFunctions = atom(
   null,
   (get, set, action: { type: string; data?: any }) => {
+    let stackCounter = get(gameTransitionStackCounterAtom)
+    let hash = get(gameHashAtom)
+
     switch (action.type) {
       case 'initialBoard': {
         let hash = crypto
@@ -32,13 +38,23 @@ export const gameFunctions = atom(
           hash = crypto.createHash('sha256').update(hash).digest()
         }
 
-        set(gameTilesAtom, tiles)
+        stackCounter++
+        set(gameTransitionStackAtom, [
+          {
+            type: GameTransitions.LOAD,
+            order: stackCounter,
+            tiles,
+          },
+        ])
+        set(gameTransitionStackCounterAtom, stackCounter)
         set(gameHashAtom, hash)
 
         break
       }
       case 'swapNode': {
-        const tiles = get(gameTilesAtom)
+        const stack = get(gameTransitionStackAtom)
+        const tiles = stack[stack.length - 1].tiles
+
         const node1 = action.data.node1.y * 8 + action.data.node1.x
         const node2 = action.data.node2.y * 8 + action.data.node2.x
 
@@ -48,22 +64,50 @@ export const gameFunctions = atom(
         newTiles[node1] = tiles[node2]
         newTiles[node2] = tiles[node1]
 
-        if (!hasMatch(newTiles)) {
-          // push history
-          set(gameTilesAtom, newTiles)
-          return
+        stack.push({
+          type: GameTransitions.SWAP,
+          order: ++stackCounter,
+          tiles: [...newTiles],
+          nodes: {
+            node1: {
+              ...action.data.node1,
+              id: node1,
+            },
+            node2: {
+              ...action.data.node2,
+              id: node2,
+            },
+          },
+        })
+
+        while (hasMatch(newTiles)) {
+          const { matches, depths } = getMatches(newTiles)
+
+          newTiles = subtract(newTiles, matches)
+          stack.push({
+            type: GameTransitions.DRAIN,
+            order: ++stackCounter,
+            tiles: newTiles,
+          })
+
+          // todo: patch hole
+
+          newTiles = applyGravity(newTiles, depths)
+
+          stack.push({
+            type: GameTransitions.FILL,
+            order: ++stackCounter,
+            tiles: [...newTiles],
+          })
         }
 
-        const { matches, depths } = getMatches(newTiles)
-
-        newTiles = subtract(newTiles, matches)
-        // push history
-
-        newTiles = applyGravity(newTiles, depths)
-
-        set(gameTilesAtom, newTiles)
+        set(gameTransitionStackAtom, [...stack])
+        break
       }
     }
+
+    set(gameTransitionStackCounterAtom, stackCounter)
+    set(gameHashAtom, hash)
   },
 )
 
@@ -87,14 +131,14 @@ function hasMatch(tiles: (number | null)[]) {
 
     // vertical
     if (row < 6) {
-      if (type === tiles[i + 8] && type === tiles[i + 16]) {
+      if (type !== null && type === tiles[i + 8] && type === tiles[i + 16]) {
         return true
       }
     }
 
     // horizontal
     if (col < 6) {
-      if (type === tiles[i + 1] && type === tiles[i + 2]) {
+      if (type !== null && type === tiles[i + 1] && type === tiles[i + 2]) {
         return true
       }
     }
@@ -113,7 +157,7 @@ function getMatches(tiles: (number | null)[]) {
 
     // vertical
     if (row < 6) {
-      if (type === tiles[i + 8] && type === tiles[i + 16]) {
+      if (type !== null && type === tiles[i + 8] && type === tiles[i + 16]) {
         if (matches[i] === null) depths[col]++
         if (matches[i + 8] === null) depths[col]++
         if (matches[i + 16] === null) depths[col]++
@@ -126,7 +170,7 @@ function getMatches(tiles: (number | null)[]) {
 
     // horizontal
     if (col < 6) {
-      if (type === tiles[i + 1] && type === tiles[i + 2]) {
+      if (type !== null && type === tiles[i + 1] && type === tiles[i + 2]) {
         if (matches[i] === null) depths[col]++
         if (matches[i + 1] === null) depths[col + 1]++
         if (matches[i + 2] === null) depths[col + 2]++
@@ -176,44 +220,3 @@ function applyGravity(tiles: (number | null)[], depths: number[]) {
 
   return [...tiles]
 }
-
-/*
-
-// RESUME GAME EVEN BOARD IS DEADLOCKED
-// ALLOW SWAPPING OF NODES REGARDLESS, CONSUME TURN
-
-Board states that we expect:
-
-1. Stable - has possible matches
-2. Unstable - contains matches already
-3. Deadlock - no possible matches
-4. Hollow - player consumes gems, has holes, pre-dropped state
-5. Dropped - no more floating blocks, still incomplete
-
-Phases of the board:
-
-1. Initial board - has to iterate through hashes until we reach ideal Stable board state (with at least 5 possible matches)
-
-History stack
-- Array on which displays the sequence of changes of the board
-- After running the 'Load' sequence, Stage display will call clear to clean all previous history before 'Load'
-- 'Load' state will came from on-chain to update 
-
-Example: 
-[
-  { 'Load', board: [...] },
-  { 'Unstable', board: [...] },
-  { 'Hollow', board: [...] },
-  { 'Dropped', board: [...], depth: [...] },
-  { 'Unstable', board: [...] },
-  { 'Hollow', board: [...] },
-  { 'Dropped', board: [...], depth: [...] },
-  { 'Stable', board: [...] },
-  { 'Load', board: [...] }, 
-  { 'Unstable', board: [...] },
-  { 'Hollow', board: [...] },
-  { 'Dropped', board: [...], depth: [...] },
-  { 'Deadlock', board: [...] },
-  { 'Stable', board: [...] },
-]
-*/
