@@ -21,7 +21,8 @@ function Tile({ type, transition, ...props }: any) {
             y: transition.from.y,
           },
           config: {
-            duration: transition.duration,
+            duration: transition.duration - 100,
+            clamp: true,
           },
         }
       }
@@ -29,6 +30,10 @@ function Tile({ type, transition, ...props }: any) {
     return {
       to: props,
       from: props,
+      config: {
+        duration: 0,
+        clamp: true,
+      },
     }
   }, [transition, props])
 

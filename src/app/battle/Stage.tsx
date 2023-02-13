@@ -74,7 +74,7 @@ export default function Stage() {
 
     setTimeout(() => {
       setStackCounter(stack.order)
-    }, stack.duration)
+    }, stack.duration + 100)
   }, [tileSize, transitionStack, stackCounter])
 
   return (
