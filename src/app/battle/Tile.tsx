@@ -3,8 +3,9 @@
 import { GameTransitions } from '@/constants/GameTransitions'
 import { animated, Spring } from '@react-spring/web'
 import { Texture } from 'pixi.js'
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { Sprite } from 'react-pixi-fiber'
+import { easeBounceOut, easeBackIn, easeBackInOut } from 'd3-ease'
 
 const AnimatedSprite = animated(Sprite)
 
@@ -22,6 +23,7 @@ function Tile({ type, id, transition, ...props }: any) {
           },
           config: {
             duration: transition.duration - 200,
+            easing: easeBackInOut,
             clamp: true,
           },
         }
@@ -38,6 +40,7 @@ function Tile({ type, id, transition, ...props }: any) {
           from: { ...props, alpha: 1 },
           config: {
             duration: transition.duration - 200,
+            easing: easeBackIn,
             clamp: true,
           },
         }
@@ -53,6 +56,7 @@ function Tile({ type, id, transition, ...props }: any) {
           },
           config: {
             duration: transition.duration - 200,
+            easing: easeBounceOut,
             clamp: true,
           },
         }

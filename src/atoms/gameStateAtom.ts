@@ -58,7 +58,7 @@ export const gameFunctions = atom(
         const node1 = action.data.node1.y * 8 + action.data.node1.x
         const node2 = action.data.node2.y * 8 + action.data.node2.x
 
-        if (tiles[node1] === null || tiles[node2] === null) return
+        if (tiles[node1] === tiles[node2]) return
 
         let newTiles = [...tiles]
         newTiles[node1] = tiles[node2]
@@ -84,7 +84,7 @@ export const gameFunctions = atom(
               },
             },
           },
-          duration: 350,
+          duration: 500,
         })
 
         while (hasMatch(newTiles)) {
@@ -107,7 +107,7 @@ export const gameFunctions = atom(
               }
               return acc
             }, {}),
-            duration: 500,
+            duration: 750,
           })
 
           const { tiles, gravity } = applyGravity(newTiles, depths)
@@ -142,7 +142,7 @@ export const gameFunctions = atom(
               }
               return acc
             }, {}),
-            duration: 350,
+            duration: 1000,
           })
         }
 
@@ -249,18 +249,29 @@ function applyGravity(tiles: (number | null)[], depths: number[]) {
   for (let i = 0; i < 8; i++) {
     if (depths[i] === 0) continue
     let gravity = 0
+    let blanks = []
     for (let j = 7; j >= 0; j--) {
       const id = j * 8 + i
       if (tiles[id] === null) {
         gravity++
-        gravityMap[id] = gravity
+        blanks.push(id)
         continue
       }
+
+      for (let k = 0; k < blanks.length; k++) {
+        gravityMap[blanks[k]] = gravity
+      }
+      blanks = []
+
       const node = tiles[id]
       const dest = (j + gravity) * 8 + i
       tiles[id] = null
       tiles[dest] = node
       gravityMap[id] = gravity
+    }
+
+    for (let k = 0; k < blanks.length; k++) {
+      gravityMap[blanks[k]] = gravity
     }
   }
 
