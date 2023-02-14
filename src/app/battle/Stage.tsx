@@ -79,7 +79,7 @@ export default function Stage() {
 
   return (
     <div className='w-full h-full flex portrait:flex-col'>
-      <div className='flex-auto w-full p-3 sm:p-5'>
+      <div className='flex-auto w-full p-3 sm:p-5 '>
         <button
           onClick={() =>
             gameFn({
@@ -93,8 +93,8 @@ export default function Stage() {
           Next Hash
         </button>
       </div>
-      <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-3 sm:p-5'>
-        <div className='landscape:h-full portrait:w-full aspect-square bg-slate-300/10 rounded-xl overflow-hidden backdrop-blur-md'>
+      <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-3 sm:p-5 backdrop-blur-sm '>
+        <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden '>
           <PixiStage options={{ backgroundAlpha: 0 }}>
             <AppContext.Consumer>
               {(app) => (
@@ -169,7 +169,7 @@ export default function Stage() {
           </PixiStage>
         </div>
       </div>
-      <div className='flex-auto w-full p-3 sm:p-5'></div>
+      <div className='flex-auto w-full p-3 sm:p-5 '></div>
     </div>
   )
 }
