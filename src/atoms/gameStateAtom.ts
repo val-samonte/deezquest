@@ -84,7 +84,7 @@ export const gameFunctions = atom(
               },
             },
           },
-          duration: 350,
+          duration: 500,
         })
 
         while (hasMatch(newTiles)) {
@@ -107,10 +107,11 @@ export const gameFunctions = atom(
               }
               return acc
             }, {}),
-            duration: 350,
+            duration: 500,
           })
 
-          newTiles = applyGravity(newTiles, depths)
+          const { tiles, gravity } = applyGravity(newTiles, depths)
+          newTiles = tiles
 
           // stack.push({
           //   type: GameTransitions.FILL,
@@ -130,6 +131,18 @@ export const gameFunctions = atom(
             type: GameTransitions.FILL,
             order: ++stackCounter,
             tiles: [...newTiles],
+            nodes: matches.reduce((acc, _, i) => {
+              if (gravity[i] !== null) {
+                acc[i] = {
+                  type: matches[i],
+                  from: {
+                    x: i % 8,
+                    y: Math.floor(i / 8) - gravity[i],
+                  },
+                }
+              }
+              return acc
+            }, {}),
             duration: 500,
           })
         }
@@ -232,6 +245,8 @@ function subtract(tiles: (number | null)[], mask: (number | null)[]) {
 }
 
 function applyGravity(tiles: (number | null)[], depths: number[]) {
+  const gravityMap = new Array(64).fill(null)
+
   for (let i = 0; i < 8; i++) {
     if (depths[i] === 0) continue
     let gravity = 0
@@ -245,10 +260,14 @@ function applyGravity(tiles: (number | null)[], depths: number[]) {
       const dest = (j + gravity) * 8 + i
       tiles[id] = null
       tiles[dest] = node
+      gravityMap[id] = gravity
     }
   }
 
-  return [...tiles]
+  return {
+    gravity: gravityMap,
+    tiles: [...tiles],
+  }
 }
 
 function fill(

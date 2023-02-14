@@ -21,7 +21,7 @@ function Tile({ type, id, transition, ...props }: any) {
             y: transition.from.y,
           },
           config: {
-            duration: transition.duration - 100,
+            duration: transition.duration - 200,
             clamp: true,
           },
         }
@@ -37,7 +37,22 @@ function Tile({ type, id, transition, ...props }: any) {
           },
           from: { ...props, alpha: 1 },
           config: {
-            duration: transition.duration - 100,
+            duration: transition.duration - 200,
+            clamp: true,
+          },
+        }
+      }
+      case GameTransitions.FILL: {
+        const { x, y, ...rest } = props
+        return {
+          to: props,
+          from: {
+            ...rest,
+            x: transition.from.x,
+            y: transition.from.y,
+          },
+          config: {
+            duration: transition.duration - 200,
             clamp: true,
           },
         }
@@ -55,8 +70,12 @@ function Tile({ type, id, transition, ...props }: any) {
     }
   }, [transition, props])
 
+  const forceKey = useMemo(() => {
+    return Math.floor(Math.random() * 100000) + ''
+  }, [transition])
+
   return (
-    <Spring {...transitionProps} key={type || 'blank'}>
+    <Spring {...transitionProps} key={forceKey}>
       {(props: any) => (
         <AnimatedSprite
           texture={type !== null ? Texture.from(`/sym_${type}.png`) : undefined}

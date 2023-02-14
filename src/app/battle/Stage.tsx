@@ -51,9 +51,6 @@ export default function Stage() {
           height: tileSize,
         }
 
-        // switch (stack.type) {
-        //   case GameTransitions.SWAP: {
-
         if (stack.nodes?.[i]) {
           const transition = {
             id: stack.type,
@@ -70,10 +67,6 @@ export default function Stage() {
             transition,
           }
         }
-
-        //     break
-        //   }
-        // }
 
         return props
       }),
