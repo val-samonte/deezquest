@@ -70,9 +70,11 @@ function Tile({ type, id, transition, ...props }: any) {
     }
   }, [transition, props])
 
+  // use different key every transition change
+  // so that the 'from' transition works correctly
   const forceKey = useMemo(() => {
-    return Math.floor(Math.random() * 100000) + ''
-  }, [transition])
+    return `${id}_${Math.floor(Math.random() * 100000)}`
+  }, [id, transition])
 
   return (
     <Spring {...transitionProps} key={forceKey}>

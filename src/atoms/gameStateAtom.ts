@@ -84,7 +84,7 @@ export const gameFunctions = atom(
               },
             },
           },
-          duration: 500,
+          duration: 350,
         })
 
         while (hasMatch(newTiles)) {
@@ -134,7 +134,6 @@ export const gameFunctions = atom(
             nodes: matches.reduce((acc, _, i) => {
               if (gravity[i] !== null) {
                 acc[i] = {
-                  type: matches[i],
                   from: {
                     x: i % 8,
                     y: Math.floor(i / 8) - gravity[i],
@@ -143,7 +142,7 @@ export const gameFunctions = atom(
               }
               return acc
             }, {}),
-            duration: 500,
+            duration: 350,
           })
         }
 
@@ -254,6 +253,7 @@ function applyGravity(tiles: (number | null)[], depths: number[]) {
       const id = j * 8 + i
       if (tiles[id] === null) {
         gravity++
+        gravityMap[id] = gravity
         continue
       }
       const node = tiles[id]
