@@ -54,6 +54,7 @@ export default function Stage() {
         if (stack.nodes?.[i]) {
           const transition = {
             id: stack.type,
+            type: stack.nodes[i].type,
             duration: stack.duration,
             from: {
               x: stack.nodes[i].from.x * tileSize,
@@ -63,7 +64,6 @@ export default function Stage() {
 
           return {
             ...props,
-            type: stack.nodes[i].type ?? type,
             transition,
           }
         }
@@ -104,10 +104,17 @@ export default function Stage() {
                 />
               )}
             </AppContext.Consumer>
-            <Container sortableChildren={true}>
-              {tiles.map((props, i) => (
-                <Tile id={i} key={i} {...props} />
-              ))}
+            <Container>
+              {tiles.map(
+                (props, i) =>
+                  props.type !== null && <Tile id={i} key={i} {...props} />,
+              )}
+            </Container>
+            <Container>
+              {tiles.map(
+                (props, i) =>
+                  props.type === null && <Tile id={i} key={i} {...props} />,
+              )}
             </Container>
             {cursorPos && (
               <Sprite

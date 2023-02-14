@@ -22,7 +22,7 @@ function Tile({ type, id, transition, ...props }: any) {
             y: transition.from.y,
           },
           config: {
-            duration: transition.duration - 200,
+            duration: transition.duration - 100,
             easing: easeBackInOut,
             clamp: true,
           },
@@ -36,10 +36,12 @@ function Tile({ type, id, transition, ...props }: any) {
             x: -rest.width,
             y: rest.height * 4,
             alpha: 0,
+            width: rest.width * 0.5,
+            height: rest.height * 0.5,
           },
-          from: { ...props, alpha: 1 },
+          from: { ...props, alpha: 1, width: rest.width, height: rest.height },
           config: {
-            duration: transition.duration - 200,
+            duration: transition.duration - 100,
             easing: easeBackIn,
             clamp: true,
           },
@@ -55,7 +57,7 @@ function Tile({ type, id, transition, ...props }: any) {
             y: transition.from.y,
           },
           config: {
-            duration: transition.duration - 200,
+            duration: transition.duration - 100,
             easing: easeBounceOut,
             clamp: true,
           },
@@ -63,7 +65,7 @@ function Tile({ type, id, transition, ...props }: any) {
       }
     }
     props.alpha = 1
-    props.zIndex = 1
+
     return {
       to: props,
       from: props,
@@ -80,11 +82,13 @@ function Tile({ type, id, transition, ...props }: any) {
     return `${id}_${Math.floor(Math.random() * 100000)}`
   }, [id, transition])
 
+  const skin = type ?? transition?.type
+
   return (
     <Spring {...transitionProps} key={forceKey}>
       {(props: any) => (
         <AnimatedSprite
-          texture={type !== null ? Texture.from(`/sym_${type}.png`) : undefined}
+          texture={skin !== null ? Texture.from(`/sym_${skin}.png`) : undefined}
           {...props}
         />
       )}

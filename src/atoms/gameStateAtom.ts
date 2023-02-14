@@ -113,12 +113,6 @@ export const gameFunctions = atom(
           const { tiles, gravity } = applyGravity(newTiles, depths)
           newTiles = tiles
 
-          // stack.push({
-          //   type: GameTransitions.FILL,
-          //   order: ++stackCounter,
-          //   tiles: [...newTiles],
-          // })
-
           hash = crypto
             .createHash('sha256')
             .update(Buffer.concat([Buffer.from('REFILL'), hash]))
