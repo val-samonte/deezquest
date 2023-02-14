@@ -70,14 +70,14 @@ export const gameFunctions = atom(
           tiles: [...newTiles],
           nodes: {
             [node1]: {
-              type: tiles[node1],
+              type: tiles[node2],
               from: {
                 x: action.data.node2.x,
                 y: action.data.node2.y,
               },
             },
             [node2]: {
-              type: tiles[node2],
+              type: tiles[node1],
               from: {
                 x: action.data.node1.x,
                 y: action.data.node1.y,
@@ -97,7 +97,13 @@ export const gameFunctions = atom(
             tiles: [...newTiles],
             nodes: matches.reduce((acc, cur, i) => {
               if (cur !== null) {
-                acc[i] = true
+                acc[i] = {
+                  type: matches[i],
+                  from: {
+                    x: i % 8,
+                    y: Math.floor(i / 8),
+                  },
+                }
               }
               return acc
             }, {}),

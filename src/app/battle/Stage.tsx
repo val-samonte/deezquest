@@ -6,7 +6,12 @@ import { useAtomValue, useSetAtom } from 'jotai'
 // import dynamic from 'next/dynamic'
 import { Application, ICanvas, Texture } from 'pixi.js'
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import { AppContext, Sprite, Stage as PixiStage } from 'react-pixi-fiber'
+import {
+  AppContext,
+  Container,
+  Sprite,
+  Stage as PixiStage,
+} from 'react-pixi-fiber'
 import Tile from './Tile'
 
 // const Tile = dynamic(() => import('./Tile'), { ssr: false })
@@ -46,27 +51,29 @@ export default function Stage() {
           height: tileSize,
         }
 
-        switch (stack.type) {
-          case GameTransitions.SWAP: {
-            if (stack.nodes[i]) {
-              const transition = {
-                id: GameTransitions.SWAP,
-                duration: stack.duration,
-                from: {
-                  x: stack.nodes[i].from.x * tileSize,
-                  y: stack.nodes[i].from.y * tileSize,
-                },
-              }
+        // switch (stack.type) {
+        //   case GameTransitions.SWAP: {
 
-              return {
-                ...props,
-                transition,
-              }
-            }
+        if (stack.nodes?.[i]) {
+          const transition = {
+            id: stack.type,
+            duration: stack.duration,
+            from: {
+              x: stack.nodes[i].from.x * tileSize,
+              y: stack.nodes[i].from.y * tileSize,
+            },
+          }
 
-            break
+          return {
+            ...props,
+            type: stack.nodes[i].type ?? type,
+            transition,
           }
         }
+
+        //     break
+        //   }
+        // }
 
         return props
       }),
@@ -104,9 +111,11 @@ export default function Stage() {
                 />
               )}
             </AppContext.Consumer>
-            {tiles.map((props, i) => (
-              <Tile key={i} {...props} />
-            ))}
+            <Container sortableChildren={true}>
+              {tiles.map((props, i) => (
+                <Tile id={i} key={i} {...props} />
+              ))}
+            </Container>
             {cursorPos && (
               <Sprite
                 texture={Texture.from(`/cursor.png`)}
