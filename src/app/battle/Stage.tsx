@@ -1,9 +1,7 @@
 'use client'
 
 import { gameFunctions, gameTransitionStackAtom } from '@/atoms/gameStateAtom'
-import { GameTransitions } from '@/constants/GameTransitions'
 import { useAtomValue, useSetAtom } from 'jotai'
-// import dynamic from 'next/dynamic'
 import { Application, ICanvas, Texture } from 'pixi.js'
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import {
@@ -14,14 +12,12 @@ import {
 } from 'react-pixi-fiber'
 import Tile from './Tile'
 
-// const Tile = dynamic(() => import('./Tile'), { ssr: false })
-
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
 
   const transitionStack = useAtomValue(gameTransitionStackAtom)
   const [stackCounter, setStackCounter] = useState(-1)
-  const [tiles, setTiles] = useState<any[]>([])
+  const [tiles, setTiles] = useState<any[]>([]) // TODO: refactor, let Tiles access this via atom
   const [dimension, setDimension] = useState({ width: 0, height: 0 })
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(
     null,

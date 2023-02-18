@@ -253,7 +253,7 @@ function applyGravity(tiles: (number | null)[], depths: number[]) {
       }
 
       for (let k = 0; k < blanks.length; k++) {
-        gravityMap[blanks[k]] = gravity
+        gravityMap[blanks[k]] = gravity + (gravityMap[blanks[k]] ?? 0)
       }
       blanks = []
 
@@ -265,7 +265,7 @@ function applyGravity(tiles: (number | null)[], depths: number[]) {
     }
 
     for (let k = 0; k < blanks.length; k++) {
-      gravityMap[blanks[k]] = gravity
+      gravityMap[blanks[k]] = gravity + (gravityMap[blanks[k]] ?? 0)
     }
   }
 
