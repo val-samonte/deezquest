@@ -94,6 +94,12 @@ export const getNextTurn = (
   return hero2
 }
 
+export type CommandFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => void
+
 export const burningPunch = (
   commandLevel: number,
   player: Hero,

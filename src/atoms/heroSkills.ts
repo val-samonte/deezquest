@@ -12,10 +12,24 @@ import {
   swiftStrike,
   tailwind,
   tornado,
+  CommandFn,
 } from '@/utils/gameFunctions'
 import { atom } from 'jotai'
 
-export const heroSkillsAtom = atom(() => [
+export interface Skill {
+  name: string
+  desc: string
+  type: SkillTypes
+  cost: {
+    fire?: number
+    wind?: number
+    water?: number
+    earth?: number
+  }
+  fn: CommandFn
+}
+
+export const heroSkillsAtom = atom<Skill[]>(() => [
   {
     name: 'Burning Punch',
     desc: 'Deals normal attack damage + the gap between FIRE MANA of both heroes.',
@@ -81,7 +95,7 @@ export const heroSkillsAtom = atom(() => [
   },
   {
     name: 'Barrier',
-    desc: 'Converts each EARTH MANA into ARMOR. Gain 3|5 SHELL in LVL 2|3.',
+    desc: 'Converts all EARTH MANA into ARMOR. Gain 3|5 SHELL in LVL 2|3.',
     type: SkillTypes.SUPPORT,
     cost: {
       earth: NaN,
