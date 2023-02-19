@@ -1,6 +1,6 @@
 import { atom } from 'jotai'
 import crypto from 'crypto'
-import { GameTransitions } from '@/constants/GameTransitions'
+import { GameTransitions } from '@/enums/GameTransitions'
 
 export const gameHashAtom = atom(
   crypto.createHash('sha256').update(Buffer.from('')).digest(),

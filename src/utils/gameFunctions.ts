@@ -1,5 +1,37 @@
 import { Hero } from '@/atoms/heroAtom'
+import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
+
+// everything here should be replicated 1:1 in solana programs
+
+export const getHeroAttributes = (pubkey: PublicKey) => {
+  let attribs = [
+    1, // INT - Mana cap increase
+    1, // SPD - More likely to get a turn
+    1, // VIT - Flat HP increase
+    1, // STR - Able to carry heavier equipment
+  ]
+  let cursor = 0
+  let remaining = 17
+  let bytes = pubkey.toBytes()
+
+  for (let i = 0; i < 256 && remaining > 0; i++) {
+    if (bytes[i % 32] % 2 === 0 || attribs[cursor] === 10) {
+      cursor = (cursor + 1) % 4
+    } else {
+      attribs[cursor] += 1
+      remaining -= 1
+    }
+  }
+
+  // very unlikely to happen
+  if (remaining !== 0) {
+    attribs = [5, 5, 5, 5]
+    attribs[bytes[0] % 4] += 1
+  }
+
+  return attribs
+}
 
 export const getNextTurn = (
   hero1: Hero,
@@ -68,11 +100,15 @@ export const burningPunch = (
   enemy: Hero,
 ) => {
   // Burning Punch	5 FIRE
-  // Deal 1/2/3 damage + gap of both players' FIRE MANA (pre-cast)
+  // Deals normal attack + the gap between FIRE MANA of both heroes
 }
 
-export const aeroSlash = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Aeroslash	3 WIND
+export const swiftStrike = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  // Swiftstrike	3 WIND
   // Deal 3/4/5 damage
 }
 
@@ -87,11 +123,11 @@ export const crushingBlow = (
   enemy: Hero,
 ) => {
   // Crushing Blow	ALL EARTH MANA
-  // Deal damage based on EARTH mana, does not scale
+  // Deals 1 damage per EARTH MANA of the user. LVL 2 ignores ARMOR. LVL 3 ignores SHELL.
 }
 
-export const meditate = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Meditate	5 FIRE
+export const enlighten = (commandLevel: number, player: Hero, enemy: Hero) => {
+  // Enlighten 5 FIRE
   // Adds 1/2/3 to normal attack during the match, stacks indefinitely
 }
 
@@ -110,7 +146,7 @@ export const barrier = (commandLevel: number, player: Hero, enemy: Hero) => {
   // Convert each EARTH MANA into SHIELD, does not scale
 }
 
-export const incinerate = (commandLevel: number, player: Hero, enemy: Hero) => {
+export const combustion = (commandLevel: number, player: Hero, enemy: Hero) => {
   // Incinerate	8 FIRE
   // Converts all WATER MANA in the board into FIRE MANA, deals damage on how many are converted
 }

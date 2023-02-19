@@ -1,6 +1,6 @@
 'use client'
 
-import { GameTransitions } from '@/constants/GameTransitions'
+import { GameTransitions } from '@/enums/GameTransitions'
 import { animated, Spring } from '@react-spring/web'
 import { Texture } from 'pixi.js'
 import { useMemo } from 'react'

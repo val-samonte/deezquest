@@ -7,14 +7,9 @@ import {
 } from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { Application, ICanvas, Texture } from 'pixi.js'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import {
-  AppContext,
-  Container,
-  Sprite,
-  Stage as PixiStage,
-} from 'react-pixi-fiber'
+import { Application, ICanvas } from 'pixi.js'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { AppContext, Container, Stage as PixiStage } from 'react-pixi-fiber'
 import StageCursor from './StageCursor'
 import Tile from './Tile'
 
