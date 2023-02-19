@@ -7,12 +7,13 @@ import { useMemo } from 'react'
 import { Sprite } from 'react-pixi-fiber'
 import { easeBounceOut, easeBackIn, easeBackInOut } from 'd3-ease'
 import { useAtomValue } from 'jotai'
-import { tileSizeAtom } from '@/atoms/stageDimensionAtom'
+import { isPortraitAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
 
 const AnimatedSprite = animated(Sprite)
 
 function Tile({ type, id, transition, ...props }: any) {
   const tileSize = useAtomValue(tileSizeAtom)
+  const isPortrait = useAtomValue(isPortraitAtom)
 
   const transitionProps = useMemo(() => {
     props = {
@@ -46,8 +47,8 @@ function Tile({ type, id, transition, ...props }: any) {
         return {
           to: {
             ...rest,
-            x: -tileSize,
-            y: tileSize * 4,
+            x: isPortrait ? tileSize * 4 : -tileSize,
+            y: isPortrait ? tileSize * 9 : tileSize * 4,
             alpha: 0,
             width: tileSize * 0.5,
             height: tileSize * 0.5,
@@ -86,7 +87,7 @@ function Tile({ type, id, transition, ...props }: any) {
         clamp: true,
       },
     }
-  }, [transition, tileSize, props])
+  }, [transition, tileSize, isPortrait, props])
 
   // use different key every transition change
   // so that the 'from' transition works correctly

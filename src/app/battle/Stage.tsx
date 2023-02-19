@@ -1,7 +1,7 @@
 'use client'
 
 import { gameFunctions, gameTransitionStackAtom } from '@/atoms/gameStateAtom'
-import { stageDimensionAtom } from '@/atoms/stageDimensionAtom'
+import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas, Texture } from 'pixi.js'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -113,6 +113,7 @@ export default function Stage() {
 
 function PixiAppHandler({ app }: { app: Application<ICanvas> }) {
   const setDimension = useSetAtom(stageDimensionAtom)
+  const setPortrait = useSetAtom(isPortraitAtom)
 
   useLayoutEffect(() => {
     const resize = () => {
@@ -121,6 +122,8 @@ function PixiAppHandler({ app }: { app: Application<ICanvas> }) {
         app.renderer.resize(parent.clientWidth, parent.clientHeight)
         setDimension({ width: parent.clientWidth, height: parent.clientHeight })
       }
+
+      setPortrait(window.innerHeight >= window.innerWidth)
     }
 
     setTimeout(() => {
