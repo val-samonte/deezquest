@@ -87,7 +87,7 @@ export const gameFunctions = atom(
               },
             },
           },
-          duration: 500,
+          duration: 350,
         })
 
         while (hasMatch(newTiles)) {
@@ -110,7 +110,7 @@ export const gameFunctions = atom(
               }
               return acc
             }, {}),
-            duration: 750,
+            duration: 500,
           })
 
           const { tiles, gravity } = applyGravity(newTiles, depths)
@@ -139,7 +139,7 @@ export const gameFunctions = atom(
               }
               return acc
             }, {}),
-            duration: 1000,
+            duration: 750,
           })
         }
 
