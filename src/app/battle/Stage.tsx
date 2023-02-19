@@ -1,6 +1,10 @@
 'use client'
 
-import { gameFunctions, gameTransitionStackAtom } from '@/atoms/gameStateAtom'
+import {
+  gameFunctions,
+  gameTransitionStackAtom,
+  isGameTransitioningAtom,
+} from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas, Texture } from 'pixi.js'
@@ -16,7 +20,7 @@ import Tile from './Tile'
 
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
-
+  const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
   const transitionStack = useAtomValue(gameTransitionStackAtom)
   const [stackCounter, setStackCounter] = useState(-1)
   const [tiles, setTiles] = useState<any[]>([]) // TODO: refactor, let Tiles access this via atom
@@ -32,7 +36,12 @@ export default function Stage() {
       }
     }
 
-    if (!stack) return
+    if (!stack) {
+      setIsTransitioning(false)
+      return
+    }
+
+    setIsTransitioning(true)
 
     setTiles(
       stack.tiles.map((type: any, i: number) => {

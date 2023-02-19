@@ -1,5 +1,5 @@
 export enum GameTransitions {
-  LOAD = 'LOAD',
+  SET = 'SET',
   SWAP = 'SWAP',
   DRAIN = 'DRAIN',
   FILL = 'FILL',

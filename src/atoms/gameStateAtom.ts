@@ -7,13 +7,14 @@ export const gameHashAtom = atom(
 )
 
 export const gameTurnCountAtom = atom(0)
-
+export const isGameTransitioningAtom = atom(false)
 export const gameTransitionStackAtom = atom<any[]>([])
 export const gameTransitionStackCounterAtom = atom(0)
 
 export const gameFunctions = atom(
   null,
   (get, set, action: { type: string; data?: any }) => {
+    let isTransitioning = get(isGameTransitioningAtom)
     let stackCounter = get(gameTransitionStackCounterAtom)
     let hash = get(gameHashAtom)
 
@@ -41,7 +42,7 @@ export const gameFunctions = atom(
         stackCounter++
         set(gameTransitionStackAtom, [
           {
-            type: GameTransitions.LOAD,
+            type: GameTransitions.SET,
             order: stackCounter,
             tiles,
           },
@@ -52,6 +53,8 @@ export const gameFunctions = atom(
         break
       }
       case 'swapNode': {
+        if (isTransitioning) return
+
         const stack = get(gameTransitionStackAtom)
         const tiles = stack[stack.length - 1].tiles
 
@@ -139,6 +142,12 @@ export const gameFunctions = atom(
             duration: 1000,
           })
         }
+
+        stack.push({
+          type: GameTransitions.SET,
+          order: ++stackCounter,
+          tiles: [...newTiles],
+        })
 
         set(gameTransitionStackAtom, [...stack])
         break
