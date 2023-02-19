@@ -14,8 +14,12 @@ export default function RootLayout({
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
       */}
       <head />
-      <body className='w-screen h-screen bg-neutral-900 text-neutral-200'>
-        <DependenciesContainer>{children}</DependenciesContainer>
+      <body className='bg-neutral-900 text-neutral-200'>
+        <div className='fixed inset-0'>
+          <div className='w-full h-full overflow-y-auto'>
+            <DependenciesContainer>{children}</DependenciesContainer>
+          </div>
+        </div>
       </body>
     </html>
   )

@@ -69,10 +69,10 @@ export default function HeroSelect() {
 
   return (
     <div className='flex flex-col max-w-3xl gap-5 mx-auto p-5 bg-neutral-800 rounded'>
-      <div className='flex gap-5'>
+      <div className='flex gap-5 portrait:flex-col'>
         <div className='flex flex-col gap-5 flex-none'>
           <img
-            className='w-60 h-60'
+            className='w-60 h-60 portrait:w-full portrait:h-auto aspect-square'
             src='https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png'
           />
           <div className='flex gap-5 text-2xl'>
@@ -90,7 +90,7 @@ export default function HeroSelect() {
         <div className='flex flex-auto flex-col gap-5'>
           <div className='flex flex-col'>
             <h2 className='text-xl font-bold mb-3'>Attributes</h2>
-            <ul className='grid grid-cols-2 gap-3 text-lg'>
+            <ul className='grid landscape:grid-cols-2 gap-y-3 gap-x-10 text-lg'>
               <li className='flex items-center justify-center gap-2'>
                 <img src='/stat_int.svg' className='w-8 h-8' />
                 Intelligence
