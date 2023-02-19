@@ -1,15 +1,17 @@
 'use client'
 
 import { gameFunctions, gameTransitionStackAtom } from '@/atoms/gameStateAtom'
+import { stageDimensionAtom } from '@/atoms/stageDimensionAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas, Texture } from 'pixi.js'
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   AppContext,
   Container,
   Sprite,
   Stage as PixiStage,
 } from 'react-pixi-fiber'
+import StageCursor from './StageCursor'
 import Tile from './Tile'
 
 export default function Stage() {
@@ -18,11 +20,6 @@ export default function Stage() {
   const transitionStack = useAtomValue(gameTransitionStackAtom)
   const [stackCounter, setStackCounter] = useState(-1)
   const [tiles, setTiles] = useState<any[]>([]) // TODO: refactor, let Tiles access this via atom
-  const [dimension, setDimension] = useState({ width: 0, height: 0 })
-  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(
-    null,
-  )
-  const tileSize = useMemo(() => dimension.width / 8, [dimension])
 
   useEffect(() => {
     if (transitionStack.length === 0) return
@@ -39,12 +36,10 @@ export default function Stage() {
 
     setTiles(
       stack.tiles.map((type: any, i: number) => {
-        const props: any = {
+        const props = {
           type,
-          x: (i % 8) * tileSize,
-          y: Math.floor(i / 8) * tileSize,
-          width: tileSize,
-          height: tileSize,
+          x: i % 8,
+          y: Math.floor(i / 8),
         }
 
         if (stack.nodes?.[i]) {
@@ -53,8 +48,8 @@ export default function Stage() {
             type: stack.nodes[i].type,
             duration: stack.duration,
             from: {
-              x: stack.nodes[i].from.x * tileSize,
-              y: stack.nodes[i].from.y * tileSize,
+              x: stack.nodes[i].from.x,
+              y: stack.nodes[i].from.y,
             },
           }
 
@@ -71,34 +66,29 @@ export default function Stage() {
     setTimeout(() => {
       setStackCounter(stack.order)
     }, stack.duration + 100)
-  }, [tileSize, transitionStack, stackCounter])
+  }, [transitionStack, stackCounter])
+
+  const loaded = useRef(false)
+
+  useEffect(() => {
+    if (loaded.current) return
+
+    gameFn({
+      type: 'initialBoard',
+      data: { seed: Math.floor(Math.random() * 100000) + '' },
+    })
+
+    loaded.current = true
+  }, [])
 
   return (
     <div className='w-full h-full flex portrait:flex-col'>
-      <div className='flex-auto w-full p-3 sm:p-5 '>
-        <button
-          onClick={() =>
-            gameFn({
-              type: 'initialBoard',
-              data: { seed: Math.floor(Math.random() * 100000) + '' },
-            })
-          }
-          type='button'
-          className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-        >
-          Next Hash
-        </button>
-      </div>
+      <div className='flex-auto w-full p-3 sm:p-5 bg-black/80'></div>
       <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-3 sm:p-5 backdrop-blur-sm '>
         <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden '>
           <PixiStage options={{ backgroundAlpha: 0 }}>
             <AppContext.Consumer>
-              {(app) => (
-                <PixiAppHandler
-                  app={app}
-                  onResize={(width, height) => setDimension({ width, height })}
-                />
-              )}
+              {(app) => <PixiAppHandler app={app} />}
             </AppContext.Consumer>
             <Container>
               {tiles.map(
@@ -112,56 +102,7 @@ export default function Stage() {
                   props.type === null && <Tile id={i} key={i} {...props} />,
               )}
             </Container>
-            {cursorPos && (
-              <Sprite
-                texture={Texture.from(`/cursor.png`)}
-                width={tileSize}
-                height={tileSize}
-                x={cursorPos.x * tileSize}
-                y={cursorPos.y * tileSize}
-              />
-            )}
-            <Sprite
-              key={'pointer_capture'}
-              interactive
-              width={dimension.width}
-              height={dimension.height}
-              onpointerup={(e) => {
-                const x = Math.floor(e.global.x / tileSize)
-                const y = Math.floor(e.global.y / tileSize)
-                let fired = 0 // TODO: BUG, setCursorPos firing twice
-
-                setCursorPos((curr) => {
-                  fired++
-                  if (curr) {
-                    const distX = Math.abs(curr.x - x)
-                    const distY = Math.abs(curr.y - y)
-                    if (distX + distY === 1) {
-                      // swap
-                      if (fired === 1) {
-                        gameFn({
-                          type: 'swapNode',
-                          data: {
-                            node1: { x: curr.x, y: curr.y },
-                            node2: { x, y },
-                          },
-                        })
-                      }
-                      return null
-                    }
-                  }
-
-                  if (!curr || !(curr.x === x && curr.y === y)) {
-                    return {
-                      x,
-                      y,
-                    }
-                  }
-
-                  return null
-                })
-              }}
-            />
+            <StageCursor />
           </PixiStage>
         </div>
       </div>
@@ -170,19 +111,15 @@ export default function Stage() {
   )
 }
 
-function PixiAppHandler({
-  app,
-  onResize,
-}: {
-  app: Application<ICanvas>
-  onResize: (w: number, h: number) => void
-}) {
+function PixiAppHandler({ app }: { app: Application<ICanvas> }) {
+  const setDimension = useSetAtom(stageDimensionAtom)
+
   useLayoutEffect(() => {
     const resize = () => {
       const parent = app.view.parentNode as HTMLDivElement
       if (parent) {
         app.renderer.resize(parent.clientWidth, parent.clientHeight)
-        onResize(parent.clientWidth, parent.clientHeight)
+        setDimension({ width: parent.clientWidth, height: parent.clientHeight })
       }
     }
 

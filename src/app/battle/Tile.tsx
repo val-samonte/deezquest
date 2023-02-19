@@ -6,11 +6,24 @@ import { Texture } from 'pixi.js'
 import { useMemo } from 'react'
 import { Sprite } from 'react-pixi-fiber'
 import { easeBounceOut, easeBackIn, easeBackInOut } from 'd3-ease'
+import { useAtomValue } from 'jotai'
+import { tileSizeAtom } from '@/atoms/stageDimensionAtom'
 
 const AnimatedSprite = animated(Sprite)
 
 function Tile({ type, id, transition, ...props }: any) {
+  const tileSize = useAtomValue(tileSizeAtom)
+
   const transitionProps = useMemo(() => {
+    props = {
+      ...props,
+      width: tileSize,
+      height: tileSize,
+      x: props.x * tileSize,
+      y: props.y * tileSize,
+      alpha: 1,
+    }
+
     switch (transition?.id) {
       case GameTransitions.SWAP: {
         const { x, y, ...rest } = props
@@ -18,8 +31,8 @@ function Tile({ type, id, transition, ...props }: any) {
           to: props,
           from: {
             ...rest,
-            x: transition.from.x,
-            y: transition.from.y,
+            x: transition.from.x * tileSize,
+            y: transition.from.y * tileSize,
           },
           config: {
             duration: transition.duration - 100,
@@ -33,13 +46,13 @@ function Tile({ type, id, transition, ...props }: any) {
         return {
           to: {
             ...rest,
-            x: -rest.width,
-            y: rest.height * 4,
+            x: -tileSize,
+            y: tileSize * 4,
             alpha: 0,
-            width: rest.width * 0.5,
-            height: rest.height * 0.5,
+            width: tileSize * 0.5,
+            height: tileSize * 0.5,
           },
-          from: { ...props, alpha: 1, width: rest.width, height: rest.height },
+          from: { ...props, alpha: 1, width: tileSize, height: tileSize },
           config: {
             duration: transition.duration - 100,
             easing: easeBackIn,
@@ -53,8 +66,8 @@ function Tile({ type, id, transition, ...props }: any) {
           to: props,
           from: {
             ...rest,
-            x: transition.from.x,
-            y: transition.from.y,
+            x: transition.from.x * tileSize,
+            y: transition.from.y * tileSize,
           },
           config: {
             duration: transition.duration - 100,
@@ -64,7 +77,6 @@ function Tile({ type, id, transition, ...props }: any) {
         }
       }
     }
-    props.alpha = 1
 
     return {
       to: props,
@@ -74,7 +86,7 @@ function Tile({ type, id, transition, ...props }: any) {
         clamp: true,
       },
     }
-  }, [transition, props])
+  }, [transition, tileSize, props])
 
   // use different key every transition change
   // so that the 'from' transition works correctly

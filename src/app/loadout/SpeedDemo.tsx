@@ -28,7 +28,12 @@ export default function SpeedDemo() {
   return null
 }
 
-function getSpeedResult(spd1: number, spd2: number) {
+function getSpeedResult(
+  attr1: number[],
+  attr2: number[],
+  spd1: number,
+  spd2: number,
+) {
   let tt1 = 0
   let tt2 = 0
 
@@ -71,7 +76,7 @@ function getSpeedResult(spd1: number, spd2: number) {
   console.log(spd1, spd2, cnt1 + ':' + cnt2)
 }
 
-// Final Fantasy Tactics speed
+// Final Fantasy Tactics speed (Charge Time)
 // Speed determines how often a unit gets a turn. Every tick, each character's CT increases by their Speed
 // (for example, a character with 10 Speed has their CT increase by 10, a character with 3 increases
 //   their CT by 3, etc.). When the CT reaches 100, that character gets a turn.

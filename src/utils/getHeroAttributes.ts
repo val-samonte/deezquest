@@ -1,5 +1,11 @@
 import { PublicKey } from '@solana/web3.js'
 
+// [FIRE, WIND, WATER, EARTH]
+// [INT, SPD, VIT, STR]
+// INT - Mana cap increase
+// SPD - More likely to get a turn
+// VIT - Flat HP increase
+// STR - Able to carry heavier equipment
 export const getHeroAttributes = (pubkey: PublicKey) => {
   let attribs = [1, 1, 1, 1]
   let cursor = 0
