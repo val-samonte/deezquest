@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
+import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 
 interface PeerMessage {
   from: string // base58 encoded
@@ -13,20 +14,37 @@ interface PeerMessage {
 
 const peerBaseAtom = atom<Peer | null>(null)
 const connectionListAtom = atom<DataConnection[]>([])
-const messageAtom = atom<PeerMessage[]>([])
+const storage = createJSONStorage<PeerMessage[]>(() => sessionStorage)
+const messagesAtom = atomWithStorage<PeerMessage[]>(
+  'demo_messages',
+  [],
+  storage,
+)
 
-function usePeer(keypair: Keypair) {
+// always end up overengineering this ¯\_(ツ)_/¯
+export function usePeer(keypair: Keypair) {
   const [peer, setPeer] = useAtom(peerBaseAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
-  const setMessages = useSetAtom(messageAtom)
+  const setMessages = useSetAtom(messagesAtom)
   const peerId = useMemo(() => keypair.publicKey.toBase58(), [keypair])
 
   const setupConnection = useCallback(
     (conn: DataConnection) => {
       setConnections((connections) => {
         if (connections.find((i) => i.peer === conn.peer)) return connections
-        conn.on('data', (data) => {
-          // TODO: verify signature first
+
+        conn.on('data', (payload) => {
+          const { data, from, signature } = payload as PeerMessage
+
+          const valid = sign.detached.verify(
+            Buffer.from(JSON.stringify(data)),
+            bs58.decode(signature),
+            bs58.decode(from),
+          )
+
+          if (valid && from === conn.peer) {
+            setMessages((m) => [...m, { data, from, signature }])
+          }
         })
 
         conn.on('close', () => {

@@ -9,6 +9,7 @@ import { useAtomValue } from 'jotai'
 import { useEffect, useMemo, useState } from 'react'
 import bs58 from 'bs58'
 import { trimAddress } from '@/utils/trimAddress'
+import { usePeer } from '@/atoms/peerAtom'
 
 function SkillView({ skill }: { skill: Skill }) {
   return (
@@ -54,6 +55,7 @@ export default function HeroSelect() {
       Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
       Keypair.generate(),
   )
+  const { sendMessage } = usePeer(kp)
   const [startMatch, setStartMatch] = useState(false)
   const [matchLinkCopied, setMatchLinkCopied] = useState(false)
   const [opponent, setOpponent] = useState(
@@ -240,7 +242,9 @@ export default function HeroSelect() {
             <button
               type='button'
               className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-              onClick={() => {}}
+              onClick={() => {
+                sendMessage(opponent, 'Hello?')
+              }}
             >
               Begin Match
             </button>
