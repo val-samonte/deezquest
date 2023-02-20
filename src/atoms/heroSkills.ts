@@ -12,7 +12,7 @@ import {
   swiftStrike,
   tailwind,
   tornado,
-  CommandFn,
+  SkillFn,
 } from '@/utils/gameFunctions'
 import { atom } from 'jotai'
 
@@ -26,7 +26,7 @@ export interface Skill {
     water?: number
     earth?: number
   }
-  fn: CommandFn
+  fn: SkillFn
 }
 
 export const heroSkillsAtom = atom<Skill[]>(() => [
@@ -59,7 +59,7 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
   },
   {
     name: 'Crushing Blow',
-    desc: 'Deals 1 MAGIC DMG per EARTH MANA of the user. LVL 3 deals current value of STR as ATTACK DMG. LVL 2|3 ignores SHELL.',
+    desc: 'Deals 1 MAGIC DMG per EARTH MANA of the hero. LVL 3 deals current value of STR as ATTACK DMG. LVL 2|3 ignores SHELL.',
     type: SkillTypes.OFFENSE,
     cost: {
       earth: NaN,

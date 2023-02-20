@@ -30,16 +30,14 @@ export function Dialog({
           <div className='m-auto w-full max-h-full p-5 overflow-auto'>
             <UiDialog.Panel
               className={classNames(
-                'w-full mx-auto max-w-sm overflow-hidden shadow-md drop-shadow-xl',
+                'w-full mx-auto max-w-sm overflow-hidden shadow-md drop-shadow-xl rounded',
                 className,
               )}
             >
-              <UiDialog.Title className='bg-stone-800'>
-                <div className='text-lg sm:text-xl lg:text-2xl px-5 py-4 gradient-1'>
-                  {title}
-                </div>
+              <UiDialog.Title className='bg-neutral-800 border-b border-b-black/50'>
+                <div className='text-lg px-5 py-4 gradient-1'>{title}</div>
               </UiDialog.Title>
-              <div className='bg-stone-900 h-full min-h-[280px] text-stone-300 w-full py-5 flex flex-col overflow-auto'>
+              <div className='bg-neutral-900 h-full min-h-[280px] text-stone-300 w-full py-5 flex flex-col overflow-auto'>
                 {children}
               </div>
             </UiDialog.Panel>

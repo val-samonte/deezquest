@@ -94,80 +94,100 @@ export const getNextTurn = (
   return hero2
 }
 
-export type CommandFn = (
-  commandLevel: number,
-  player: Hero,
-  enemy: Hero,
-) => void
+export type SkillFn = (commandLevel: number, player: Hero, enemy: Hero) => void
 
-export const burningPunch = (
+export const burningPunch: SkillFn = (
   commandLevel: number,
   player: Hero,
   enemy: Hero,
 ) => {
-  // Burning Punch	5 FIRE
-  // Deals normal attack + the gap between FIRE MANA of both heroes
+  //
 }
 
-export const swiftStrike = (
+export const swiftStrike: SkillFn = (
   commandLevel: number,
   player: Hero,
   enemy: Hero,
 ) => {
-  // Swiftstrike	3 WIND
-  // Deal 3/4/5 damage
+  //
 }
 
-export const aquaShot = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Aquashot	4 WATER
-  // Deal 2/6/8 damage
-}
-
-export const crushingBlow = (
+export const aquaShot: SkillFn = (
   commandLevel: number,
   player: Hero,
   enemy: Hero,
 ) => {
-  // Crushing Blow	ALL EARTH MANA
-  // Deals 1 damage per EARTH MANA of the user. LVL 2 ignores ARMOR. LVL 3 ignores SHELL.
+  //
 }
 
-export const empower = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Enlighten 5 FIRE
-  // Adds 1/2/3 to normal attack during the match, stacks indefinitely
+export const crushingBlow: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
 }
 
-export const tailwind = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Tailwind	3 WIND
-  // Adds 1/2/3 SPD during the match, stacks indefinitely
+export const empower: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
 }
 
-export const healing = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Healing	4 WATER
-  // Recover 3/4/5 HP
+export const tailwind: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
 }
 
-export const manaWall = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Barrier	ALL EARTH MANA
-  // Convert each EARTH MANA into SHIELD, does not scale
+export const healing: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
 }
 
-export const combustion = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Incinerate	8 FIRE
-  // Converts all WATER MANA in the board into FIRE MANA, deals damage on how many are converted
+export const manaWall: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
 }
 
-export const tornado = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Tornado	10 WIND
-  // Shuffles the board, deals damage based on how many WIND + EARTH MANA appears after the shuffle
+export const combustion: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
 }
 
-export const extinguish = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Extinguish	8 WATER
-  // Converts all FIRE MANA in the board into WATER MANA, recover HP based on how many are converted
+export const tornado: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
 }
 
-export const quake = (commandLevel: number, player: Hero, enemy: Hero) => {
-  // Quake	10 EARTH MANA
-  // Deals 30 damage on both players, damage is reduced respectively based on each player's WIND MANA
+export const extinguish: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
+}
+
+export const quake: SkillFn = (
+  commandLevel: number,
+  player: Hero,
+  enemy: Hero,
+) => {
+  //
 }

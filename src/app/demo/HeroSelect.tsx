@@ -1,11 +1,14 @@
 'use client'
 
 import { heroSkillsAtom, Skill } from '@/atoms/heroSkills'
+import { Dialog } from '@/components/Dialog'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { getHeroAttributes } from '@/utils/gameFunctions'
 import { Keypair } from '@solana/web3.js'
 import { useAtomValue } from 'jotai'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import bs58 from 'bs58'
+import { trimAddress } from '@/utils/trimAddress'
 
 function SkillView({ skill }: { skill: Skill }) {
   return (
@@ -46,7 +49,17 @@ function SkillView({ skill }: { skill: Skill }) {
 
 export default function HeroSelect() {
   const heroSkills = useAtomValue(heroSkillsAtom)
-  const [kp, setKp] = useState(Keypair.generate())
+  const [kp, setKp] = useState(
+    (localStorage.getItem('demo_kp') &&
+      Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
+      Keypair.generate(),
+  )
+  const [findingMatch, setFindingMatch] = useState(false)
+  const [matchLinkCopied, setMatchLinkCopied] = useState(false)
+  const [opponent, setOpponent] = useState(
+    localStorage.getItem('demo_opponent') ?? '',
+  )
+
   const stats = useMemo(() => {
     const attribs = getHeroAttributes(kp.publicKey)
     const bytes = kp.publicKey.toBytes()
@@ -67,14 +80,24 @@ export default function HeroSelect() {
     }
   }, [kp, heroSkills])
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.has('opponent')) {
+      const opponent = searchParams.get('opponent')!
+      localStorage.setItem('demo_opponent', opponent)
+      setOpponent(opponent)
+    }
+  }, [window.location.search])
+
   return (
-    <div className='flex flex-col max-w-3xl gap-5 mx-auto p-5 bg-neutral-800 rounded'>
+    <div className='flex flex-col max-w-3xl gap-5 mx-auto p-5 bg-neutral-900 rounded'>
       <div className='flex gap-5 portrait:flex-col'>
         <div className='flex flex-col gap-5 flex-none'>
           <img
             className='w-60 h-60 portrait:w-full portrait:h-auto aspect-square'
             src='https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png'
           />
+          <div>Hero ID: {trimAddress(kp.publicKey.toBase58())}</div>
           <div className='flex gap-5 text-2xl'>
             <span>
               HP:{' '}
@@ -151,10 +174,76 @@ export default function HeroSelect() {
         <button
           type='button'
           className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+          onClick={() => {
+            localStorage.setItem('demo_kp', bs58.encode(kp.secretKey))
+            setFindingMatch(true)
+          }}
         >
-          Find A Match
+          {opponent ? 'Ready' : 'Find A Match'}
         </button>
       </div>
+      <Dialog
+        show={findingMatch}
+        title='DEMO Match'
+        onClose={() => setFindingMatch(false)}
+      >
+        {!opponent ? (
+          <>
+            <p className='mx-5 mb-5'>
+              Click <span className='font-bold'>Copy Match Link</span> and share
+              it to someone whom you would like to play with.
+            </p>
+            <p className='mx-5'>
+              If the link is already shared, please standby and wait for the
+              other player to setup. The game will commence automatically.
+            </p>
+            <div className='flex-auto'></div>
+            <button
+              type='button'
+              className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `${
+                    window.location.origin
+                  }/demo?opponent=${kp.publicKey.toBase58()}`,
+                )
+                setMatchLinkCopied(true)
+              }}
+            >
+              {matchLinkCopied ? 'Copied to Clipboard!' : 'Copy Match Link'}
+            </button>
+          </>
+        ) : (
+          <>
+            <p className='mx-5 mb-5'>
+              You are about to start your match with{' '}
+              <span className='font-bold'>{trimAddress(opponent)}</span>.
+            </p>
+            <p className='mx-5'>
+              If you would like to play with different opponent,{' '}
+              <button
+                type='button'
+                className='underline'
+                onClick={() => {
+                  localStorage.removeItem('demo_opponent')
+                  setOpponent('')
+                }}
+              >
+                click here
+              </button>
+              .
+            </p>
+            <div className='flex-auto'></div>
+            <button
+              type='button'
+              className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+              onClick={() => {}}
+            >
+              Begin Match
+            </button>
+          </>
+        )}
+      </Dialog>
     </div>
   )
 }
