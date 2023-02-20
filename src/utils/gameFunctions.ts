@@ -41,8 +41,8 @@ export const getNextTurn = (
   gameHash: Uint8Array,
 ) => {
   while (hero1.turnTime < 200 && hero2.turnTime < 200) {
-    hero1.turnTime += hero1.spd
-    hero2.turnTime += hero2.spd
+    hero1.turnTime += hero1.spd + 5
+    hero2.turnTime += hero2.spd + 5
   }
 
   if (hero1.turnTime >= 200 && hero2.turnTime >= 200) {

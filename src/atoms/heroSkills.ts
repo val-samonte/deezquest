@@ -32,7 +32,7 @@ export interface Skill {
 export const heroSkillsAtom = atom<Skill[]>(() => [
   {
     name: 'Burning Punch',
-    desc: 'Deals ATTACK DMG + the gap between FIRE MANA of both heroes.',
+    desc: 'Deals ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.',
     type: SkillTypes.OFFENSE,
     cost: {
       fire: 5,
@@ -50,7 +50,7 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
   },
   {
     name: 'Aquashot',
-    desc: 'Deals 2|6|8 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes. LVL 3 ignores SHELL.',
+    desc: 'Deals 2|6|8 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes. LVL 3 pierces through SHELL.',
     type: SkillTypes.OFFENSE,
     cost: {
       water: 4,
@@ -59,7 +59,7 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
   },
   {
     name: 'Crushing Blow',
-    desc: 'Deals 1 MAGIC DMG per EARTH MANA of the hero. LVL 3 deals current value of STR as ATTACK DMG. LVL 2|3 ignores SHELL.',
+    desc: 'Deals 1 MAGIC DMG per EARTH MANA of the hero. LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5. LVL 3 destroys ARMOR after damage is applied.',
     type: SkillTypes.OFFENSE,
     cost: {
       earth: NaN,

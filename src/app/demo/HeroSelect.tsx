@@ -42,7 +42,7 @@ function SkillView({ skill }: { skill: Skill }) {
           )}
         </p>
       </div>
-      <p>{skill.desc}</p>
+      <p className='text-sm text-neutral-300'>{skill.desc}</p>
     </div>
   )
 }
@@ -54,7 +54,7 @@ export default function HeroSelect() {
       Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
       Keypair.generate(),
   )
-  const [findingMatch, setFindingMatch] = useState(false)
+  const [startMatch, setStartMatch] = useState(false)
   const [matchLinkCopied, setMatchLinkCopied] = useState(false)
   const [opponent, setOpponent] = useState(
     localStorage.getItem('demo_opponent') ?? '',
@@ -113,7 +113,7 @@ export default function HeroSelect() {
         <div className='flex flex-auto flex-col gap-5'>
           <div className='flex flex-col'>
             <h2 className='text-xl font-bold mb-3'>Attributes</h2>
-            <ul className='grid landscape:grid-cols-2 gap-y-3 gap-x-10 text-lg'>
+            <ul className='grid md:grid-cols-2 gap-y-3 gap-x-10 text-lg'>
               <li className='flex items-center justify-center gap-2'>
                 <img src='/stat_int.svg' className='w-8 h-8' />
                 Intelligence
@@ -167,7 +167,10 @@ export default function HeroSelect() {
         <button
           type='button'
           className='px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded'
-          onClick={() => setKp(Keypair.generate())}
+          onClick={() => {
+            setMatchLinkCopied(false)
+            setKp(Keypair.generate())
+          }}
         >
           Reroll
         </button>
@@ -176,16 +179,16 @@ export default function HeroSelect() {
           className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
           onClick={() => {
             localStorage.setItem('demo_kp', bs58.encode(kp.secretKey))
-            setFindingMatch(true)
+            setStartMatch(true)
           }}
         >
-          {opponent ? 'Ready' : 'Find A Match'}
+          {opponent ? 'Ready' : 'Start A Match'}
         </button>
       </div>
       <Dialog
-        show={findingMatch}
+        show={startMatch}
         title='DEMO Match'
-        onClose={() => setFindingMatch(false)}
+        onClose={() => setStartMatch(false)}
       >
         {!opponent ? (
           <>
@@ -193,7 +196,7 @@ export default function HeroSelect() {
               Click <span className='font-bold'>Copy Match Link</span> and share
               it to someone whom you would like to play with.
             </p>
-            <p className='mx-5'>
+            <p className='mx-5 mb-5'>
               If the link is already shared, please standby and wait for the
               other player to setup. The game will commence automatically.
             </p>
@@ -219,7 +222,7 @@ export default function HeroSelect() {
               You are about to start your match with{' '}
               <span className='font-bold'>{trimAddress(opponent)}</span>.
             </p>
-            <p className='mx-5'>
+            <p className='mx-5 mb-5'>
               If you would like to play with different opponent,{' '}
               <button
                 type='button'
