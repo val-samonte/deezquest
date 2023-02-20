@@ -58,21 +58,44 @@ export function usePeer(keypair: Keypair) {
   )
 
   useEffect(() => {
-    if (peer && peer.id !== peerId) {
-      // clean up
+    if (peer === null) {
       setPeer((oldPeer) => {
+        if (
+          oldPeer?.id === peerId &&
+          !(oldPeer.destroyed || oldPeer.disconnected)
+        ) {
+          return oldPeer
+        }
+
         oldPeer?.destroy()
-        const peer = new Peer(peerId)
-        peer.on('connection', setupConnection)
-        return peer
-      })
-      // clear existing connections
-      setConnections((connections) => {
-        connections.forEach((conn) => conn.close())
-        return []
+
+        if (peerId === null) return null
+
+        const newPeer = new Peer(peerId)
+
+        newPeer.on('connection', setupConnection)
+
+        newPeer.on('open', () => {
+          console.log(`Peer opened ${peerId}`)
+        })
+
+        newPeer.on('error', (err) => {
+          console.log(`Peer error ${peerId}: ${err}`)
+        })
+
+        newPeer.on('close', () => {
+          console.log(`Peer closed ${peerId}`)
+        })
+
+        setConnections((connections) => {
+          connections.forEach((conn) => conn.close())
+          return []
+        })
+
+        return newPeer
       })
     }
-  }, [peerId, setPeer, setConnections])
+  }, [peer, peerId, setPeer, setConnections])
 
   const sendMessage = useCallback(
     async (receiverId: string, message: any) => {
@@ -82,29 +105,36 @@ export function usePeer(keypair: Keypair) {
         from: keypair.publicKey.toBase58(),
         data: message,
         signature: bs58.encode(
-          sign(Buffer.from(JSON.stringify(message)), keypair.secretKey),
+          sign.detached(
+            Buffer.from(JSON.stringify(message)),
+            keypair.secretKey,
+          ),
         ),
       }
 
       let connection = connections.find((conn) => conn.peer === receiverId)
 
       if (!connection) {
-        const newConnection = peer.connect(receiverId, {
-          serialization: 'json',
-        })
+        connection = await new Promise<DataConnection>((resolve, reject) => {
+          const newConnection = peer.connect(receiverId, {
+            serialization: 'json',
+          })
 
-        await new Promise<void>((resolve, reject) => {
+          if (!newConnection) {
+            reject('Remote peer is possibly destroyed / disconnected.')
+            return
+          }
+
           newConnection.on('error', reject)
 
           newConnection.on('open', () => {
             newConnection.off('error')
-            resolve()
+            resolve(newConnection)
           })
         })
 
-        connection = newConnection
-
         setupConnection(connection)
+        console.log(`Connection established ${connection.peer}`)
       }
 
       connection.send(payload)
