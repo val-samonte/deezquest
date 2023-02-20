@@ -61,6 +61,7 @@ export default function HeroSelect() {
   const [opponent, setOpponent] = useState(
     localStorage.getItem('demo_opponent') ?? '',
   )
+  const [errorMsg, setErrorMsg] = useState('')
 
   const stats = useMemo(() => {
     const attribs = getHeroAttributes(kp.publicKey)
@@ -238,6 +239,12 @@ export default function HeroSelect() {
               </button>
               .
             </p>
+            {errorMsg && (
+              <p className='mx-5 mb-5 text-red-400 bg-red-800/10 p-5 text-sm rounded'>
+                {/* Opponent is not available. Ask for the match link again. */}
+                {errorMsg}
+              </p>
+            )}
             <div className='flex-auto'></div>
             <button
               type='button'
