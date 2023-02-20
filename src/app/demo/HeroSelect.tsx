@@ -196,11 +196,11 @@ export default function HeroSelect() {
           <>
             <p className='mx-5 mb-5'>
               Click <span className='font-bold'>Copy Match Link</span> and share
-              it to someone whom you would like to play with.
+              it with someone you would like to play with.
             </p>
             <p className='mx-5 mb-5'>
-              If the link is already shared, please standby and wait for the
-              other player to setup. The game will commence automatically.
+              If the link has already been shared, please standby and wait for
+              the other player to set up. The game will commence automatically.
             </p>
             <div className='flex-auto'></div>
             <button
@@ -246,7 +246,7 @@ export default function HeroSelect() {
                 sendMessage(opponent, 'Hello?')
               }}
             >
-              Begin Match
+              Start Match
             </button>
           </>
         )}
