@@ -1,13 +1,13 @@
 import { SkillTypes } from '@/enums/SkillTypes'
 import {
   aquaShot,
-  barrier,
+  manaWall,
   burningPunch,
   crushingBlow,
   extinguish,
   healing,
   combustion,
-  enlighten,
+  empower,
   quake,
   swiftStrike,
   tailwind,
@@ -32,7 +32,7 @@ export interface Skill {
 export const heroSkillsAtom = atom<Skill[]>(() => [
   {
     name: 'Burning Punch',
-    desc: 'Deals normal attack damage + the gap between FIRE MANA of both heroes.',
+    desc: 'Deals ATTACK DMG + the gap between FIRE MANA of both heroes.',
     type: SkillTypes.OFFENSE,
     cost: {
       fire: 5,
@@ -41,7 +41,7 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
   },
   {
     name: 'Swift Strike',
-    desc: 'Deals 3|4|5 damage.',
+    desc: 'Deals 3|4|5 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.',
     type: SkillTypes.OFFENSE,
     cost: {
       wind: 3,
@@ -50,7 +50,7 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
   },
   {
     name: 'Aquashot',
-    desc: 'Deals 2|6|8 damage. LVL 3 ignores SHELL.',
+    desc: 'Deals 2|6|8 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes. LVL 3 ignores SHELL.',
     type: SkillTypes.OFFENSE,
     cost: {
       water: 4,
@@ -59,7 +59,7 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
   },
   {
     name: 'Crushing Blow',
-    desc: 'Deals 1 damage per EARTH MANA of the user. LVL 2|3 ignores SHELL.',
+    desc: 'Deals 1 MAGIC DMG per EARTH MANA of the user. LVL 3 deals current value of STR as ATTACK DMG. LVL 2|3 ignores SHELL.',
     type: SkillTypes.OFFENSE,
     cost: {
       earth: NaN,
@@ -67,13 +67,13 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
     fn: crushingBlow,
   },
   {
-    name: 'Enlighten',
-    desc: 'Adds 1|2|3 to normal attacks during the match, stacks indefinitely.',
+    name: 'Empower',
+    desc: 'Adds 1|2|3 to ATTACK DMG during the match, stacks indefinitely.',
     type: SkillTypes.SUPPORT,
     cost: {
       fire: 5,
     },
-    fn: enlighten,
+    fn: empower,
   },
   {
     name: 'Tailwind',
@@ -86,7 +86,7 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
   },
   {
     name: 'Healing',
-    desc: 'Recover 3|4|5 HP.',
+    desc: 'Recover 3|4|5 HP. LVL 3 adds current value of VIT as HP.',
     type: SkillTypes.SUPPORT,
     cost: {
       water: 4,
@@ -94,26 +94,26 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
     fn: healing,
   },
   {
-    name: 'Barrier',
-    desc: 'Converts all EARTH MANA into ARMOR. Gain 3|5 SHELL in LVL 2|3.',
+    name: 'Manawall',
+    desc: 'Converts all EARTH MANA into SHELL. Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.',
     type: SkillTypes.SUPPORT,
     cost: {
       earth: NaN,
     },
-    fn: barrier,
+    fn: manaWall,
   },
   {
     name: 'Combustion',
-    desc: 'Converts all WATER MANA in the board into FIRE MANA, deals damage on how many are converted.',
+    desc: 'Converts all WATER MANA in the board into FIRE MANA, deals MAGIC DMG on how many are converted.',
     type: SkillTypes.SPECIAL,
     cost: {
-      fire: 5,
+      fire: 6,
     },
     fn: combustion,
   },
   {
     name: 'Tornado',
-    desc: 'Shuffles the board, deals damage based on how many WIND + EARTH MANA appears after the shuffle.',
+    desc: 'Shuffles the board, deals MAGIC DMG based on how many WIND + EARTH MANA appear after the shuffle.',
     type: SkillTypes.SPECIAL,
     cost: {
       wind: 10,
@@ -125,13 +125,13 @@ export const heroSkillsAtom = atom<Skill[]>(() => [
     desc: 'Converts all FIRE MANA in the board into WATER MANA, recover HP based on how many are converted.',
     type: SkillTypes.SPECIAL,
     cost: {
-      water: 5,
+      water: 6,
     },
     fn: extinguish,
   },
   {
     name: 'Quake',
-    desc: "Deals 30 damage on both players. Damage is reduced based on each respective heroes' WIND MANA.",
+    desc: "Deals 30 MAGIC DMG on both players. Damage is reduced based on each respective heroes' WIND MANA.",
     type: SkillTypes.SPECIAL,
     cost: {
       earth: 10,

@@ -132,7 +132,7 @@ export const crushingBlow = (
   // Deals 1 damage per EARTH MANA of the user. LVL 2 ignores ARMOR. LVL 3 ignores SHELL.
 }
 
-export const enlighten = (commandLevel: number, player: Hero, enemy: Hero) => {
+export const empower = (commandLevel: number, player: Hero, enemy: Hero) => {
   // Enlighten 5 FIRE
   // Adds 1/2/3 to normal attack during the match, stacks indefinitely
 }
@@ -147,7 +147,7 @@ export const healing = (commandLevel: number, player: Hero, enemy: Hero) => {
   // Recover 3/4/5 HP
 }
 
-export const barrier = (commandLevel: number, player: Hero, enemy: Hero) => {
+export const manaWall = (commandLevel: number, player: Hero, enemy: Hero) => {
   // Barrier	ALL EARTH MANA
   // Convert each EARTH MANA into SHIELD, does not scale
 }
