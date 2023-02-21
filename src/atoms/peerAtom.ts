@@ -1,3 +1,5 @@
+'use client'
+
 import Peer, { DataConnection } from 'peerjs'
 import { atom, useAtom, useSetAtom } from 'jotai'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -28,7 +30,7 @@ export function usePeer(keypair: Keypair) {
   const [isOpen, setOpen] = useAtom(peerOpenAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
   const [messages, setMessages] = useAtom(messagesAtom)
-  const peerId = useMemo(() => keypair.publicKey.toBase58(), [keypair])
+  const peerId = useMemo(() => keypair?.publicKey.toBase58(), [keypair])
 
   const setupConnection = useCallback(
     (conn: DataConnection) => {

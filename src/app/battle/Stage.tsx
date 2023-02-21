@@ -91,7 +91,7 @@ export default function Stage() {
       <div className='p-2 w-full h-full '>
         <PlayerCard />
       </div>
-      <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-3 sm:p-5 backdrop-blur-sm '>
+      <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5 backdrop-blur-sm '>
         <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden '>
           <PixiStage options={{ backgroundAlpha: 0 }}>
             <AppContext.Consumer>

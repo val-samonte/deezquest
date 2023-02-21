@@ -15,10 +15,20 @@ export default function StatCounter({
   children,
 }: StatCounterProps) {
   return (
-    <div className='flex items-center gap-1'>
-      <img src={img} className={classNames('w-4 h-4')} />
-      {children && <span className={classNames('hidden')}>{children}</span>}
-      <span className='text-right font-bold'>{value}</span>
+    <div
+      className={classNames('flex items-center md:gap-1', children && 'w-full')}
+    >
+      <img src={img} className={classNames('w-4 h-4 opacity-30')} />
+      {children && (
+        <span
+          className={classNames(
+            'hidden mx-1 md:mx-0 landscape:md:flex opacity-30',
+          )}
+        >
+          {children}
+        </span>
+      )}
+      <span className='text-right font-bold ml-auto'>{value}</span>
     </div>
   )
 }

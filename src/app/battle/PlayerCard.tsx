@@ -29,7 +29,7 @@ export default function PlayerCard({
           }}
         ></div>
       </div>
-      <div className='flex-[2_2_0%] flex flex-col text-sm xl:text-base py-2 gap-1 xl:gap-2'>
+      <div className='flex-[2_2_0%] flex flex-col text-xs xs:text-sm xl:text-base py-2 gap-1 xl:gap-2'>
         <div
           className={classNames(
             'flex-none flex px-2 gap-1 xl:gap-2',
@@ -38,28 +38,28 @@ export default function PlayerCard({
         >
           {/* HP */}
           <div className='flex flex-col items-center'>
-            <span className='text-4xl xl:text-7xl font-bold flex-none'>
+            <span className='text-3xl md:text-4xl xl:text-7xl xs:font-bold flex-none'>
               100
             </span>
-            <span className='font-bold xl:hidden'>/ 100</span>
+            <span className='xs:font-bold xl:hidden'>/ 100</span>
           </div>
 
           {/* HP Bar & Time */}
           <div className='flex flex-auto flex-col gap-1 xl:gap-2'>
             <div
               className={classNames(
-                'flex items-center gap-1 xl:gap-2 bg-neutral-400/5 px-2 py-1',
+                'flex items-center gap-1 xl:gap-2 bg-neutral-400/5 p-1 xs:px-2',
                 asOpponent && 'portrait:flex-row-reverse',
               )}
             >
-              <span className='hidden font-bold xl:flex'>/ 100</span>
+              {/* <span className='hidden xs:font-bold xl:flex'>/ 100</span> */}
               <span className='mx-auto' />
               <StatCounter img='/armor.svg' value={99} />
               <StatCounter img='/shell.svg' value={99} />
             </div>
             <div
               className={classNames(
-                'flex items-center gap-1 xl:gap-2 bg-neutral-400/5 px-2 py-1',
+                'flex items-center gap-1 xl:gap-2 bg-neutral-400/5 p-1 xs:px-2',
                 asOpponent && 'portrait:flex-row-reverse',
               )}
             >
@@ -72,20 +72,26 @@ export default function PlayerCard({
         </div>
 
         {/* Mana */}
-        <ul className='flex-none grid grid-cols-4 landscape:md:grid-cols-2 px-2 gap-1 xl:gap-2'>
-          <li className='flex items-center justify-center bg-neutral-400/5 px-2 py-1'>
+        <ul className='flex-none grid grid-cols-4 landscape:sm:grid-cols-2 px-2 gap-1 xl:gap-2'>
+          <li className='flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
             <StatCounter img='/elem_fire.svg' value={99}>
-              <span className='hidden landscape:md:flex'>Fire</span>
+              Fire
             </StatCounter>
           </li>
-          <li className='flex items-center justify-center bg-neutral-400/5 px-2 py-1'>
-            <StatCounter img='/elem_wind.svg' value={99} />
+          <li className='flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
+            <StatCounter img='/elem_wind.svg' value={99}>
+              Wind
+            </StatCounter>
           </li>
-          <li className='flex items-center justify-center bg-neutral-400/5 px-2 py-1'>
-            <StatCounter img='/elem_water.svg' value={99} />
+          <li className='flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
+            <StatCounter img='/elem_water.svg' value={99}>
+              Water
+            </StatCounter>
           </li>
-          <li className='flex items-center justify-center bg-neutral-400/5 px-2 py-1'>
-            <StatCounter img='/elem_earth.svg' value={99} />
+          <li className='flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
+            <StatCounter img='/elem_earth.svg' value={99}>
+              Earth
+            </StatCounter>
           </li>
         </ul>
 
@@ -94,7 +100,7 @@ export default function PlayerCard({
           <div className='absolute inset-x-2 inset-y-0 flex'>
             <div className='relative w-1/3 h-full'>
               <div className='absolute inset-0 flex flex-col items-center justify-center'>
-                <div className='xs:hidden bg-blue-800 animate-pulse px-2 rounded-full'>
+                <div className='xs:hidden'>
                   <StatCounter img='/cmd_attack.svg' value={1} />
                 </div>
                 <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
@@ -102,7 +108,7 @@ export default function PlayerCard({
                     src='/cmd_attack.svg'
                     className='w-full aspect-square '
                   />
-                  <span className='font-bold text-base absolute bottom-0 right-2 text-right'>
+                  <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
                     1
                   </span>
                 </div>
@@ -110,7 +116,7 @@ export default function PlayerCard({
             </div>
             <div className='relative w-1/3 h-full'>
               <div className='absolute inset-0 flex flex-col items-center justify-center'>
-                <div className='xs:hidden bg-blue-800 animate-pulse px-2 rounded-full'>
+                <div className='xs:hidden'>
                   <StatCounter img='/cmd_support.svg' value={1} />
                 </div>
                 <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
@@ -118,7 +124,7 @@ export default function PlayerCard({
                     src='/cmd_support.svg'
                     className='w-full aspect-square '
                   />
-                  <span className='font-bold text-base absolute bottom-0 right-2 text-right'>
+                  <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
                     1
                   </span>
                 </div>
@@ -126,7 +132,7 @@ export default function PlayerCard({
             </div>
             <div className='relative w-1/3 h-full'>
               <div className='absolute inset-0 flex flex-col items-center justify-center '>
-                <div className='xs:hidden bg-blue-800 animate-pulse px-2 rounded-full'>
+                <div className='xs:hidden'>
                   <StatCounter img='/cmd_special.svg' value={1} />
                 </div>
                 <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
@@ -134,7 +140,7 @@ export default function PlayerCard({
                     src='/cmd_special.svg'
                     className='w-full aspect-square '
                   />
-                  <span className='font-bold text-base absolute bottom-0 right-2 text-right'>
+                  <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
                     1
                   </span>
                 </div>
