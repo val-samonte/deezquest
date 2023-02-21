@@ -10,6 +10,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas } from 'pixi.js'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { AppContext, Container, Stage as PixiStage } from 'react-pixi-fiber'
+import PlayerCard from './PlayerCard'
 import StageCursor from './StageCursor'
 import Tile from './Tile'
 
@@ -86,8 +87,10 @@ export default function Stage() {
   }, [])
 
   return (
-    <div className='w-full h-full flex portrait:flex-col'>
-      <div className='flex-auto w-full p-3 sm:p-5 bg-black/80'></div>
+    <div className='w-full h-full flex portrait:flex-col-reverse'>
+      <div className='p-2 w-full h-full '>
+        <PlayerCard />
+      </div>
       <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-3 sm:p-5 backdrop-blur-sm '>
         <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden '>
           <PixiStage options={{ backgroundAlpha: 0 }}>
@@ -110,7 +113,9 @@ export default function Stage() {
           </PixiStage>
         </div>
       </div>
-      <div className='flex-auto w-full p-3 sm:p-5 '></div>
+      <div className='p-2 w-full h-full '>
+        <PlayerCard asOpponent />
+      </div>
     </div>
   )
 }

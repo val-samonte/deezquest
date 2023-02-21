@@ -48,7 +48,7 @@ function Tile({ type, id, transition, ...props }: any) {
           to: {
             ...rest,
             x: isPortrait ? tileSize * 4 : -tileSize,
-            y: isPortrait ? tileSize * 9 : tileSize * 4,
+            y: isPortrait ? tileSize * 9 : tileSize * 2,
             alpha: 0,
             width: tileSize * 0.5,
             height: tileSize * 0.5,

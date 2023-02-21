@@ -6,18 +6,18 @@ const PeerConnectionManager = dynamic(() => import('./PeerConnectionManager'), {
   ssr: false,
 })
 
-export default function Battle() {
+export default function DemoBattle() {
   return (
     <main className='flex flex-col landscape:justify-center w-full h-full bg-cover bg-no-repeat bg-center'>
-      <div className='flex-auto flex items-center justify-center bg-black/80'>
-        <div className='max-w-[100vw] max-h-[calc(100vh-56px)] landscape:w-full landscape:aspect-[5/3] portrait:h-full portrait:aspect-[3/5] mx-auto'>
+      <div className='flex-auto flex items-center justify-center'>
+        <div className='max-w-[100vw] max-h-[calc(100vh-56px)] landscape:w-full landscape:aspect-[2/1] portrait:h-full portrait:aspect-[1/2] mx-auto'>
           <Suspense fallback={null}>
             <PeerConnectionManager />
             <Stage />
           </Suspense>
         </div>
       </div>
-      <div className='flex-none h-14 w-full bg-black/80'></div>
+      <div className='flex-none h-14 w-full'></div>
     </main>
   )
 }
