@@ -10,6 +10,8 @@ import { useEffect, useMemo, useState } from 'react'
 import bs58 from 'bs58'
 import { trimAddress } from '@/utils/trimAddress'
 import { usePeer } from '@/atoms/peerAtom'
+import { PeerMessages } from '@/enums/PeerMessages'
+import { useRouter } from 'next/navigation'
 
 function SkillView({ skill }: { skill: Skill }) {
   return (
@@ -49,13 +51,15 @@ function SkillView({ skill }: { skill: Skill }) {
 }
 
 export default function HeroSelect() {
+  const router = useRouter()
   const heroSkills = useAtomValue(heroSkillsAtom)
   const [kp, setKp] = useState(
     (localStorage.getItem('demo_kp') &&
       Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
       Keypair.generate(),
   )
-  const { sendMessage } = usePeer(kp)
+  const { messages, sendMessage } = usePeer(kp)
+  const [messageCursor, setMessageCursor] = useState(0)
   const [startMatch, setStartMatch] = useState(false)
   const [matchLinkCopied, setMatchLinkCopied] = useState(false)
   const [opponent, setOpponent] = useState(
@@ -90,7 +94,41 @@ export default function HeroSelect() {
       localStorage.setItem('demo_opponent', opponent)
       setOpponent(opponent)
     }
-  }, [window.location.search])
+  }, [window.location.search, setOpponent])
+
+  useEffect(() => {
+    const currentMessage = messages[messageCursor]
+
+    if (!currentMessage) return
+
+    switch (currentMessage.data.type) {
+      case PeerMessages.INVITATION: {
+        localStorage.setItem('demo_opponent', currentMessage.from)
+        setOpponent(currentMessage.from)
+        sendMessage(currentMessage.from, {
+          type: PeerMessages.ACCEPT_INVITATION,
+        }).then(() => {
+          router.push('/demo_battle')
+        })
+        return
+      }
+      case PeerMessages.ACCEPT_INVITATION: {
+        if (currentMessage.from !== opponent) break
+        router.push('/demo_battle')
+        return
+      }
+    }
+
+    setMessageCursor(messageCursor + 1)
+  }, [
+    router,
+    messages,
+    messageCursor,
+    opponent,
+    sendMessage,
+    setMessageCursor,
+    setOpponent,
+  ])
 
   return (
     <div className='flex flex-col max-w-3xl gap-5 mx-auto p-5 bg-neutral-900 rounded'>
@@ -241,7 +279,6 @@ export default function HeroSelect() {
             </p>
             {errorMsg && (
               <p className='mx-5 mb-5 text-red-400 bg-red-800/10 p-5 text-sm rounded'>
-                {/* Opponent is not available. Ask for the match link again. */}
                 {errorMsg}
               </p>
             )}
@@ -250,7 +287,12 @@ export default function HeroSelect() {
               type='button'
               className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
               onClick={() => {
-                sendMessage(opponent, 'Hello?')
+                sendMessage(opponent, { type: PeerMessages.INVITATION }).catch(
+                  () =>
+                    setErrorMsg(
+                      'Opponent is not available. Ask for the match link again.',
+                    ),
+                )
               }}
             >
               Start Match

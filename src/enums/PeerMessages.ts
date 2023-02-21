@@ -1,0 +1,4 @@
+export enum PeerMessages {
+  INVITATION = 'INVITATION',
+  ACCEPT_INVITATION = 'ACCEPT_INVITATION',
+}

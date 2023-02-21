@@ -25,7 +25,7 @@ const messagesAtom = atomWithStorage<PeerMessage[]>(
 export function usePeer(keypair: Keypair) {
   const [peer, setPeer] = useAtom(peerBaseAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
-  const setMessages = useSetAtom(messagesAtom)
+  const [messages, setMessages] = useAtom(messagesAtom)
   const peerId = useMemo(() => keypair.publicKey.toBase58(), [keypair])
 
   const setupConnection = useCallback(
@@ -142,5 +142,5 @@ export function usePeer(keypair: Keypair) {
     [keypair, peer, connections, setConnections],
   )
 
-  return { peer, sendMessage }
+  return { peer, messages, sendMessage }
 }
