@@ -58,7 +58,7 @@ export default function HeroSelect() {
       Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
       Keypair.generate(),
   )
-  const { messages, sendMessage } = usePeer(kp)
+  const { messages, sendMessage, clearMessages } = usePeer(kp)
   const [messageCursor, setMessageCursor] = useState(0)
   const [startMatch, setStartMatch] = useState(false)
   const [matchLinkCopied, setMatchLinkCopied] = useState(false)
@@ -269,6 +269,8 @@ export default function HeroSelect() {
                 type='button'
                 className='underline'
                 onClick={() => {
+                  clearMessages(opponent)
+                  setMessageCursor(0)
                   localStorage.removeItem('demo_opponent')
                   setOpponent('')
                 }}

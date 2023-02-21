@@ -13,6 +13,7 @@ interface PeerMessage {
 }
 
 const peerBaseAtom = atom<Peer | null>(null)
+const peerOpenAtom = atom(false)
 const connectionListAtom = atom<DataConnection[]>([])
 const storage = createJSONStorage<PeerMessage[]>(() => sessionStorage)
 const messagesAtom = atomWithStorage<PeerMessage[]>(
@@ -24,6 +25,7 @@ const messagesAtom = atomWithStorage<PeerMessage[]>(
 // always end up overengineering this ¯\_(ツ)_/¯
 export function usePeer(keypair: Keypair) {
   const [peer, setPeer] = useAtom(peerBaseAtom)
+  const [isOpen, setOpen] = useAtom(peerOpenAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
   const [messages, setMessages] = useAtom(messagesAtom)
   const peerId = useMemo(() => keypair.publicKey.toBase58(), [keypair])
@@ -32,6 +34,8 @@ export function usePeer(keypair: Keypair) {
     (conn: DataConnection) => {
       setConnections((connections) => {
         if (connections.find((i) => i.peer === conn.peer)) return connections
+
+        console.log(`Connection established ${conn.peer}`)
 
         conn.on('data', (payload) => {
           const { data, from, signature } = payload as PeerMessage
@@ -77,14 +81,16 @@ export function usePeer(keypair: Keypair) {
 
         newPeer.on('open', () => {
           console.log(`Peer opened ${peerId}`)
+          setOpen(true)
         })
 
         newPeer.on('error', (err) => {
-          console.log(`Peer error ${peerId}: ${err}`)
+          console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
         })
 
         newPeer.on('close', () => {
           console.log(`Peer closed ${peerId}`)
+          setOpen(false)
         })
 
         setConnections((connections) => {
@@ -95,7 +101,7 @@ export function usePeer(keypair: Keypair) {
         return newPeer
       })
     }
-  }, [peer, peerId, setPeer, setConnections])
+  }, [peer, peerId, setPeer, setOpen, setConnections])
 
   const sendMessage = useCallback(
     async (receiverId: string, message: any) => {
@@ -116,25 +122,36 @@ export function usePeer(keypair: Keypair) {
 
       if (!connection) {
         connection = await new Promise<DataConnection>((resolve, reject) => {
+          const peerErr = (err: any) => {
+            peer.off('error', peerErr)
+            reject(err)
+          }
+
+          peer.on('error', peerErr)
+
           const newConnection = peer.connect(receiverId, {
             serialization: 'json',
           })
 
           if (!newConnection) {
+            peer.off('error', peerErr)
             reject('Remote peer is possibly destroyed / disconnected.')
             return
           }
 
-          newConnection.on('error', reject)
+          newConnection.on('error', (err) => {
+            peer.off('error', peerErr)
+            reject(err)
+          })
 
           newConnection.on('open', () => {
             newConnection.off('error')
+            peer.off('error', peerErr)
             resolve(newConnection)
           })
         })
 
         setupConnection(connection)
-        console.log(`Connection established ${connection.peer}`)
       }
 
       connection.send(payload)
@@ -142,5 +159,14 @@ export function usePeer(keypair: Keypair) {
     [keypair, peer, connections, setConnections],
   )
 
-  return { peer, messages, sendMessage }
+  const clearMessages = useCallback(
+    (from: string) => {
+      setMessages((messages) => {
+        return messages.filter((m) => m.from !== from)
+      })
+    },
+    [setMessages],
+  )
+
+  return { peer, isOpen, messages, connections, sendMessage, clearMessages }
 }

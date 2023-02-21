@@ -1,4 +1,5 @@
 export enum PeerMessages {
+  PING = 'PING',
   INVITATION = 'INVITATION',
   ACCEPT_INVITATION = 'ACCEPT_INVITATION',
 }
