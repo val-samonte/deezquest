@@ -29,7 +29,7 @@ export default function PlayerCard({
           }}
         ></div>
       </div>
-      <div className='flex-[2_2_0%] flex flex-col text-xs xs:text-sm xl:text-base py-2 gap-1 xl:gap-2'>
+      <div className='flex-[2_2_0%] flex flex-col text-xs xs:text-sm lg:text-base xl:text-lg py-2 gap-1 xl:gap-2'>
         <div
           className={classNames(
             'flex-none flex px-2 gap-1 xl:gap-2',
@@ -41,18 +41,48 @@ export default function PlayerCard({
             <span className='text-3xl md:text-4xl xl:text-7xl xs:font-bold flex-none'>
               100
             </span>
-            <span className='xs:font-bold xl:hidden'>/ 100</span>
+            <span className='xs:font-bold xl:hidden whitespace-nowrap'>
+              / 100
+            </span>
           </div>
 
           {/* HP Bar & Time */}
           <div className='flex flex-auto flex-col gap-1 xl:gap-2'>
             <div
               className={classNames(
-                'flex items-center gap-1 xl:gap-2 bg-neutral-400/5 p-1 xs:px-2',
+                'relative flex items-center gap-1 xl:gap-2 bg-neutral-400/5 p-1 xs:px-2 ',
                 asOpponent && 'portrait:flex-row-reverse',
               )}
             >
-              {/* <span className='hidden xs:font-bold xl:flex'>/ 100</span> */}
+              <div className='absolute inset-0 flex pointer-events-none'>
+                <div
+                  className='h-full'
+                  style={{
+                    width: '70%',
+                    background:
+                      'linear-gradient(180deg, rgba(5,131,0,0) 40%, rgba(5,131,0,0.15) 89%, rgba(5,131,0,1) 90%)',
+                  }}
+                ></div>
+                <div
+                  className='h-full'
+                  style={{
+                    width: '10%',
+                    background:
+                      'linear-gradient(180deg, rgba(55,236,214,0) 40%, rgba(55,236,214,0.15) 89%, rgba(55,236,214,1) 90%)',
+                  }}
+                ></div>
+                <div
+                  className='h-full'
+                  style={{
+                    width: '15%',
+                    background:
+                      'linear-gradient(180deg, rgba(208,21,255,0) 40%, rgba(208,21,255,0.15) 89%, rgba(208,21,255,1) 90%)',
+                  }}
+                ></div>
+              </div>
+              <span className='hidden xs:font-bold xl:flex whitespace-nowrap'>
+                / 100
+              </span>
               <span className='mx-auto' />
               <StatCounter img='/armor.svg' value={99} />
               <StatCounter img='/shell.svg' value={99} />

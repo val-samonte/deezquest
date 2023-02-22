@@ -10,6 +10,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas } from 'pixi.js'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { AppContext, Container, Stage as PixiStage } from 'react-pixi-fiber'
+import { animated, useSpring } from '@react-spring/web'
 import PlayerCard from './PlayerCard'
 import StageCursor from './StageCursor'
 import Tile from './Tile'
@@ -86,12 +87,29 @@ export default function Stage() {
     loaded.current = true
   }, [])
 
+  // const props = useSpring({
+  //   delay: 500,
+  //   from: {
+  //     opacity: 0,
+  //     marginBottom: '-200px',
+  //   },
+  //   to: {
+  //     opacity: 1,
+  //     marginBottom: '0px',
+  //   },
+  //   config: {
+  //     mass: 1,
+  //     tension: 180,
+  //     friction: 12,
+  //   },
+  // })
+
   return (
-    <div className='w-full h-full flex portrait:flex-col-reverse'>
+    <div className='relative w-full h-full flex portrait:flex-col-reverse'>
       <div className='p-2 w-full h-full '>
         <PlayerCard />
       </div>
-      <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5 backdrop-blur-sm '>
+      <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5 backdrop-blur-sm '>
         <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden '>
           <PixiStage options={{ backgroundAlpha: 0 }}>
             <AppContext.Consumer>
@@ -112,8 +130,23 @@ export default function Stage() {
             <StageCursor />
           </PixiStage>
         </div>
+        {/* TODO */}
+        {/* <div className='bg-black/80 absolute inset-0 flex items-center justify-center'>
+          <animated.div
+            style={props}
+            className='relative text-3xl xs:text-4xl font-bold flex items-center gap-3 md:gap-5'
+          >
+            <div className='flex items-center justify-center gap-3 md:gap-5'>
+              <img
+                src='/cmd_attack.svg'
+                className='w-10 h-10 md:w-12 md:h-12'
+              />
+              <span>Crushing Blow</span>
+            </div>
+          </animated.div>
+        </div> */}
       </div>
-      <div className='p-2 w-full h-full '>
+      <div className='p-2 w-full h-full opacity-20'>
         <PlayerCard asOpponent />
       </div>
     </div>

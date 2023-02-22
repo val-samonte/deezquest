@@ -16,9 +16,17 @@ export default function StatCounter({
 }: StatCounterProps) {
   return (
     <div
-      className={classNames('flex items-center md:gap-1', children && 'w-full')}
+      className={classNames(
+        'relative flex items-center md:gap-1',
+        children && 'w-full',
+      )}
     >
-      <img src={img} className={classNames('w-4 h-4 opacity-30')} />
+      <img
+        src={img}
+        className={classNames(
+          'w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8 opacity-30',
+        )}
+      />
       {children && (
         <span
           className={classNames(

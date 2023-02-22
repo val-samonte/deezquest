@@ -1,11 +1,10 @@
 'use client'
 
 import { GameTransitions } from '@/enums/GameTransitions'
-import { animated, Spring } from '@react-spring/web'
+import { animated, easings, Spring } from '@react-spring/web'
 import { Texture } from 'pixi.js'
 import { useMemo } from 'react'
 import { Sprite } from 'react-pixi-fiber'
-import { easeBounceOut, easeBackIn, easeBackInOut } from 'd3-ease'
 import { useAtomValue } from 'jotai'
 import { isPortraitAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
 
@@ -37,7 +36,7 @@ function Tile({ type, id, transition, ...props }: any) {
           },
           config: {
             duration: transition.duration - 100,
-            easing: easeBackInOut,
+            easing: easings.easeInOutBack, //easeBackInOut,
             clamp: true,
           },
         }
@@ -56,7 +55,7 @@ function Tile({ type, id, transition, ...props }: any) {
           from: { ...props, alpha: 1, width: tileSize, height: tileSize },
           config: {
             duration: transition.duration - 100,
-            easing: easeBackIn,
+            easing: easings.easeInBack, // easeBackIn,
             clamp: true,
           },
         }
@@ -72,7 +71,7 @@ function Tile({ type, id, transition, ...props }: any) {
           },
           config: {
             duration: transition.duration - 100,
-            easing: easeBounceOut,
+            easing: easings.easeOutBounce, //easeBounceOut,
             clamp: true,
           },
         }
