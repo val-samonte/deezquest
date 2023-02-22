@@ -146,7 +146,7 @@ export default function Stage() {
           </animated.div>
         </div> */}
       </div>
-      <div className='p-2 w-full h-full opacity-20'>
+      <div className='p-2 w-full h-full'>
         <PlayerCard asOpponent />
       </div>
     </div>

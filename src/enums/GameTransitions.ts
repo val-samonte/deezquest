@@ -2,5 +2,11 @@ export enum GameTransitions {
   SET = 'SET',
   SWAP = 'SWAP',
   DRAIN = 'DRAIN',
+  DRAIN_FADE = 'DRAIN_FADE',
+  DRAIN_STAB = 'DRAIN_STAB',
+  DRAIN_GLOW = 'DRAIN_GLOW',
+  NORMAL_ATTACK = 'NORMAL_ATTACK',
+  CAST = 'CAST',
+  APPLY_SPELL = 'APPLY_SPELL',
   FILL = 'FILL',
 }

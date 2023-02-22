@@ -19,6 +19,8 @@ export const gameFunctions = atom(
     let hash = get(gameHashAtom)
 
     switch (action.type) {
+      // TODO
+      // case 'checkturn':
       case 'initialBoard': {
         let hash = crypto
           .createHash('sha256')
@@ -91,7 +93,14 @@ export const gameFunctions = atom(
         })
 
         while (hasMatch(newTiles)) {
-          const { matches, depths } = getMatches(newTiles)
+          const { matches, depths, count } = getMatches(newTiles)
+
+          // todo: who made the turn? (hero)
+
+          // absorb mana first
+          // then decide for the command
+          // console.log(count) // [SWRD, SHLD, SPEC, FIRE, WATR, WIND, EART]
+          // hero.doSomthingWithThisCountInfo
 
           newTiles = subtract(newTiles, matches)
           stack.push({
@@ -99,6 +108,11 @@ export const gameFunctions = atom(
             order: ++stackCounter,
             tiles: [...newTiles],
             nodes: matches.reduce((acc, cur, i) => {
+              // drain variation
+              // amulets < LVL 2 - fade in place
+              // swords without spells - stab enemy
+              // swords with spell - glow
+
               if (cur !== null) {
                 acc[i] = {
                   type: matches[i],
@@ -112,6 +126,13 @@ export const gameFunctions = atom(
             }, {}),
             duration: 600,
           })
+
+          // GameTransitions.NORMAL_ATTACK for normal attack, else:
+
+          // GameTransitions.CAST cast intro transition if spell is present
+          // GameTransitions.APPLY_SPELL fade involved symbols upward, opacity 1 to the targets (player / opponent / both)
+          // - apply slash effect / shake profile for damage
+          // - apply refresh effect for buff / heal
 
           const { tiles, gravity } = applyGravity(newTiles, depths)
           newTiles = tiles
@@ -196,6 +217,7 @@ function hasMatch(tiles: (number | null)[]) {
 
 function getMatches(tiles: (number | null)[]) {
   const matches = new Array(64).fill(null)
+  const count = new Array(7).fill(0)
   const depths = new Array(8).fill(0)
 
   for (let i = 0; i < 64; i++) {
@@ -206,26 +228,42 @@ function getMatches(tiles: (number | null)[]) {
     // vertical
     if (row < 6) {
       if (type !== null && type === tiles[i + 8] && type === tiles[i + 16]) {
-        if (matches[i] === null) depths[col]++
-        if (matches[i + 8] === null) depths[col]++
-        if (matches[i + 16] === null) depths[col]++
-
-        matches[i] = type
-        matches[i + 8] = type
-        matches[i + 16] = type
+        if (matches[i] === null) {
+          depths[col]++
+          count[type]++
+          matches[i] = type
+        }
+        if (matches[i + 8] === null) {
+          depths[col]++
+          count[type]++
+          matches[i + 8] = type
+        }
+        if (matches[i + 16] === null) {
+          depths[col]++
+          count[type]++
+          matches[i + 16] = type
+        }
       }
     }
 
     // horizontal
     if (col < 6) {
       if (type !== null && type === tiles[i + 1] && type === tiles[i + 2]) {
-        if (matches[i] === null) depths[col]++
-        if (matches[i + 1] === null) depths[col + 1]++
-        if (matches[i + 2] === null) depths[col + 2]++
-
-        matches[i] = type
-        matches[i + 1] = type
-        matches[i + 2] = type
+        if (matches[i] === null) {
+          depths[col]++
+          count[type]++
+          matches[i] = type
+        }
+        if (matches[i + 1] === null) {
+          depths[col + 1]++
+          count[type]++
+          matches[i + 1] = type
+        }
+        if (matches[i + 2] === null) {
+          depths[col + 2]++
+          count[type]++
+          matches[i + 2] = type
+        }
       }
     }
   }
@@ -233,6 +271,7 @@ function getMatches(tiles: (number | null)[]) {
   return {
     matches,
     depths,
+    count,
   }
 }
 
