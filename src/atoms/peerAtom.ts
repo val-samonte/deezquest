@@ -8,7 +8,7 @@ import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 
-interface PeerMessage {
+export interface PeerMessage {
   from: string // base58 encoded
   data: any
   signature: string // base58 encoded
@@ -17,12 +17,13 @@ interface PeerMessage {
 const peerBaseAtom = atom<Peer | null>(null)
 const peerOpenAtom = atom(false)
 const connectionListAtom = atom<DataConnection[]>([])
-const storage = createJSONStorage<PeerMessage[]>(() => sessionStorage)
-const messagesAtom = atomWithStorage<PeerMessage[]>(
-  'demo_messages',
-  [],
-  storage,
-)
+// const storage = createJSONStorage<PeerMessage[]>(() => sessionStorage)
+// const messagesAtom = atomWithStorage<PeerMessage[]>(
+//   'demo_messages',
+//   [],
+//   storage,
+// )
+const messagesAtom = atom<PeerMessage[]>([])
 
 // always end up overengineering this ¯\_(ツ)_/¯
 export function usePeer(keypair: Keypair) {

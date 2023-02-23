@@ -1,14 +1,26 @@
 import { gameFunctions, playerKpAtom } from '@/atoms/gameStateAtom'
+import { usePeer } from '@/atoms/peerAtom'
 import { stageDimensionAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
+import { GameStateFunctions } from '@/enums/GameStateFunctions'
+import { Keypair } from '@solana/web3.js'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { FederatedPointerEvent, Texture } from 'pixi.js'
 import { useCallback, useState } from 'react'
 import { Sprite } from 'react-pixi-fiber'
+import bs58 from 'bs58'
+import { PeerMessages } from '@/enums/PeerMessages'
 
 const cursorIcon = Texture.from(`/cursor.png`)
 
 export default function StageCursor() {
+  const [kp] = useState(
+    (localStorage.getItem('demo_kp') &&
+      Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
+      null,
+  )
+  const { sendMessage } = usePeer(kp!)
   const playerKp = useAtomValue(playerKpAtom)
+  const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
   const gameFn = useSetAtom(gameFunctions)
   const tileSize = useAtomValue(tileSizeAtom)
   const { width, height } = useAtomValue(stageDimensionAtom)
@@ -32,15 +44,21 @@ export default function StageCursor() {
             const dir = distX > distY ? 'h' : 'v'
 
             if (fired === 1) {
-              gameFn({
-                type: 'swapNode',
+              const payload = {
+                type: GameStateFunctions.INIT,
                 data: {
                   publicKey: playerKp?.publicKey.toBase58(),
                   origin: dir + origin,
                   node1: { x: curr.x, y: curr.y },
                   node2: { x, y },
                 },
-              })
+              }
+              gameFn(payload)
+              opponent &&
+                sendMessage(opponent, {
+                  type: PeerMessages.GAME_TURN,
+                  data: payload,
+                })
             }
             return null
           }
@@ -56,7 +74,7 @@ export default function StageCursor() {
         return null
       })
     },
-    [tileSize],
+    [tileSize, opponent, playerKp, sendMessage],
   )
 
   return (

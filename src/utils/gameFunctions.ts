@@ -192,9 +192,9 @@ export const getNextTurn = (
 
     for (let i = 0; i < seq1.length; i++) {
       if (seq1[i] > seq2[i]) {
-        return hero1
+        return { hero: hero1, pubkey: pubkey1 }
       } else if (seq1[i] < seq2[i]) {
-        return hero2
+        return { hero: hero2, pubkey: pubkey2 }
       }
     }
 
@@ -203,10 +203,10 @@ export const getNextTurn = (
       'Heroes are too identical, even having the same public key hash result.',
     )
   } else if (hero1.turnTime >= 200) {
-    return hero1
+    return { hero: hero1, pubkey: pubkey1 }
   }
 
-  return hero2
+  return { hero: hero2, pubkey: pubkey2 }
 }
 
 export type SkillFn = (
@@ -566,7 +566,6 @@ export const executableCommands = (
 
   return {
     flags,
-    hero,
     stacks,
   }
 }

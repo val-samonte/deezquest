@@ -1,15 +1,35 @@
 'use client'
 
 import StatCounter from '@/components/StatCounter'
+import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
 import classNames from 'classnames'
+import { atom, useAtomValue } from 'jotai'
+import { atomFamily } from 'jotai/utils'
+
+export const heroDisplayAtom = atomFamily((pubkey: string) =>
+  atom<Hero>(heroFromPublicKey(pubkey)),
+)
+
+export const updateHeroesAtom = atom(
+  null,
+  (get, set, update: { [key: string]: Hero }) => {
+    if (typeof update === 'object') {
+      Object.entries(update).map(([pubkey, hero]) => {
+        set(heroDisplayAtom(pubkey), hero)
+      })
+    }
+  },
+)
 
 export default function PlayerCard({
-  asOpponent,
   publicKey,
+  asOpponent,
 }: {
+  publicKey: string
   asOpponent?: boolean
-  publicKey?: string
 }) {
+  const hero = useAtomValue(heroDisplayAtom(publicKey))
+
   return (
     <div
       className={classNames(
@@ -39,10 +59,10 @@ export default function PlayerCard({
           {/* HP */}
           <div className='flex flex-col items-center'>
             <span className='text-3xl md:text-4xl xl:text-7xl xs:font-bold flex-none'>
-              100
+              {hero.hp}
             </span>
             <span className='xs:font-bold xl:hidden whitespace-nowrap'>
-              / 100
+              / {hero.hpCap}
             </span>
           </div>
 
@@ -81,11 +101,11 @@ export default function PlayerCard({
                 ></div>
               </div>
               <span className='hidden xs:font-bold xl:flex whitespace-nowrap'>
-                / 100
+                / {hero.hpCap}
               </span>
               <span className='mx-auto' />
-              <StatCounter img='/armor.svg' value={99} />
-              <StatCounter img='/shell.svg' value={99} />
+              <StatCounter img='/armor.svg' value={hero.armor} />
+              <StatCounter img='/shell.svg' value={hero.shell} />
             </div>
             <div
               className={classNames(
@@ -94,9 +114,9 @@ export default function PlayerCard({
               )}
             >
               <span className='xl:hidden mx-auto' />
-              <StatCounter img='/time.svg' value={99} />
+              <StatCounter img='/time.svg' value={hero.turnTime} />
               <span className='hidden xl:flex mx-auto' />
-              <StatCounter img='/stat_spd.svg' value={99} />
+              <StatCounter img='/stat_spd.svg' value={hero.spd} />
             </div>
           </div>
         </div>
@@ -104,22 +124,22 @@ export default function PlayerCard({
         {/* Mana */}
         <ul className='flex-none grid grid-cols-4 landscape:sm:grid-cols-2 px-2 gap-1 xl:gap-2'>
           <li className='flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
-            <StatCounter img='/elem_fire.svg' value={99}>
+            <StatCounter img='/elem_fire.svg' value={hero.fireMp}>
               Fire
             </StatCounter>
           </li>
           <li className='flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
-            <StatCounter img='/elem_wind.svg' value={99}>
+            <StatCounter img='/elem_wind.svg' value={hero.windMp}>
               Wind
             </StatCounter>
           </li>
           <li className='flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
-            <StatCounter img='/elem_water.svg' value={99}>
+            <StatCounter img='/elem_water.svg' value={hero.watrMp}>
               Water
             </StatCounter>
           </li>
           <li className='flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
-            <StatCounter img='/elem_earth.svg' value={99}>
+            <StatCounter img='/elem_earth.svg' value={hero.eartMp}>
               Earth
             </StatCounter>
           </li>

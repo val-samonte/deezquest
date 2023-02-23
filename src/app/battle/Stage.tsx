@@ -8,19 +8,31 @@ import {
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas } from 'pixi.js'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AppContext, Container, Stage as PixiStage } from 'react-pixi-fiber'
 import { animated, useSpring } from '@react-spring/web'
-import PlayerCard from './PlayerCard'
+import PlayerCard, { updateHeroesAtom } from './PlayerCard'
 import StageCursor from './StageCursor'
 import Tile from './Tile'
+import { Keypair } from '@solana/web3.js'
+import bs58 from 'bs58'
+import { GameStateFunctions } from '@/enums/GameStateFunctions'
 
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
+  const updateHeroes = useSetAtom(updateHeroesAtom)
   const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
   const transitionStack = useAtomValue(gameTransitionStackAtom)
   const [stackCounter, setStackCounter] = useState(-1)
-  const [tiles, setTiles] = useState<any[]>([]) // TODO: refactor, let Tiles access this via atom
+  const [tiles, setTiles] = useState<any[]>([])
+
+  const [kp] = useState(
+    (localStorage.getItem('demo_kp') &&
+      Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
+      null,
+  )
+  const player = useMemo(() => kp?.publicKey.toBase58() ?? null, [kp])
+  const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
 
   useEffect(() => {
     if (transitionStack.length === 0) return
@@ -71,14 +83,35 @@ export default function Stage() {
         }),
       )
 
+    if (stack.heroes) {
+      updateHeroes(stack.heroes)
+    }
+
+    // ATTACK_NORMAL
+    // BUFF_ARMOR
+    // CAST
+    // ATTACK_SPELL
+    // BUFF_SPELL
+
     // target: command.skill.target,
     // - apply slash effect / shake profile for damage
     // - apply refresh effect for buff / heal
 
-    setTimeout(() => {
-      setStackCounter(stack.order)
-    }, stack.duration + 100)
-  }, [transitionStack, stackCounter])
+    setTimeout(
+      () => {
+        setStackCounter(stack.order)
+      },
+      stack.duration ? stack.duration + 100 : 0,
+    )
+  }, [
+    transitionStack,
+    stackCounter,
+    player,
+    opponent,
+    setTiles,
+    setIsTransitioning,
+    updateHeroes,
+  ])
 
   const loaded = useRef(false)
 
@@ -86,8 +119,7 @@ export default function Stage() {
     if (loaded.current) return
 
     gameFn({
-      type: 'initialBoard',
-      data: { seed: Math.floor(Math.random() * 100000) + '' },
+      type: GameStateFunctions.INIT,
     })
 
     loaded.current = true
@@ -113,7 +145,7 @@ export default function Stage() {
   return (
     <div className='relative w-full h-full flex portrait:flex-col-reverse'>
       <div className='p-2 w-full h-full '>
-        <PlayerCard />
+        {player && <PlayerCard publicKey={player} />}
       </div>
       <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5 backdrop-blur-sm '>
         <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden '>
@@ -153,7 +185,7 @@ export default function Stage() {
         </div> */}
       </div>
       <div className='p-2 w-full h-full'>
-        <PlayerCard asOpponent />
+        {opponent && <PlayerCard asOpponent publicKey={opponent} />}
       </div>
     </div>
   )

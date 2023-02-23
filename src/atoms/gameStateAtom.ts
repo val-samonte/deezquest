@@ -15,8 +15,9 @@ import {
 } from '@/utils/gameFunctions'
 import { TargetHero } from '@/enums/TargetHero'
 import { SkillTypes } from '@/enums/SkillTypes'
+import { GameStateFunctions } from '@/enums/GameStateFunctions'
 
-interface GameState {
+export interface GameState {
   hashes: string[]
   tiles: number[]
   currentTurn: string
@@ -67,61 +68,6 @@ export const gameStateAtom = atom(
   },
 )
 
-export const gameHashAtom = atom((get) => {
-  const gameState = get(gameStateAtom)
-
-  if (gameState && (gameState.hashes.length ?? 0) > 0) {
-    return gameState.hashes[gameState.hashes.length - 1]
-  }
-
-  return null
-})
-
-export const playerHeroAtom = atom((get) => {
-  const playerKp = get(playerKpAtom)
-  if (!playerKp) return null
-
-  const gameState = get(gameStateAtom)
-  if (!gameState) return null
-
-  return gameState.players[playerKp.publicKey.toBase58()] ?? null
-})
-
-export const opponentHeroAtom = atom((get) => {
-  const gameState = get(gameStateAtom)
-  if (!gameState) return null
-
-  const localPubkey = window.localStorage.getItem('demo_opponent')
-  return localPubkey ? gameState.players[localPubkey] ?? null : null
-})
-
-export const currentHeroInTurnAtom = atom((get) => {
-  const gameState = get(gameStateAtom)
-  if (!gameState) return null
-  if (!gameState.currentTurn) return null
-
-  return {
-    publicKey: gameState.currentTurn,
-    hero: gameState.players[gameState.currentTurn],
-  }
-})
-
-export const gameTilesAtom = atom((get) => {
-  const gameState = get(gameStateAtom)
-  if (!gameState) return null
-
-  return gameState.tiles
-})
-
-export const turnCountsAtom = atom((get) => {
-  const gameState = get(gameStateAtom)
-  if (!gameState) return null
-
-  return gameState.hashes.length
-})
-
-// TODO: consult opponent "hey, do you have the latest game state?"
-
 export const isGameTransitioningAtom = atom(false)
 export const gameTransitionStackAtom = atom<any[]>([])
 export const gameTransitionStackCounterAtom = atom(0)
@@ -131,7 +77,6 @@ export const gameFunctions = atom(
   (get, set, action: { type: string; data?: any }) => {
     let gameState = get(gameStateAtom)
 
-    // initialize game state
     if (!gameState) {
       const playerKp = get(playerKpAtom)
       const opponentPubkey = window.localStorage.getItem('demo_opponent')
@@ -156,8 +101,7 @@ export const gameFunctions = atom(
         hash,
       )
 
-      const currentTurn =
-        heroInTurn === playerHero ? playerPubkey : opponentPubkey
+      const currentTurn = bs58.encode(heroInTurn.pubkey)
 
       let tiles = new Array(64)
       while (true) {
@@ -178,8 +122,6 @@ export const gameFunctions = atom(
         },
       }
 
-      set(gameStateAtom, gameState)
-
       console.log('GameState Initialized', gameState)
     }
 
@@ -187,15 +129,29 @@ export const gameFunctions = atom(
     let stackCounter = get(gameTransitionStackCounterAtom)
     let hash = bs58.decode(gameState.hashes[gameState.hashes.length - 1])
 
-    // treatment of player vs opponent depends on context
+    // NOTE: treatment of player vs opponent depends on context
     // at this point, player is the one who currently doing this turn, opponent otherwise
+
     let playerHero = gameState.players[gameState.currentTurn]
     let [opponentPubkey, opponentHero] = Object.entries(gameState.players).find(
       (p) => p[0] !== gameState!.currentTurn,
     )!
 
     switch (action.type) {
-      case 'swapNode': {
+      case GameStateFunctions.INIT: {
+        const stack = get(gameTransitionStackAtom)
+
+        stack.push({
+          type: GameTransitions.SET,
+          order: ++stackCounter,
+          tiles: gameState.tiles,
+          heroes: gameState.players,
+        })
+
+        set(gameTransitionStackAtom, [...stack])
+        break
+      }
+      case GameStateFunctions.SWAP_NODE: {
         if (isTransitioning) return
         if (action.data.publicKey !== gameState.currentTurn) return
 
@@ -251,11 +207,10 @@ export const gameFunctions = atom(
 
           // count: [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
           playerHero = absorbMana(playerHero, count.slice(3))
-          const {
-            flags,
-            hero: postCommandsHero,
-            stacks: commandsStacks,
-          } = executableCommands(playerHero, count.slice(0, 3))
+          const { flags, stacks: commandsStacks } = executableCommands(
+            playerHero,
+            count.slice(0, 3),
+          )
 
           newTiles = subtract(newTiles, matches)
           stack.push({
@@ -420,10 +375,18 @@ export const gameFunctions = atom(
           })
         }
 
+        gameState.tiles = [...newTiles] as number[]
+        gameState.hashes = [...gameState.hashes, bs58.encode(hash)]
+        gameState.players = {
+          [gameState.currentTurn]: playerHero,
+          [opponentPubkey]: opponentHero,
+        }
+
         stack.push({
           type: GameTransitions.SET,
           order: ++stackCounter,
-          tiles: [...newTiles],
+          tiles: gameState.tiles,
+          heroes: gameState.players,
         })
 
         set(gameTransitionStackAtom, [...stack])
@@ -431,8 +394,20 @@ export const gameFunctions = atom(
       }
     }
 
+    const nextTurn = getNextTurn(
+      playerHero,
+      opponentHero,
+      new PublicKey(gameState.currentTurn).toBytes(),
+      new PublicKey(opponentPubkey).toBytes(),
+      hash,
+    )
+
+    set(gameStateAtom, {
+      ...gameState,
+      currentTurn: bs58.encode(nextTurn.pubkey),
+    })
+
     set(gameTransitionStackCounterAtom, stackCounter)
-    // set game state
   },
 )
 
