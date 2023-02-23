@@ -1,12 +1,127 @@
 import { atom } from 'jotai'
 import crypto from 'crypto'
+import bs58 from 'bs58'
 import { GameTransitions } from '@/enums/GameTransitions'
+import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
+import { Keypair, PublicKey } from '@solana/web3.js'
+import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
+import {
+  absorbMana,
+  applyDamage,
+  executableCommands,
+  getNextTurn,
+  Hero,
+  heroFromPublicKey,
+} from '@/utils/gameFunctions'
+import { TargetHero } from '@/enums/TargetHero'
+import { SkillTypes } from '@/enums/SkillTypes'
 
-export const gameHashAtom = atom(
-  crypto.createHash('sha256').update(Buffer.from('')).digest(),
+interface GameState {
+  hashes: string[]
+  tiles: number[]
+  currentTurn: string
+  players: {
+    [key: string]: Hero
+  }
+}
+
+export const gamesStateAtom = atomFamily((matchId: string) =>
+  atomWithStorage<GameState | null>(
+    `demo_games_${matchId}`,
+    null,
+    createJSONStorage<GameState | null>(() => sessionStorage),
+  ),
 )
 
-export const gameTurnCountAtom = atom(0)
+export const playerKpAtom = atom(() => {
+  const playerDemoKp = localStorage.getItem('demo_kp')
+  if (!playerDemoKp) return null
+  return Keypair.fromSecretKey(bs58.decode(playerDemoKp))
+})
+
+export const matchIdAtom = atom((get) => {
+  const playerKp = get(playerKpAtom)
+  if (!playerKp) return null
+
+  const opponentPubkey = window.localStorage.getItem('demo_opponent')
+  if (!opponentPubkey) return null
+
+  return combinePublicKeysAsHash(
+    playerKp.publicKey.toBase58(),
+    opponentPubkey,
+  ) as string
+})
+
+export const gameStateAtom = atom(
+  (get) => {
+    const matchId = get(matchIdAtom)
+    if (!matchId) return null
+
+    return get(gamesStateAtom(matchId)) ?? null
+  },
+  (get, set, data: GameState) => {
+    const matchId = get(matchIdAtom)
+    if (!matchId) return null
+
+    set(gamesStateAtom(matchId), data)
+  },
+)
+
+export const gameHashAtom = atom((get) => {
+  const gameState = get(gameStateAtom)
+
+  if (gameState && (gameState.hashes.length ?? 0) > 0) {
+    return gameState.hashes[gameState.hashes.length - 1]
+  }
+
+  return null
+})
+
+export const playerHeroAtom = atom((get) => {
+  const playerKp = get(playerKpAtom)
+  if (!playerKp) return null
+
+  const gameState = get(gameStateAtom)
+  if (!gameState) return null
+
+  return gameState.players[playerKp.publicKey.toBase58()] ?? null
+})
+
+export const opponentHeroAtom = atom((get) => {
+  const gameState = get(gameStateAtom)
+  if (!gameState) return null
+
+  const localPubkey = window.localStorage.getItem('demo_opponent')
+  return localPubkey ? gameState.players[localPubkey] ?? null : null
+})
+
+export const currentHeroInTurnAtom = atom((get) => {
+  const gameState = get(gameStateAtom)
+  if (!gameState) return null
+  if (!gameState.currentTurn) return null
+
+  return {
+    publicKey: gameState.currentTurn,
+    hero: gameState.players[gameState.currentTurn],
+  }
+})
+
+export const gameTilesAtom = atom((get) => {
+  const gameState = get(gameStateAtom)
+  if (!gameState) return null
+
+  return gameState.tiles
+})
+
+export const turnCountsAtom = atom((get) => {
+  const gameState = get(gameStateAtom)
+  if (!gameState) return null
+
+  return gameState.hashes.length
+})
+
+// TODO: consult opponent "hey, do you have the latest game state?"
+
 export const isGameTransitioningAtom = atom(false)
 export const gameTransitionStackAtom = atom<any[]>([])
 export const gameTransitionStackCounterAtom = atom(0)
@@ -14,58 +129,85 @@ export const gameTransitionStackCounterAtom = atom(0)
 export const gameFunctions = atom(
   null,
   (get, set, action: { type: string; data?: any }) => {
+    let gameState = get(gameStateAtom)
+
+    // initialize game state
+    if (!gameState) {
+      const playerKp = get(playerKpAtom)
+      const opponentPubkey = window.localStorage.getItem('demo_opponent')
+
+      if (!playerKp || !opponentPubkey)
+        throw Error('Missing player / opponent public keys')
+
+      const playerPubkey = playerKp.publicKey.toBase58()
+      let playerHero = heroFromPublicKey(playerKp.publicKey)
+      let opponentHero = heroFromPublicKey(opponentPubkey)
+      let hash = combinePublicKeysAsHash(
+        playerPubkey,
+        opponentPubkey,
+        false,
+      ) as Uint8Array
+
+      const heroInTurn = getNextTurn(
+        playerHero,
+        opponentHero,
+        playerKp.publicKey.toBytes(),
+        new PublicKey(opponentPubkey).toBytes(),
+        hash,
+      )
+
+      const currentTurn =
+        heroInTurn === playerHero ? playerPubkey : opponentPubkey
+
+      let tiles = new Array(64)
+      while (true) {
+        tiles = hashToTiles(hash)
+        if (!hasMatch(tiles)) {
+          break
+        }
+        hash = crypto.createHash('sha256').update(hash).digest()
+      }
+
+      gameState = {
+        hashes: [bs58.encode(hash)],
+        currentTurn,
+        tiles,
+        players: {
+          [playerPubkey]: playerHero,
+          [opponentPubkey]: opponentHero,
+        },
+      }
+
+      set(gameStateAtom, gameState)
+
+      console.log('GameState Initialized', gameState)
+    }
+
     let isTransitioning = get(isGameTransitioningAtom)
     let stackCounter = get(gameTransitionStackCounterAtom)
-    let hash = get(gameHashAtom)
+    let hash = bs58.decode(gameState.hashes[gameState.hashes.length - 1])
+
+    // treatment of player vs opponent depends on context
+    // at this point, player is the one who currently doing this turn, opponent otherwise
+    let playerHero = gameState.players[gameState.currentTurn]
+    let [opponentPubkey, opponentHero] = Object.entries(gameState.players).find(
+      (p) => p[0] !== gameState!.currentTurn,
+    )!
 
     switch (action.type) {
-      // TODO
-      // case 'checkturn':
-      case 'initialBoard': {
-        let hash = crypto
-          .createHash('sha256')
-          .update(Buffer.from(action.data.seed))
-          .digest()
-        let tiles = new Array(64)
-        let iter = 0
-
-        while (true) {
-          tiles = hashToTiles(hash)
-
-          if (!hasMatch(tiles)) {
-            console.log(iter, hash.toString('hex'))
-            break
-          }
-
-          iter++
-          hash = crypto.createHash('sha256').update(hash).digest()
-        }
-
-        stackCounter++
-        set(gameTransitionStackAtom, [
-          {
-            type: GameTransitions.SET,
-            order: stackCounter,
-            tiles,
-          },
-        ])
-        set(gameTransitionStackCounterAtom, stackCounter)
-        set(gameHashAtom, hash)
-
-        break
-      }
       case 'swapNode': {
         if (isTransitioning) return
+        if (action.data.publicKey !== gameState.currentTurn) return
 
         const stack = get(gameTransitionStackAtom)
-        const tiles = stack[stack.length - 1].tiles
+        const tiles = gameState.tiles // stack[stack.length - 1].tiles
 
         const node1 = action.data.node1.y * 8 + action.data.node1.x
         const node2 = action.data.node2.y * 8 + action.data.node2.x
 
         if (tiles[node1] === tiles[node2]) return
 
-        let newTiles = [...tiles]
+        let newTiles = [...tiles] as (number | null)[]
         newTiles[node1] = tiles[node2]
         newTiles[node2] = tiles[node1]
 
@@ -92,29 +234,46 @@ export const gameFunctions = atom(
           duration: 450,
         })
 
+        hash = crypto
+          .createHash('sha256')
+          .update(
+            Buffer.concat([
+              Buffer.from('SWAP'),
+              hash,
+              action.data.origin,
+              bs58.decode(gameState.currentTurn),
+            ]),
+          )
+          .digest()
+
         while (hasMatch(newTiles)) {
           const { matches, depths, count } = getMatches(newTiles)
 
-          // todo: who made the turn? (hero)
-
-          // absorb mana first
-          // then decide for the command
-          // console.log(count) // [SWRD, SHLD, SPEC, FIRE, WATR, WIND, EART]
-          // hero.doSomthingWithThisCountInfo
+          // count: [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+          playerHero = absorbMana(playerHero, count.slice(3))
+          const {
+            flags,
+            hero: postCommandsHero,
+            stacks: commandsStacks,
+          } = executableCommands(playerHero, count.slice(0, 3))
 
           newTiles = subtract(newTiles, matches)
           stack.push({
             type: GameTransitions.DRAIN,
             order: ++stackCounter,
             tiles: [...newTiles],
+            heroes: {
+              [gameState.currentTurn]: { ...playerHero },
+            },
             nodes: matches.reduce((acc, cur, i) => {
-              // drain variation
-              // amulets < LVL 2 - fade in place
-              // swords without spells - stab enemy
-              // swords with spell - glow
-
               if (cur !== null) {
                 acc[i] = {
+                  // TODO: swords without spells - stab enemy
+                  variation: flags[matches[i]]
+                    ? GameTransitions.DRAIN_GLOW
+                    : i === 2
+                    ? GameTransitions.DRAIN_FADE
+                    : undefined,
                   type: matches[i],
                   from: {
                     x: i % 8,
@@ -127,12 +286,109 @@ export const gameFunctions = atom(
             duration: 600,
           })
 
-          // GameTransitions.NORMAL_ATTACK for normal attack, else:
+          commandsStacks.forEach((command) => {
+            if (command.attack) {
+              opponentHero = applyDamage(opponentHero, command.attack)
+              stack.push({
+                type: GameTransitions.ATTACK_NORMAL,
+                order: ++stackCounter,
+                heroes: {
+                  [opponentPubkey]: { ...opponentHero },
+                },
+              })
+            } else if (command.armor) {
+              playerHero.armor += command.armor
+              stack.push({
+                type: GameTransitions.BUFF_ARMOR,
+                order: ++stackCounter,
+                heroes: {
+                  [gameState!.currentTurn]: { ...playerHero },
+                },
+              })
+            } else if (command.skill) {
+              playerHero.fireMp = command.hero.fireMp
+              playerHero.windMp = command.hero.windMp
+              playerHero.watrMp = command.hero.watrMp
+              playerHero.eartMp = command.hero.eartMp
 
-          // GameTransitions.CAST cast intro transition if spell is present
-          // GameTransitions.APPLY_SPELL fade involved symbols upward, opacity 1 to the targets (player / opponent / both)
-          // - apply slash effect / shake profile for damage
-          // - apply refresh effect for buff / heal
+              stack.push({
+                type: GameTransitions.CAST,
+                order: ++stackCounter,
+                spotlight: [gameState!.currentTurn],
+                heroes: {
+                  [gameState!.currentTurn]: { ...playerHero },
+                },
+                spell: {
+                  lvl: command.lvl ?? 1,
+                  name: command.skill.name,
+                  type: command.skill.type,
+                },
+                nodes: matches.reduce((acc, cur, i) => {
+                  if (cur !== null) {
+                    acc[i] = {
+                      type: matches[i],
+                      // TODO: remove
+                      from: {
+                        x: i % 8,
+                        y: Math.floor(i / 8),
+                      },
+                    }
+                  }
+                  return acc
+                }, {}),
+                duration: 1000,
+              })
+
+              const postCommand = command.skill.fn(
+                command.lvl ?? 1,
+                playerHero,
+                opponentHero,
+                newTiles,
+                hash,
+              )
+
+              playerHero = postCommand.player
+              opponentHero = postCommand.opponent
+              newTiles = postCommand.tiles
+              hash = postCommand.gameHash
+
+              const spotlight: any = []
+              const heroes: any = {}
+              let type = GameTransitions.ATTACK_SPELL
+
+              if (
+                command.skill.target === TargetHero.SELF ||
+                command.skill.target === TargetHero.BOTH
+              ) {
+                spotlight.push(gameState!.currentTurn)
+                heroes[gameState!.currentTurn] = { ...playerHero }
+
+                if (command.skill.type === SkillTypes.SUPPORT) {
+                  type = GameTransitions.BUFF_SPELL
+                }
+              }
+              if (
+                command.skill.target === TargetHero.ENEMY ||
+                command.skill.target === TargetHero.BOTH
+              ) {
+                spotlight.push(opponentPubkey)
+                heroes[opponentPubkey] = { ...opponentHero }
+              }
+
+              stack.push({
+                type,
+                order: ++stackCounter,
+                spotlight,
+                heroes,
+                // tiles: [...newTiles]
+                duration: 500,
+              })
+            }
+
+            // TODO: HP check after each command
+          })
+
+          // TODO: issue with shuffle skills
 
           const { tiles, gravity } = applyGravity(newTiles, depths)
           newTiles = tiles
@@ -176,7 +432,7 @@ export const gameFunctions = atom(
     }
 
     set(gameTransitionStackCounterAtom, stackCounter)
-    set(gameHashAtom, hash)
+    // set game state
   },
 )
 

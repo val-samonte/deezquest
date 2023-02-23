@@ -40,34 +40,40 @@ export default function Stage() {
 
     setIsTransitioning(true)
 
-    setTiles(
-      stack.tiles.map((type: any, i: number) => {
-        const props = {
-          type,
-          x: i % 8,
-          y: Math.floor(i / 8),
-        }
-
-        if (stack.nodes?.[i]) {
-          const transition = {
-            id: stack.type,
-            type: stack.nodes[i].type,
-            duration: stack.duration,
-            from: {
-              x: stack.nodes[i].from.x,
-              y: stack.nodes[i].from.y,
-            },
+    stack.tiles &&
+      setTiles(
+        stack.tiles.map((type: any, i: number) => {
+          const props = {
+            type,
+            x: i % 8,
+            y: Math.floor(i / 8),
           }
 
-          return {
-            ...props,
-            transition,
-          }
-        }
+          if (stack.nodes?.[i]) {
+            const transition = {
+              id: stack.type,
+              type: stack.nodes[i].type,
+              variation: stack.nodes[i].variation,
+              duration: stack.duration,
+              from: {
+                x: stack.nodes[i].from.x,
+                y: stack.nodes[i].from.y,
+              },
+            }
 
-        return props
-      }),
-    )
+            return {
+              ...props,
+              transition,
+            }
+          }
+
+          return props
+        }),
+      )
+
+    // target: command.skill.target,
+    // - apply slash effect / shake profile for damage
+    // - apply refresh effect for buff / heal
 
     setTimeout(() => {
       setStackCounter(stack.order)

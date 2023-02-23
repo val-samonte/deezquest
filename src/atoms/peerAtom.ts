@@ -2,7 +2,7 @@
 
 import Peer, { DataConnection } from 'peerjs'
 import { atom, useAtom, useSetAtom } from 'jotai'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
@@ -63,45 +63,58 @@ export function usePeer(keypair: Keypair) {
     [setConnections, setMessages],
   )
 
+  const debounceId = useRef<number | undefined>()
   useEffect(() => {
     if (peer === null) {
-      setPeer((oldPeer) => {
-        if (
-          oldPeer?.id === peerId &&
-          !(oldPeer.destroyed || oldPeer.disconnected)
-        ) {
-          return oldPeer
-        }
+      if (debounceId.current) {
+        window.clearTimeout(debounceId.current)
+      }
+      debounceId.current = window.setTimeout(() => {
+        setPeer((oldPeer) => {
+          if (
+            oldPeer?.id === peerId &&
+            !(oldPeer.destroyed || oldPeer.disconnected)
+          ) {
+            return oldPeer
+          }
 
-        oldPeer?.destroy()
+          oldPeer?.destroy()
 
-        if (peerId === null) return null
+          if (peerId === null) return null
 
-        const newPeer = new Peer(peerId)
+          const newPeer = new Peer(peerId)
 
-        newPeer.on('connection', setupConnection)
+          newPeer.on('connection', setupConnection)
 
-        newPeer.on('open', () => {
-          console.log(`Peer opened ${peerId}`)
-          setOpen(true)
+          newPeer.on('open', () => {
+            console.log(`Peer opened ${peerId}`)
+            setOpen(true)
+          })
+
+          newPeer.on('error', (err) => {
+            console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
+          })
+
+          newPeer.on('close', () => {
+            console.log(`Peer closed ${peerId}`)
+            setOpen(false)
+          })
+
+          setConnections((connections) => {
+            connections.forEach((conn) => conn.close())
+            return []
+          })
+
+          return newPeer
         })
-
-        newPeer.on('error', (err) => {
-          console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
-        })
-
-        newPeer.on('close', () => {
-          console.log(`Peer closed ${peerId}`)
-          setOpen(false)
-        })
-
-        setConnections((connections) => {
-          connections.forEach((conn) => conn.close())
-          return []
-        })
-
-        return newPeer
-      })
+      }, 50)
+    }
+    return () => {
+      if (peer !== null) {
+        // this will ensure creation of a fresh peer client
+        peer.disconnected && peer.destroy()
+        setPeer(null)
+      }
     }
   }, [peer, peerId, setPeer, setOpen, setConnections])
 

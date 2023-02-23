@@ -1,4 +1,4 @@
-import { gameFunctions } from '@/atoms/gameStateAtom'
+import { gameFunctions, playerKpAtom } from '@/atoms/gameStateAtom'
 import { stageDimensionAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { FederatedPointerEvent, Texture } from 'pixi.js'
@@ -8,6 +8,7 @@ import { Sprite } from 'react-pixi-fiber'
 const cursorIcon = Texture.from(`/cursor.png`)
 
 export default function StageCursor() {
+  const playerKp = useAtomValue(playerKpAtom)
   const gameFn = useSetAtom(gameFunctions)
   const tileSize = useAtomValue(tileSizeAtom)
   const { width, height } = useAtomValue(stageDimensionAtom)
@@ -27,11 +28,15 @@ export default function StageCursor() {
           const distX = Math.abs(curr.x - x)
           const distY = Math.abs(curr.y - y)
           if (distX + distY === 1) {
-            // swap
+            const origin = Math.min(curr.x, x) + Math.min(curr.y, y) * 8
+            const dir = distX > distY ? 'h' : 'v'
+
             if (fired === 1) {
               gameFn({
                 type: 'swapNode',
                 data: {
+                  publicKey: playerKp?.publicKey.toBase58(),
+                  origin: dir + origin,
                   node1: { x: curr.x, y: curr.y },
                   node2: { x, y },
                 },

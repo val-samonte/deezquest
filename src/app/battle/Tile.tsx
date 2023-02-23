@@ -15,6 +15,7 @@ function Tile({ type, id, transition, ...props }: any) {
   const isPortrait = useAtomValue(isPortraitAtom)
 
   const transitionProps = useMemo(() => {
+    // TODO: remove transition.from
     props = {
       ...props,
       width: tileSize,
@@ -43,19 +44,61 @@ function Tile({ type, id, transition, ...props }: any) {
       }
       case GameTransitions.DRAIN: {
         const { x, y, ...rest } = props
+        const to = { ...rest }
+        const from = {
+          ...props,
+          alpha: 1,
+          width: tileSize,
+          height: tileSize,
+        }
+
+        switch (transition.variation) {
+          case GameTransitions.DRAIN_GLOW: {
+            break
+          }
+          case GameTransitions.DRAIN_FADE: {
+            to.alpha = 0
+            break
+          }
+          default: {
+            to.x = isPortrait ? tileSize * 4 : -tileSize
+            to.y = isPortrait ? tileSize * 9 : tileSize * 2
+            to.alpha = 0
+            to.width = tileSize * 0.5
+            to.height = tileSize * 0.5
+          }
+        }
+
         return {
-          to: {
-            ...rest,
-            x: isPortrait ? tileSize * 4 : -tileSize,
-            y: isPortrait ? tileSize * 9 : tileSize * 2,
-            alpha: 0,
-            width: tileSize * 0.5,
-            height: tileSize * 0.5,
-          },
-          from: { ...props, alpha: 1, width: tileSize, height: tileSize },
+          to,
+          from,
           config: {
             duration: transition.duration - 100,
             easing: easings.easeInBack, // easeBackIn,
+            clamp: true,
+          },
+        }
+      }
+      case GameTransitions.CAST: {
+        const { x, y, ...rest } = props
+        const to = {
+          ...rest,
+          y: (y - 1) * tileSize,
+          alpha: 0,
+        }
+        const from = {
+          ...props,
+          alpha: 1,
+          width: tileSize,
+          height: tileSize,
+        }
+
+        return {
+          to,
+          from,
+          config: {
+            duration: transition.duration - 100,
+            easing: easings.easeOutCubic,
             clamp: true,
           },
         }
