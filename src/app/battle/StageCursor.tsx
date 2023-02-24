@@ -1,4 +1,8 @@
-import { gameFunctions, playerKpAtom } from '@/atoms/gameStateAtom'
+import {
+  gameFunctions,
+  gameStateAtom,
+  playerKpAtom,
+} from '@/atoms/gameStateAtom'
 import { usePeer } from '@/atoms/peerAtom'
 import { stageDimensionAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
@@ -27,9 +31,13 @@ export default function StageCursor() {
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(
     null,
   )
+  const gameState = useAtomValue(gameStateAtom)
 
   const onPointerUp = useCallback(
     (e: FederatedPointerEvent) => {
+      if (!gameState) return
+      if (gameState.currentTurn !== playerKp?.publicKey.toBase58()) return
+
       const x = Math.floor(e.global.x / tileSize)
       const y = Math.floor(e.global.y / tileSize)
       let fired = 0 // TODO: BUG, setCursorPos firing twice
@@ -45,7 +53,7 @@ export default function StageCursor() {
 
             if (fired === 1) {
               const payload = {
-                type: GameStateFunctions.INIT,
+                type: GameStateFunctions.SWAP_NODE,
                 data: {
                   publicKey: playerKp?.publicKey.toBase58(),
                   origin: dir + origin,
@@ -56,6 +64,7 @@ export default function StageCursor() {
               gameFn(payload)
               opponent &&
                 sendMessage(opponent, {
+                  latestHash: gameState.hashes[gameState.hashes.length - 1],
                   type: PeerMessages.GAME_TURN,
                   data: payload,
                 })
@@ -74,7 +83,7 @@ export default function StageCursor() {
         return null
       })
     },
-    [tileSize, opponent, playerKp, sendMessage],
+    [tileSize, opponent, playerKp, gameState, sendMessage],
   )
 
   return (

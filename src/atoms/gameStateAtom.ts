@@ -196,7 +196,7 @@ export const gameFunctions = atom(
             Buffer.concat([
               Buffer.from('SWAP'),
               hash,
-              action.data.origin,
+              Buffer.from(action.data.origin),
               bs58.decode(gameState.currentTurn),
             ]),
           )
@@ -375,6 +375,7 @@ export const gameFunctions = atom(
           })
         }
 
+        playerHero.turnTime -= 100
         gameState.tiles = [...newTiles] as number[]
         gameState.hashes = [...gameState.hashes, bs58.encode(hash)]
         gameState.players = {
@@ -388,6 +389,8 @@ export const gameFunctions = atom(
           tiles: gameState.tiles,
           heroes: gameState.players,
         })
+
+        console.log(stack, gameState)
 
         set(gameTransitionStackAtom, [...stack])
         break

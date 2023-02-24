@@ -147,6 +147,7 @@ export function usePeer(keypair: Keypair) {
 
           const newConnection = peer.connect(receiverId, {
             serialization: 'json',
+            reliable: true,
           })
 
           if (!newConnection) {
@@ -170,7 +171,8 @@ export function usePeer(keypair: Keypair) {
         setupConnection(connection)
       }
 
-      connection.send(payload)
+      console.log(`Sending message to ${receiverId}: `, message)
+      connection.send(payload, false)
     },
     [keypair, peer, connections, setConnections],
   )

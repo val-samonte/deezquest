@@ -31,10 +31,14 @@ export default function PeerConnectionManager() {
       lastMessage.current !== messages[messages.length - 1]
     ) {
       lastMessage.current = messages[messages.length - 1]
+      const latestHash = gameState?.hashes[gameState.hashes.length - 1] ?? null
+
       switch (lastMessage.current.data.type) {
         case PeerMessages.GAME_TURN: {
-          gameFn(lastMessage.current.data.data)
-          break
+          if (latestHash === lastMessage.current.data.latestHash) {
+            gameFn(lastMessage.current.data.data)
+            break
+          }
         }
         case PeerMessages.REQUEST_GAME_STATE: {
           opponent &&
