@@ -4,18 +4,16 @@ import {
   gameFunctions,
   gameTransitionStackAtom,
   isGameTransitioningAtom,
+  playerKpAtom,
 } from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas } from 'pixi.js'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AppContext, Container, Stage as PixiStage } from 'react-pixi-fiber'
-import { animated, useSpring } from '@react-spring/web'
 import PlayerCard, { updateHeroesAtom } from './PlayerCard'
 import StageCursor from './StageCursor'
 import Tile from './Tile'
-import { Keypair } from '@solana/web3.js'
-import bs58 from 'bs58'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 
 export default function Stage() {
@@ -26,12 +24,11 @@ export default function Stage() {
   const [stackCounter, setStackCounter] = useState(-1)
   const [tiles, setTiles] = useState<any[]>([])
 
-  const [kp] = useState(
-    (localStorage.getItem('demo_kp') &&
-      Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
-      null,
+  const playerKp = useAtomValue(playerKpAtom)
+  const player = useMemo(
+    () => playerKp?.publicKey.toBase58() ?? null,
+    [playerKp],
   )
-  const player = useMemo(() => kp?.publicKey.toBase58() ?? null, [kp])
   const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
 
   useEffect(() => {

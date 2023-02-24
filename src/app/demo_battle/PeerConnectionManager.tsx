@@ -3,23 +3,24 @@
 import { Keypair } from '@solana/web3.js'
 import bs58 from 'bs58'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { PeerMessage, usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { sleep } from '@/utils/sleep'
-import { useAtom, useSetAtom } from 'jotai'
-import { gameFunctions, GameState, gameStateAtom } from '@/atoms/gameStateAtom'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import {
+  gameFunctions,
+  GameState,
+  gameStateAtom,
+  playerKpAtom,
+} from '@/atoms/gameStateAtom'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 
 export default function PeerConnectionManager() {
   const router = useRouter()
-  const [kp] = useState(
-    (localStorage.getItem('demo_kp') &&
-      Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
-      null,
-  )
+  const playerKp = useAtomValue(playerKpAtom)
   const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
-  const { isOpen, connections, messages, sendMessage } = usePeer(kp!)
+  const { isOpen, connections, messages, sendMessage } = usePeer(playerKp!)
   const gameFn = useSetAtom(gameFunctions)
   const [gameState, setGameState] = useAtom(gameStateAtom)
 
@@ -35,6 +36,7 @@ export default function PeerConnectionManager() {
 
       switch (lastMessage.current.data.type) {
         case PeerMessages.GAME_TURN: {
+          console.log('>>', latestHash, lastMessage.current.data)
           if (latestHash === lastMessage.current.data.latestHash) {
             gameFn(lastMessage.current.data.data)
             break
@@ -64,15 +66,16 @@ export default function PeerConnectionManager() {
   }, [isOpen, messages, gameState, opponent, gameFn, sendMessage])
 
   useEffect(() => {
-    if (!kp || !opponent) {
+    if (!playerKp || !opponent) {
       sessionStorage.clear()
       router.push('/demo')
     }
-  }, [kp, opponent])
+  }, [playerKp, opponent])
 
   const retrying = useRef(false)
   useEffect(() => {
     if (!isOpen) return
+    if (!gameState) return
 
     const opponentActive = connections.find((conn) => conn.peer === opponent)
 
@@ -82,7 +85,10 @@ export default function PeerConnectionManager() {
         while (retrying.current) {
           try {
             if (opponent) {
-              await sendMessage(opponent, { type: PeerMessages.PING })
+              await sendMessage(opponent, {
+                type: PeerMessages.PING,
+                latestHash: gameState.hashes[gameState.hashes.length - 1],
+              })
             }
             retrying.current = false
           } catch (err: any) {
@@ -97,7 +103,7 @@ export default function PeerConnectionManager() {
       }
       !retrying.current && ping()
     }
-  }, [isOpen, connections, opponent, sendMessage])
+  }, [isOpen, connections, opponent, gameState, sendMessage])
 
   return null
 }

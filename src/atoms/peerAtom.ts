@@ -35,28 +35,35 @@ export function usePeer(keypair: Keypair) {
 
   const setupConnection = useCallback(
     (conn: DataConnection) => {
+      conn.off('data')
+      conn.off('close')
+
+      conn.on('data', (payload) => {
+        const { data, from, signature } = payload as PeerMessage
+
+        console.log(`Recieving data from ${from}: `, data)
+
+        const valid = sign.detached.verify(
+          Buffer.from(JSON.stringify(data)),
+          bs58.decode(signature),
+          bs58.decode(from),
+        )
+
+        if (valid && from === conn.peer) {
+          setMessages((m) => [...m, { data, from, signature }])
+        }
+      })
+
+      conn.on('close', () => {
+        setConnections((c) => c.filter((i) => i.peer !== conn.peer))
+      })
+
       setConnections((connections) => {
-        if (connections.find((i) => i.peer === conn.peer)) return connections
+        if (connections.find((i) => i.peer === conn.peer)) {
+          return connections
+        }
 
         console.log(`Connection established ${conn.peer}`)
-
-        conn.on('data', (payload) => {
-          const { data, from, signature } = payload as PeerMessage
-
-          const valid = sign.detached.verify(
-            Buffer.from(JSON.stringify(data)),
-            bs58.decode(signature),
-            bs58.decode(from),
-          )
-
-          if (valid && from === conn.peer) {
-            setMessages((m) => [...m, { data, from, signature }])
-          }
-        })
-
-        conn.on('close', () => {
-          setConnections((c) => c.filter((i) => i.peer !== conn.peer))
-        })
 
         return [...connections, conn]
       })
@@ -146,7 +153,7 @@ export function usePeer(keypair: Keypair) {
           peer.on('error', peerErr)
 
           const newConnection = peer.connect(receiverId, {
-            serialization: 'json',
+            // serialization: 'json',
             reliable: true,
           })
 
@@ -171,7 +178,9 @@ export function usePeer(keypair: Keypair) {
         setupConnection(connection)
       }
 
+      setupConnection(connection)
       console.log(`Sending message to ${receiverId}: `, message)
+
       connection.send(payload, false)
     },
     [keypair, peer, connections, setConnections],
