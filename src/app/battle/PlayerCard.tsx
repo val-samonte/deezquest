@@ -1,6 +1,6 @@
 'use client'
 
-import { gameStateAtom } from '@/atoms/gameStateAtom'
+import { gameStateAtom, isGameTransitioningAtom } from '@/atoms/gameStateAtom'
 import StatCounter from '@/components/StatCounter'
 import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
 import classNames from 'classnames'
@@ -32,6 +32,7 @@ export default function PlayerCard({
 }) {
   const hero = useAtomValue(heroDisplayAtom(publicKey))
   const gameState = useAtomValue(gameStateAtom)
+  const isTransitioning = useAtomValue(isGameTransitioningAtom)
 
   const timeDisplay = useMemo(
     () => (hero.turnTime > 200 ? 100 : hero.turnTime - 100),
@@ -57,7 +58,7 @@ export default function PlayerCard({
     }
   }, [hero.hp, hero.hpCap, hero.armor, hero.shell])
 
-  const currentTurn = gameState?.currentTurn === publicKey
+  const currentTurn = gameState?.currentTurn === publicKey && !isTransitioning
 
   return (
     <div
@@ -189,11 +190,25 @@ export default function PlayerCard({
                 />
               </div>
               <span className='xl:hidden mx-auto' />
-              <StatCounter
-                img='/time.svg'
-                value={timeDisplay}
-                className={timeDisplay < 0 ? 'text-red-500' : ''}
-              />
+              {currentTurn && !asOpponent ? (
+                <span className='relative flex items-center md:gap-1'>
+                  <img
+                    src='/time.svg'
+                    className={classNames(
+                      'w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8 opacity-30',
+                    )}
+                  />
+                  <span className='text-right font-bold ml-auto'>
+                    Your Turn
+                  </span>
+                </span>
+              ) : (
+                <StatCounter
+                  img='/time.svg'
+                  value={timeDisplay}
+                  className={timeDisplay < 0 ? 'text-red-500' : ''}
+                />
+              )}
               <span className='hidden xl:flex mx-auto' />
               <StatCounter img='/stat_spd.svg' value={hero.spd} />
             </div>

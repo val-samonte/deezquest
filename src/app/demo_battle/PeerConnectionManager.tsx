@@ -36,9 +36,13 @@ export default function PeerConnectionManager() {
 
       switch (lastMessage.current.data.type) {
         case PeerMessages.GAME_TURN: {
-          console.log('>>', latestHash, lastMessage.current.data)
           if (latestHash === lastMessage.current.data.latestHash) {
             gameFn(lastMessage.current.data.data)
+            break
+          }
+        }
+        case PeerMessages.PING: {
+          if (latestHash === lastMessage.current.data.latestHash) {
             break
           }
         }
@@ -51,9 +55,10 @@ export default function PeerConnectionManager() {
           break
         }
         case PeerMessages.RESPONSE_GAME_STATE: {
-          const opponentGameState = lastMessage.current.data as GameState
+          const opponentGameState = lastMessage.current.data.data as GameState
+          console.log(gameState?.hashes, opponentGameState)
           if (
-            !gameState ||
+            !gameState?.hashes ||
             gameState.hashes.length < opponentGameState.hashes.length
           ) {
             setGameState(opponentGameState)

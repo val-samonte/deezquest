@@ -71,6 +71,10 @@ export const gameStateAtom = atom(
 export const isGameTransitioningAtom = atom(false)
 export const gameTransitionStackAtom = atom<any[]>([])
 export const gameTransitionStackCounterAtom = atom(0)
+export const resetGameTransitionStackAtom = atom(null, (_, set) => {
+  set(gameTransitionStackCounterAtom, 0)
+  set(gameTransitionStackAtom, [])
+})
 
 export const gameFunctions = atom(
   null,
@@ -155,6 +159,8 @@ export const gameFunctions = atom(
         if (isTransitioning) return
         if (action.data.publicKey !== gameState.currentTurn) return
 
+        playerHero.turnTime -= 100
+
         const stack = get(gameTransitionStackAtom)
         const tiles = gameState.tiles // stack[stack.length - 1].tiles
 
@@ -171,6 +177,9 @@ export const gameFunctions = atom(
           type: GameTransitions.SWAP,
           order: ++stackCounter,
           tiles: [...newTiles],
+          heroes: {
+            [gameState.currentTurn]: { ...playerHero },
+          },
           nodes: {
             [node1]: {
               type: tiles[node2],
@@ -375,7 +384,6 @@ export const gameFunctions = atom(
           })
         }
 
-        playerHero.turnTime -= 100
         gameState.tiles = [...newTiles] as number[]
         gameState.hashes = [...gameState.hashes, bs58.encode(hash)]
         gameState.players = {
@@ -390,7 +398,7 @@ export const gameFunctions = atom(
           heroes: gameState.players,
         })
 
-        console.log(stack, gameState)
+        // console.log(stack, gameState)
 
         set(gameTransitionStackAtom, [...stack])
         break

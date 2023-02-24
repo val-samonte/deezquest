@@ -5,6 +5,7 @@ import {
   gameTransitionStackAtom,
   isGameTransitioningAtom,
   playerKpAtom,
+  resetGameTransitionStackAtom,
 } from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
 import { useAtomValue, useSetAtom } from 'jotai'
@@ -22,6 +23,7 @@ export default function Stage() {
   const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
   const transitionStack = useAtomValue(gameTransitionStackAtom)
   const [stackCounter, setStackCounter] = useState(-1)
+  const resetTransitionStack = useSetAtom(resetGameTransitionStackAtom)
   const [tiles, setTiles] = useState<any[]>([])
 
   const playerKp = useAtomValue(playerKpAtom)
@@ -44,6 +46,8 @@ export default function Stage() {
 
     if (!stack) {
       setIsTransitioning(false)
+      setStackCounter(-1)
+      resetTransitionStack()
       return
     }
 
@@ -105,6 +109,7 @@ export default function Stage() {
     stackCounter,
     player,
     opponent,
+    resetTransitionStack,
     setTiles,
     setIsTransitioning,
     updateHeroes,

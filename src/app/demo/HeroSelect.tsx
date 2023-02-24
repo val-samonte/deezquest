@@ -1,11 +1,9 @@
 'use client'
 
-import { heroSkillsAtom, Skill } from '@/atoms/heroSkills'
 import { Dialog } from '@/components/Dialog'
 import { SkillTypes } from '@/enums/SkillTypes'
-import { getHeroAttributes } from '@/utils/gameFunctions'
+import { getHeroAttributes, Skill, skills } from '@/utils/gameFunctions'
 import { Keypair } from '@solana/web3.js'
-import { useAtomValue } from 'jotai'
 import { useEffect, useMemo, useState } from 'react'
 import bs58 from 'bs58'
 import { trimAddress } from '@/utils/trimAddress'
@@ -52,7 +50,6 @@ function SkillView({ skill }: { skill: Skill }) {
 
 export default function HeroSelect() {
   const router = useRouter()
-  const heroSkills = useAtomValue(heroSkillsAtom)
   const [kp, setKp] = useState(
     (localStorage.getItem('demo_kp') &&
       Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
@@ -70,10 +67,10 @@ export default function HeroSelect() {
   const stats = useMemo(() => {
     const attribs = getHeroAttributes(kp.publicKey)
     const bytes = kp.publicKey.toBytes()
-    const skills = {
-      [SkillTypes.OFFENSE]: heroSkills[bytes[0] % 4],
-      [SkillTypes.SUPPORT]: heroSkills[(bytes[1] % 4) + 4],
-      [SkillTypes.SPECIAL]: heroSkills[(bytes[2] % 4) + 8],
+    const availableSkills = {
+      [SkillTypes.OFFENSE]: skills[bytes[0] % 4],
+      [SkillTypes.SUPPORT]: skills[(bytes[1] % 4) + 4],
+      [SkillTypes.SPECIAL]: skills[(bytes[2] % 4) + 8],
     }
 
     return {
@@ -83,9 +80,9 @@ export default function HeroSelect() {
         vit: attribs[2],
         str: attribs[3],
       },
-      skills,
+      skills: availableSkills,
     }
-  }, [kp, heroSkills])
+  }, [kp])
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
