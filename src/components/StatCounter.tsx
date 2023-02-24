@@ -7,12 +7,14 @@ interface StatCounterProps {
   img: string
   value: number
   children?: ReactNode
+  className?: string
 }
 
 export default function StatCounter({
   img,
   value,
   children,
+  className,
 }: StatCounterProps) {
   return (
     <div
@@ -36,7 +38,9 @@ export default function StatCounter({
           {children}
         </span>
       )}
-      <span className='text-right font-bold ml-auto'>{value}</span>
+      <span className={classNames('text-right font-bold ml-auto', className)}>
+        {value}
+      </span>
     </div>
   )
 }

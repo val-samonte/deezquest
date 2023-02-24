@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { PeerMessage, usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { sleep } from '@/utils/sleep'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { gameFunctions, GameState, gameStateAtom } from '@/atoms/gameStateAtom'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 
