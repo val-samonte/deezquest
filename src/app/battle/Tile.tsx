@@ -1,14 +1,12 @@
 'use client'
 
 import { GameTransitions } from '@/enums/GameTransitions'
-import { animated, easings, Spring } from '@react-spring/web'
+import { animated, easings, Spring, useSpringValue } from '@react-spring/web'
 import { Texture } from 'pixi.js'
 import { useCallback, useMemo, useState } from 'react'
 import { Container, Sprite, usePixiTicker } from 'react-pixi-fiber'
 import { useAtomValue } from 'jotai'
 import { isPortraitAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
-
-const AnimatedContainer = animated(Container)
 
 function MagicCircle({ ...props }) {
   const [rotation, setRotation] = useState(0)
@@ -25,9 +23,13 @@ function MagicCircle({ ...props }) {
   )
 }
 
+const AnimatedContainer = animated(Container)
+const AnimatedMagicCircle = animated(MagicCircle)
+
 function Tile({ type, id, transition, ...props }: any) {
   const tileSize = useAtomValue(tileSizeAtom)
   const isPortrait = useAtomValue(isPortraitAtom)
+  const magicCircleAlpha = useSpringValue(0)
 
   const tilePos = useMemo(() => {
     return {
@@ -46,6 +48,19 @@ function Tile({ type, id, transition, ...props }: any) {
       x: tilePos.x,
       y: tilePos.y,
       alpha: 1,
+    }
+
+    switch (transition?.id) {
+      case GameTransitions.DRAIN:
+      case GameTransitions.DRAIN_GLOW:
+      case GameTransitions.CAST:
+      case GameTransitions.ATTACK_SPELL:
+      case GameTransitions.BUFF_SPELL:
+        break
+      default: {
+        console.log(transition.id)
+        magicCircleAlpha.set(0)
+      }
     }
 
     switch (transition?.id) {
@@ -68,15 +83,25 @@ function Tile({ type, id, transition, ...props }: any) {
       case GameTransitions.DRAIN: {
         const { x, y, ...rest } = props
         const to = { ...rest }
+        const config = {
+          duration: transition.duration - 100,
+          easing: easings.easeInBack,
+          clamp: true,
+        }
 
         switch (transition.variation) {
-          // case GameTransitions.DRAIN_GLOW: {
-          //   break
-          // }
-          // case GameTransitions.DRAIN_FADE: {
-          //   to.alpha = 0
-          //   break
-          // }
+          case GameTransitions.DRAIN_GLOW: {
+            magicCircleAlpha.start({
+              from: 0,
+              to: 0.5,
+            })
+            break
+          }
+          case GameTransitions.DRAIN_FADE: {
+            to.alpha = 0
+            config.easing = easings.easeOutCubic
+            break
+          }
           default: {
             to.x = isPortrait ? tilePos.tileSize * 4 : -tilePos.tileSize
             to.y = isPortrait ? tilePos.tileSize * 9 : tilePos.tileSize * 2
@@ -94,11 +119,7 @@ function Tile({ type, id, transition, ...props }: any) {
         return {
           from: props,
           to,
-          config: {
-            duration: transition.duration - 100,
-            easing: easings.easeInBack,
-            clamp: true,
-          },
+          config,
         }
       }
       case GameTransitions.CAST: {
@@ -150,7 +171,7 @@ function Tile({ type, id, transition, ...props }: any) {
         clamp: true,
       },
     }
-  }, [tilePos, isPortrait, transition, props])
+  }, [tilePos, isPortrait, magicCircleAlpha, transition, props])
 
   // use different key every transition change
   // so that the 'from' transition works correctly
@@ -163,9 +184,9 @@ function Tile({ type, id, transition, ...props }: any) {
 
   return (
     <Spring {...transitionProps} key={forceKey}>
-      {({ props, x, y }: any) => (
+      {(props: any) => (
         <>
-          <AnimatedContainer {...props} x={x} y={y} anchor='0.5,0.5'>
+          <AnimatedContainer {...props} anchor='0.5,0.5'>
             <Sprite
               width={tileSize}
               height={tileSize}
@@ -174,12 +195,14 @@ function Tile({ type, id, transition, ...props }: any) {
                 skin !== null ? Texture.from(`/sym_${skin}.png`) : undefined
               }
             />
-            {/* <MagicCircle
-              anchor='0.5,0.5'
-              alpha={0.5}
-              width={tileSize}
-              height={tileSize}
-            /> */}
+            {transition?.variation === GameTransitions.DRAIN_GLOW && (
+              <AnimatedMagicCircle
+                anchor='0.5,0.5'
+                alpha={magicCircleAlpha}
+                width={tileSize}
+                height={tileSize}
+              />
+            )}
           </AnimatedContainer>
         </>
       )}

@@ -234,13 +234,23 @@ export const gameFunctions = atom(
             },
             nodes: matches.reduce((acc, cur, i) => {
               if (cur !== null) {
+                let variation
+
+                // sword
+                if (matches[i] === 2 && count[2] < 4) {
+                  variation = GameTransitions.DRAIN_FADE
+                } else if (flags[matches[i]]) {
+                  variation = GameTransitions.DRAIN_GLOW
+                }
+
                 acc[i] = {
                   // TODO: swords without spells - stab enemy
-                  variation: flags[matches[i]]
-                    ? GameTransitions.DRAIN_GLOW
-                    : i === 2
-                    ? GameTransitions.DRAIN_FADE
-                    : undefined,
+                  // variation: flags[matches[i]]
+                  //   ? GameTransitions.DRAIN_GLOW
+                  //   : i === 2
+                  //   ? GameTransitions.DRAIN_FADE
+                  //   : undefined,
+                  variation,
                   type: matches[i],
                   from: {
                     x: i % 8,

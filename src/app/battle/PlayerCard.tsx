@@ -130,7 +130,7 @@ export default function PlayerCard({
                   style={{
                     width: armor,
                     background:
-                      'linear-gradient(180deg, rgba(55,236,214,0) 40%, rgba(55,236,214,0.25) 89%, rgba(55,236,214,1) 90%)',
+                      'linear-gradient(180deg, rgba(55,186,214,0) 40%, rgba(55,186,214,0.25) 89%, rgba(55,186,214,1) 90%)',
                   }}
                 />
                 <div
