@@ -2,7 +2,7 @@
 
 import { gameStateAtom, isGameTransitioningAtom } from '@/atoms/gameStateAtom'
 import StatCounter from '@/components/StatCounter'
-import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
+import { Hero, heroFromPublicKey, skills } from '@/utils/gameFunctions'
 import classNames from 'classnames'
 import { atom, useAtomValue } from 'jotai'
 import { atomFamily } from 'jotai/utils'
@@ -89,7 +89,12 @@ export default function PlayerCard({
           )}
         >
           {/* HP */}
-          <div className={classNames('flex flex-col items-center', highlight)}>
+          <div
+            className={classNames(
+              'flex flex-col items-center w-14 md:w-20',
+              highlight,
+            )}
+          >
             <span className='text-3xl md:text-4xl xl:text-7xl xs:font-bold flex-none'>
               {hero.hp}
             </span>
@@ -199,7 +204,7 @@ export default function PlayerCard({
                     )}
                   />
                   <span className='text-right font-bold ml-auto'>
-                    Your Turn
+                    <span className='hidden md:inline'>Your</span> Turn
                   </span>
                 </span>
               ) : (
@@ -300,7 +305,7 @@ export default function PlayerCard({
         </ul>
 
         {/* Skills */}
-        <div className='relative h-full landscape:lg:hidden'>
+        <div className='relative h-full landscape:lg:hidden opacity-20'>
           <div className='absolute inset-x-2 inset-y-0 flex'>
             <div className='relative w-1/3 h-full'>
               <div className='absolute inset-0 flex flex-col items-center justify-center'>
@@ -313,7 +318,7 @@ export default function PlayerCard({
                     className='w-full aspect-square '
                   />
                   <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    1
+                    0
                   </span>
                 </div>
               </div>
@@ -329,7 +334,7 @@ export default function PlayerCard({
                     className='w-full aspect-square '
                   />
                   <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    1
+                    0
                   </span>
                 </div>
               </div>
@@ -345,7 +350,7 @@ export default function PlayerCard({
                     className='w-full aspect-square '
                   />
                   <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    1
+                    0
                   </span>
                 </div>
               </div>

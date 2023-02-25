@@ -68,7 +68,7 @@ export default function HeroSelect() {
     const attribs = getHeroAttributes(kp.publicKey)
     const bytes = kp.publicKey.toBytes()
     const availableSkills = {
-      [SkillTypes.OFFENSE]: skills[bytes[0] % 4],
+      [SkillTypes.ATTACK]: skills[bytes[0] % 4],
       [SkillTypes.SUPPORT]: skills[(bytes[1] % 4) + 4],
       [SkillTypes.SPECIAL]: skills[(bytes[2] % 4) + 8],
     }
@@ -187,7 +187,7 @@ export default function HeroSelect() {
             <ul className='flex flex-col gap-5'>
               <li className='flex gap-5'>
                 <img src='/cmd_attack.svg' className='w-20 h-20' />
-                <SkillView skill={stats.skills[SkillTypes.OFFENSE]} />
+                <SkillView skill={stats.skills[SkillTypes.ATTACK]} />
               </li>
               <li className='flex gap-5'>
                 <img src='/cmd_support.svg' className='w-20 h-20' />

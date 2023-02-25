@@ -1,5 +1,5 @@
 export enum SkillTypes {
-  OFFENSE = 'offense',
+  ATTACK = 'attack',
   SUPPORT = 'support',
   SPECIAL = 'special',
 }

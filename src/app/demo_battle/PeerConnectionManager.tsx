@@ -47,16 +47,16 @@ export default function PeerConnectionManager() {
           }
         }
         case PeerMessages.REQUEST_GAME_STATE: {
-          opponent &&
+          if (opponent && latestHash !== lastMessage.current.data.latestHash) {
             sendMessage(opponent, {
               type: PeerMessages.RESPONSE_GAME_STATE,
               data: gameState,
             })
+          }
           break
         }
         case PeerMessages.RESPONSE_GAME_STATE: {
           const opponentGameState = lastMessage.current.data.data as GameState
-          console.log(gameState?.hashes, opponentGameState)
           if (
             !gameState?.hashes ||
             gameState.hashes.length < opponentGameState.hashes.length
@@ -109,6 +109,34 @@ export default function PeerConnectionManager() {
       !retrying.current && ping()
     }
   }, [isOpen, connections, opponent, gameState, sendMessage])
+
+  // TODO: ping every 10 secs if player is not in turn
+  // to check if opponent already had his / her turn
+  // and was unsuccessful to message back earlier
+  const checkIntervalId = useRef<number>()
+  useEffect(() => {
+    if (!isOpen) return
+    if (!gameState) return
+
+    if (checkIntervalId.current) {
+      window.clearInterval(checkIntervalId.current)
+    }
+
+    if (gameState.currentTurn === opponent) {
+      checkIntervalId.current = window.setInterval(() => {
+        sendMessage(opponent, {
+          type: PeerMessages.REQUEST_GAME_STATE,
+          latestHash: gameState.hashes[gameState.hashes.length - 1],
+        })
+      }, 10_000)
+    }
+
+    return () => {
+      if (checkIntervalId.current) {
+        window.clearInterval(checkIntervalId.current)
+      }
+    }
+  }, [isOpen, opponent, gameState, sendMessage])
 
   return null
 }

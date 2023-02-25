@@ -282,7 +282,7 @@ export const gameFunctions = atom(
                 heroes: {
                   [gameState!.currentTurn]: { ...playerHero },
                 },
-                spell: {
+                skill: {
                   lvl: command.lvl ?? 1,
                   name: command.skill.name,
                   type: command.skill.type,
@@ -300,7 +300,7 @@ export const gameFunctions = atom(
                   }
                   return acc
                 }, {}),
-                duration: 1000,
+                duration: 1500,
               })
 
               const postCommand = command.skill.fn(

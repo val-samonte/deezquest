@@ -16,6 +16,9 @@ import PlayerCard, { updateHeroesAtom } from './PlayerCard'
 import StageCursor from './StageCursor'
 import Tile from './Tile'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
+import CastingDisplay from './CastingDisplay'
+import { SkillTypes } from '@/enums/SkillTypes'
+import { GameTransitions } from '@/enums/GameTransitions'
 
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
@@ -25,6 +28,11 @@ export default function Stage() {
   const [stackCounter, setStackCounter] = useState(-1)
   const resetTransitionStack = useSetAtom(resetGameTransitionStackAtom)
   const [tiles, setTiles] = useState<any[]>([])
+  const [skill, setSkill] = useState<{
+    name: string
+    lvl: number
+    type: SkillTypes
+  }>()
 
   const playerKp = useAtomValue(playerKpAtom)
   const player = useMemo(
@@ -88,9 +96,12 @@ export default function Stage() {
       updateHeroes(stack.heroes)
     }
 
+    if (stack.type === GameTransitions.CAST) {
+      setSkill(stack.skill)
+    }
+
     // ATTACK_NORMAL
     // BUFF_ARMOR
-    // CAST
     // ATTACK_SPELL
     // BUFF_SPELL
 
@@ -112,6 +123,7 @@ export default function Stage() {
     resetTransitionStack,
     setTiles,
     setIsTransitioning,
+    setSkill,
     updateHeroes,
   ])
 
@@ -127,26 +139,9 @@ export default function Stage() {
     loaded.current = true
   }, [])
 
-  // const props = useSpring({
-  //   delay: 500,
-  //   from: {
-  //     opacity: 0,
-  //     marginBottom: '-200px',
-  //   },
-  //   to: {
-  //     opacity: 1,
-  //     marginBottom: '0px',
-  //   },
-  //   config: {
-  //     mass: 1,
-  //     tension: 180,
-  //     friction: 12,
-  //   },
-  // })
-
   return (
     <div className='relative w-full h-full flex portrait:flex-col-reverse'>
-      <div className='p-2 w-full h-full '>
+      <div className='p-2 w-full h-full'>
         {player && <PlayerCard publicKey={player} />}
       </div>
       <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5 backdrop-blur-sm '>
@@ -170,21 +165,7 @@ export default function Stage() {
             <StageCursor />
           </PixiStage>
         </div>
-        {/* TODO */}
-        {/* <div className='bg-black/80 absolute inset-0 flex items-center justify-center'>
-          <animated.div
-            style={props}
-            className='relative text-3xl xs:text-4xl font-bold flex items-center gap-3 md:gap-5'
-          >
-            <div className='flex items-center justify-center gap-3 md:gap-5'>
-              <img
-                src='/cmd_attack.svg'
-                className='w-10 h-10 md:w-12 md:h-12'
-              />
-              <span>Crushing Blow</span>
-            </div>
-          </animated.div>
-        </div> */}
+        <CastingDisplay skill={skill} />
       </div>
       <div className='p-2 w-full h-full'>
         {opponent && <PlayerCard asOpponent publicKey={opponent} />}

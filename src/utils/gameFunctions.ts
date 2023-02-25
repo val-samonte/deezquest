@@ -362,7 +362,7 @@ export const skills: Skill[] = [
   {
     name: 'Burning Punch',
     desc: 'Deals ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.',
-    type: SkillTypes.OFFENSE,
+    type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
       fire: 5,
@@ -372,7 +372,7 @@ export const skills: Skill[] = [
   {
     name: 'Swift Strike',
     desc: 'Deals 3|4|5 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.',
-    type: SkillTypes.OFFENSE,
+    type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
       wind: 3,
@@ -382,7 +382,7 @@ export const skills: Skill[] = [
   {
     name: 'Aquashot',
     desc: 'Deals 2|6|8 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes. LVL 3 pierces through SHELL.',
-    type: SkillTypes.OFFENSE,
+    type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
       water: 4,
@@ -392,7 +392,7 @@ export const skills: Skill[] = [
   {
     name: 'Crushing Blow',
     desc: 'Deals 1 MAGIC DMG per EARTH MANA of the hero. LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5. LVL 3 destroys ARMOR after damage is applied.',
-    type: SkillTypes.OFFENSE,
+    type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
       earth: NaN,
