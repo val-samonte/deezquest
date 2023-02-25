@@ -2,11 +2,12 @@
 
 import { gameStateAtom, isGameTransitioningAtom } from '@/atoms/gameStateAtom'
 import StatCounter from '@/components/StatCounter'
-import { Hero, heroFromPublicKey, skills } from '@/utils/gameFunctions'
+import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
 import classNames from 'classnames'
-import { atom, useAtomValue } from 'jotai'
+import { atom, useAtom, useAtomValue } from 'jotai'
 import { atomFamily } from 'jotai/utils'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
+import HeroPortrait from './HeroPortrait'
 
 export const heroDisplayAtom = atomFamily((pubkey: string) =>
   atom<Hero>(heroFromPublicKey(pubkey)),
@@ -69,17 +70,12 @@ export default function PlayerCard({
         !currentTurn && 'brightness-90',
       )}
     >
-      <div className='bg-black/20 flex-1 overflow-hidden'>
-        <div
-          className={classNames(
-            'bg-no-repeat bg-cover bg-center w-full h-full',
-            asOpponent && 'scale-x-[-1]',
-            !currentTurn && 'brightness-50',
-          )}
-          style={{
-            backgroundImage: `url("https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png")`,
-          }}
-        ></div>
+      <div className='bg-black/20 flex-1 overflow-hidden flex items-center justify-center'>
+        <HeroPortrait
+          publicKey={publicKey}
+          flip={asOpponent}
+          spotlight={currentTurn}
+        />
       </div>
       <div className='flex-[2_2_0%] flex flex-col text-xs xs:text-sm lg:text-base xl:text-lg py-2 gap-1 xl:gap-2'>
         <div

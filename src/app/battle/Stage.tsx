@@ -19,6 +19,7 @@ import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import CastingDisplay from './CastingDisplay'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { GameTransitions } from '@/enums/GameTransitions'
+import { heroDamagedAtom } from './HeroPortrait'
 
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
@@ -40,6 +41,8 @@ export default function Stage() {
     [playerKp],
   )
   const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
+
+  const setDamage = useSetAtom(heroDamagedAtom)
 
   useEffect(() => {
     if (transitionStack.length === 0) return
@@ -96,7 +99,7 @@ export default function Stage() {
     }
 
     if (stack.damage) {
-      //
+      setDamage({ hero: stack.damage, amount: 10 })
     }
 
     setTimeout(
@@ -114,6 +117,7 @@ export default function Stage() {
     setTiles,
     setIsTransitioning,
     setSkill,
+    setDamage,
     updateHeroes,
   ])
 
