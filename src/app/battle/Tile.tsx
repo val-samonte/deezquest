@@ -1,9 +1,9 @@
 'use client'
 
 import { GameTransitions } from '@/enums/GameTransitions'
-import { animated, easings, Spring, useSpringValue } from '@react-spring/web'
+import { animated, easings, Spring, useSpring } from '@react-spring/web'
 import { Texture } from 'pixi.js'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Container, Sprite, usePixiTicker } from 'react-pixi-fiber'
 import { useAtomValue } from 'jotai'
 import { isPortraitAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
@@ -29,7 +29,16 @@ const AnimatedMagicCircle = animated(MagicCircle)
 function Tile({ type, id, transition, ...props }: any) {
   const tileSize = useAtomValue(tileSizeAtom)
   const isPortrait = useAtomValue(isPortraitAtom)
-  const magicCircleAlpha = useSpringValue(0)
+  const [magicCircle, magicCircleApi] = useSpring(() => ({
+    immediate: false,
+    reset: true,
+    from: {
+      alpha: 0,
+    },
+    to: {
+      alpha: 0.5,
+    },
+  }))
 
   const tilePos = useMemo(() => {
     return {
@@ -39,8 +48,29 @@ function Tile({ type, id, transition, ...props }: any) {
     }
   }, [tileSize, id])
 
+  const showMagic = useRef(false)
+  const showMagicCircle = useMemo(() => {
+    switch (transition?.id) {
+      case GameTransitions.DRAIN:
+        if (transition?.variation === GameTransitions.DRAIN_GLOW) {
+          magicCircleApi.start({
+            to: { alpha: 0.5 },
+          })
+          showMagic.current = true
+        }
+      case GameTransitions.CAST:
+      case GameTransitions.ATTACK_SPELL:
+      case GameTransitions.BUFF_SPELL:
+        return showMagic.current
+      default: {
+        magicCircleApi.set({ alpha: 0 })
+        showMagic.current = false
+        return false
+      }
+    }
+  }, [transition, magicCircleApi])
+
   const transitionProps = useMemo(() => {
-    // TODO: remove transition.from
     props = {
       ...props,
       width: tilePos.tileSize,
@@ -48,19 +78,7 @@ function Tile({ type, id, transition, ...props }: any) {
       x: tilePos.x,
       y: tilePos.y,
       alpha: 1,
-    }
-
-    switch (transition?.id) {
-      case GameTransitions.DRAIN:
-      case GameTransitions.DRAIN_GLOW:
-      case GameTransitions.CAST:
-      case GameTransitions.ATTACK_SPELL:
-      case GameTransitions.BUFF_SPELL:
-        break
-      default: {
-        console.log(transition.id)
-        magicCircleAlpha.set(0)
-      }
+      rotation: 0,
     }
 
     switch (transition?.id) {
@@ -91,15 +109,27 @@ function Tile({ type, id, transition, ...props }: any) {
 
         switch (transition.variation) {
           case GameTransitions.DRAIN_GLOW: {
-            magicCircleAlpha.start({
-              from: 0,
-              to: 0.5,
-            })
             break
           }
           case GameTransitions.DRAIN_FADE: {
             to.alpha = 0
             config.easing = easings.easeOutCubic
+            break
+          }
+          case GameTransitions.DRAIN_STAB: {
+            to.x = isPortrait ? tilePos.tileSize * 4 : tilePos.tileSize * 9
+            to.y = isPortrait ? -tilePos.tileSize : tilePos.tileSize * 2
+            to.rotation = isPortrait
+              ? (-45 * Math.PI) / 180
+              : (45 * Math.PI) / 180
+
+            if (transition.asOpponent) {
+              to.x = isPortrait ? tilePos.tileSize * 4 : -tilePos.tileSize
+              to.y = isPortrait ? tilePos.tileSize * 9 : tilePos.tileSize * 2
+              to.rotation = isPortrait
+                ? (-225 * Math.PI) / 180
+                : (225 * Math.PI) / 180
+            }
             break
           }
           default: {
@@ -122,28 +152,20 @@ function Tile({ type, id, transition, ...props }: any) {
           config,
         }
       }
-      case GameTransitions.CAST: {
-        // const { x, y, ...rest } = props
-        // const to = {
-        //   ...rest,
-        //   y: (y - 1) * tileSize,
-        //   alpha: 0,
-        // }
-        // const from = {
-        //   ...props,
-        //   alpha: 1,
-        //   width: tileSize,
-        //   height: tileSize,
-        // }
-        // return {
-        //   to,
-        //   from,
-        //   config: {
-        //     duration: transition.duration - 100,
-        //     easing: easings.easeOutCubic,
-        //     clamp: true,
-        //   },
-        // }
+      case GameTransitions.ATTACK_SPELL:
+      case GameTransitions.BUFF_SPELL: {
+        // TODO: not working (fade)
+        return {
+          from: props,
+          to: {
+            alpha: 0,
+          },
+          config: {
+            duration: transition.duration - 100,
+            easing: easings.easeOutCubic,
+            clamp: true,
+          },
+        }
       }
       case GameTransitions.FILL: {
         const { x, y, ...rest } = props
@@ -171,7 +193,7 @@ function Tile({ type, id, transition, ...props }: any) {
         clamp: true,
       },
     }
-  }, [tilePos, isPortrait, magicCircleAlpha, transition, props])
+  }, [tilePos, isPortrait, magicCircleApi, transition, props])
 
   // use different key every transition change
   // so that the 'from' transition works correctly
@@ -195,10 +217,10 @@ function Tile({ type, id, transition, ...props }: any) {
                 skin !== null ? Texture.from(`/sym_${skin}.png`) : undefined
               }
             />
-            {transition?.variation === GameTransitions.DRAIN_GLOW && (
+            {showMagicCircle && (
               <AnimatedMagicCircle
                 anchor='0.5,0.5'
-                alpha={magicCircleAlpha}
+                alpha={magicCircle.alpha}
                 width={tileSize}
                 height={tileSize}
               />

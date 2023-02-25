@@ -236,20 +236,15 @@ export const gameFunctions = atom(
               if (cur !== null) {
                 let variation
 
-                // sword
-                if (matches[i] === 2 && count[2] < 4) {
+                if (matches[i] === 0 && !flags[0] && count[0] > 2) {
+                  variation = GameTransitions.DRAIN_STAB
+                } else if (matches[i] === 2 && count[2] < 4) {
                   variation = GameTransitions.DRAIN_FADE
                 } else if (flags[matches[i]]) {
                   variation = GameTransitions.DRAIN_GLOW
                 }
 
                 acc[i] = {
-                  // TODO: swords without spells - stab enemy
-                  // variation: flags[matches[i]]
-                  //   ? GameTransitions.DRAIN_GLOW
-                  //   : i === 2
-                  //   ? GameTransitions.DRAIN_FADE
-                  //   : undefined,
                   variation,
                   type: matches[i],
                   from: {
@@ -273,6 +268,7 @@ export const gameFunctions = atom(
                 heroes: {
                   [opponentPubkey]: { ...opponentHero },
                 },
+                duration: 100,
               })
             } else if (command.armor) {
               playerHero.armor += command.armor
@@ -283,6 +279,7 @@ export const gameFunctions = atom(
                 heroes: {
                   [gameState!.currentTurn]: { ...playerHero },
                 },
+                duration: 100,
               })
             } else if (command.skill) {
               playerHero.fireMp = command.hero.fireMp
