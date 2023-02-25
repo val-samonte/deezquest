@@ -238,7 +238,7 @@ export const gameFunctions = atom(
 
                 if (matches[i] === 0 && !flags[0] && count[0] > 2) {
                   variation = GameTransitions.DRAIN_STAB
-                } else if (matches[i] === 2 && count[2] < 4) {
+                } else if (matches[i] === 2 && (count[2] < 4 || !flags[2])) {
                   variation = GameTransitions.DRAIN_FADE
                 } else if (flags[matches[i]]) {
                   variation = GameTransitions.DRAIN_GLOW

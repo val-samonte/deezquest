@@ -70,7 +70,7 @@ export default function PlayerCard({
         !currentTurn && 'brightness-90',
       )}
     >
-      <div className='bg-black/20 flex-1 overflow-hidden flex items-center justify-center'>
+      <div className='bg-black/20 flex-1 overflow-hidden flex items-center justify-center relative'>
         <HeroPortrait
           publicKey={publicKey}
           flip={asOpponent}
@@ -87,7 +87,7 @@ export default function PlayerCard({
           {/* HP */}
           <div
             className={classNames(
-              'flex flex-col items-center w-14 md:w-20',
+              'flex flex-col items-center w-14 md:w-20 xl:w-36',
               highlight,
             )}
           >
@@ -103,7 +103,7 @@ export default function PlayerCard({
           <div className='flex flex-auto flex-col gap-1 xl:gap-2'>
             <div
               className={classNames(
-                'relative flex items-center gap-1 xl:gap-2 bg-neutral-400/5 p-1 xs:px-2 ',
+                'relative flex items-center gap-1 xl:gap-2 bg-black/20 p-1 xs:px-2 ',
                 asOpponent && 'portrait:flex-row-reverse',
               )}
             >
@@ -152,7 +152,7 @@ export default function PlayerCard({
             </div>
             <div
               className={classNames(
-                'relative flex items-center gap-1 xl:gap-2 bg-neutral-400/5 p-1 xs:px-2',
+                'relative flex items-center gap-1 xl:gap-2 bg-black/20 p-1 xs:px-2',
                 asOpponent && 'portrait:flex-row-reverse',
               )}
             >
@@ -218,7 +218,7 @@ export default function PlayerCard({
 
         {/* Mana */}
         <ul className='flex-none grid grid-cols-4 landscape:sm:grid-cols-2 px-2 gap-1 xl:gap-2'>
-          <li className='relative flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
+          <li className='relative flex items-center justify-center bg-black/20 p-1 xs:px-2'>
             <div
               className={classNames(
                 'absolute inset-0 flex pointer-events-none opacity-50',
@@ -238,7 +238,7 @@ export default function PlayerCard({
               Fire
             </StatCounter>
           </li>
-          <li className='relative flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
+          <li className='relative flex items-center justify-center bg-black/20 p-1 xs:px-2'>
             <div
               className={classNames(
                 'absolute inset-0 flex pointer-events-none opacity-50',
@@ -258,7 +258,7 @@ export default function PlayerCard({
               Wind
             </StatCounter>
           </li>
-          <li className='relative flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
+          <li className='relative flex items-center justify-center bg-black/20 p-1 xs:px-2'>
             <div
               className={classNames(
                 'absolute inset-0 flex pointer-events-none opacity-50',
@@ -278,7 +278,7 @@ export default function PlayerCard({
               Water
             </StatCounter>
           </li>
-          <li className='relative flex items-center justify-center bg-neutral-400/5 p-1 xs:px-2'>
+          <li className='relative flex items-center justify-center bg-black/20 p-1 xs:px-2'>
             <div
               className={classNames(
                 'absolute inset-0 flex pointer-events-none opacity-50',

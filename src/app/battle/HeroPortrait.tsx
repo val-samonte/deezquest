@@ -56,15 +56,17 @@ export default function HeroPortrait({
   }, [publicKey, damage, setDamage, setIsWobbling, setInSpotlight])
 
   return (
-    <animated.div
-      className={classNames(
-        'bg-no-repeat bg-cover bg-center portrait:h-full landscape:w-full aspect-square',
-        !(spotlight || inSpotlight) && 'brightness-50',
-      )}
-      style={{
-        ...wobbleAnimation,
-        backgroundImage: `url("https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png")`,
-      }}
-    />
+    <>
+      <animated.div
+        className={classNames(
+          'bg-no-repeat bg-cover bg-center portrait:h-full landscape:w-full aspect-square',
+          !(spotlight || inSpotlight) && 'brightness-50',
+        )}
+        style={{
+          ...wobbleAnimation,
+          backgroundImage: `url("https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png")`,
+        }}
+      />
+    </>
   )
 }
