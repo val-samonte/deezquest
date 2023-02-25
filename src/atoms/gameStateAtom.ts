@@ -265,6 +265,7 @@ export const gameFunctions = atom(
                 type: GameTransitions.ATTACK_NORMAL,
                 order: ++stackCounter,
                 turn: gameState!.currentTurn,
+                damage: opponentPubkey,
                 heroes: {
                   [opponentPubkey]: { ...opponentHero },
                 },
@@ -352,9 +353,14 @@ export const gameFunctions = atom(
                 order: ++stackCounter,
                 turn: gameState!.currentTurn,
                 spotlight,
+                damage:
+                  // TODO: included both
+                  type === GameTransitions.ATTACK_SPELL
+                    ? opponentPubkey
+                    : undefined,
                 heroes,
                 // tiles: [...newTiles]
-                duration: 500,
+                duration: 100,
               })
             }
 

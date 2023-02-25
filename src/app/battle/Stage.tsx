@@ -95,14 +95,9 @@ export default function Stage() {
       setSkill(stack.skill)
     }
 
-    // ATTACK_NORMAL
-    // BUFF_ARMOR
-    // ATTACK_SPELL
-    // BUFF_SPELL
-
-    // target: command.skill.target,
-    // - apply slash effect / shake profile for damage
-    // - apply refresh effect for buff / heal
+    if (stack.damage) {
+      //
+    }
 
     setTimeout(
       () => {
