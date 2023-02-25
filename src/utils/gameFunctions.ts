@@ -483,10 +483,10 @@ export const skills: Skill[] = [
 
 export const isExecutable = (hero: Hero, cost: SkillCost) => {
   return (
-    hero.fireMp >= (isNaN(cost.fire ?? 0) ? 0 : cost.fire ?? 0) &&
-    hero.windMp >= (isNaN(cost.wind ?? 0) ? 0 : cost.wind ?? 0) &&
-    hero.watrMp >= (isNaN(cost.water ?? 0) ? 0 : cost.water ?? 0) &&
-    hero.eartMp >= (isNaN(cost.earth ?? 0) ? 0 : cost.earth ?? 0)
+    hero.fireMp >= (isNaN(cost.fire ?? 0) ? 1 : cost.fire ?? 0) &&
+    hero.windMp >= (isNaN(cost.wind ?? 0) ? 1 : cost.wind ?? 0) &&
+    hero.watrMp >= (isNaN(cost.water ?? 0) ? 1 : cost.water ?? 0) &&
+    hero.eartMp >= (isNaN(cost.earth ?? 0) ? 1 : cost.earth ?? 0)
   )
 }
 

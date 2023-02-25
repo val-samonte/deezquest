@@ -148,6 +148,7 @@ export const gameFunctions = atom(
         stack.push({
           type: GameTransitions.SET,
           order: ++stackCounter,
+          turn: gameState.currentTurn,
           tiles: gameState.tiles,
           heroes: gameState.players,
         })
@@ -176,6 +177,7 @@ export const gameFunctions = atom(
         stack.push({
           type: GameTransitions.SWAP,
           order: ++stackCounter,
+          turn: gameState.currentTurn,
           tiles: [...newTiles],
           heroes: {
             [gameState.currentTurn]: { ...playerHero },
@@ -225,6 +227,7 @@ export const gameFunctions = atom(
           stack.push({
             type: GameTransitions.DRAIN,
             order: ++stackCounter,
+            turn: gameState.currentTurn,
             tiles: [...newTiles],
             heroes: {
               [gameState.currentTurn]: { ...playerHero },
@@ -256,6 +259,7 @@ export const gameFunctions = atom(
               stack.push({
                 type: GameTransitions.ATTACK_NORMAL,
                 order: ++stackCounter,
+                turn: gameState!.currentTurn,
                 heroes: {
                   [opponentPubkey]: { ...opponentHero },
                 },
@@ -265,6 +269,7 @@ export const gameFunctions = atom(
               stack.push({
                 type: GameTransitions.BUFF_ARMOR,
                 order: ++stackCounter,
+                turn: gameState!.currentTurn,
                 heroes: {
                   [gameState!.currentTurn]: { ...playerHero },
                 },
@@ -278,6 +283,7 @@ export const gameFunctions = atom(
               stack.push({
                 type: GameTransitions.CAST,
                 order: ++stackCounter,
+                turn: gameState!.currentTurn,
                 spotlight: [gameState!.currentTurn],
                 heroes: {
                   [gameState!.currentTurn]: { ...playerHero },
@@ -291,11 +297,6 @@ export const gameFunctions = atom(
                   if (cur !== null) {
                     acc[i] = {
                       type: matches[i],
-                      // TODO: remove
-                      from: {
-                        x: i % 8,
-                        y: Math.floor(i / 8),
-                      },
                     }
                   }
                   return acc
@@ -342,6 +343,7 @@ export const gameFunctions = atom(
               stack.push({
                 type,
                 order: ++stackCounter,
+                turn: gameState!.currentTurn,
                 spotlight,
                 heroes,
                 // tiles: [...newTiles]
@@ -368,6 +370,7 @@ export const gameFunctions = atom(
           stack.push({
             type: GameTransitions.FILL,
             order: ++stackCounter,
+            turn: gameState.currentTurn,
             tiles: [...newTiles],
             nodes: matches.reduce((acc, _, i) => {
               if (gravity[i] !== null) {
@@ -394,6 +397,7 @@ export const gameFunctions = atom(
         stack.push({
           type: GameTransitions.SET,
           order: ++stackCounter,
+          turn: gameState.currentTurn,
           tiles: gameState.tiles,
           heroes: gameState.players,
         })

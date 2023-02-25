@@ -2,7 +2,7 @@
 
 import { SkillTypes } from '@/enums/SkillTypes'
 import { animated, useSpring, useSpringValue } from '@react-spring/web'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 const textSpring = {
   delay: 300,

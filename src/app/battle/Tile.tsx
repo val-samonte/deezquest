@@ -3,25 +3,48 @@
 import { GameTransitions } from '@/enums/GameTransitions'
 import { animated, easings, Spring } from '@react-spring/web'
 import { Texture } from 'pixi.js'
-import { useMemo } from 'react'
-import { Sprite } from 'react-pixi-fiber'
+import { useCallback, useMemo, useState } from 'react'
+import { Container, Sprite, usePixiTicker } from 'react-pixi-fiber'
 import { useAtomValue } from 'jotai'
 import { isPortraitAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
 
-const AnimatedSprite = animated(Sprite)
+const AnimatedContainer = animated(Container)
+
+function MagicCircle({ ...props }) {
+  const [rotation, setRotation] = useState(0)
+  const animate = useCallback((delta: number) => {
+    setRotation((rotation) => rotation + 0.05 * delta)
+  }, [])
+  usePixiTicker(animate)
+  return (
+    <Sprite
+      texture={Texture.from(`/magic_circle.svg`)}
+      {...props}
+      rotation={rotation}
+    />
+  )
+}
 
 function Tile({ type, id, transition, ...props }: any) {
   const tileSize = useAtomValue(tileSizeAtom)
   const isPortrait = useAtomValue(isPortraitAtom)
 
+  const tilePos = useMemo(() => {
+    return {
+      tileSize,
+      x: tileSize * (id % 8) + tileSize / 2,
+      y: tileSize * Math.floor(id / 8) + tileSize / 2,
+    }
+  }, [tileSize, id])
+
   const transitionProps = useMemo(() => {
     // TODO: remove transition.from
     props = {
       ...props,
-      width: tileSize,
-      height: tileSize,
-      x: props.x * tileSize,
-      y: props.y * tileSize,
+      width: tilePos.tileSize,
+      height: tilePos.tileSize,
+      x: tilePos.x,
+      y: tilePos.y,
       alpha: 1,
     }
 
@@ -32,12 +55,12 @@ function Tile({ type, id, transition, ...props }: any) {
           to: props,
           from: {
             ...rest,
-            x: transition.from.x * tileSize,
-            y: transition.from.y * tileSize,
+            x: transition.from.x * tilePos.tileSize + tilePos.tileSize / 2,
+            y: transition.from.y * tilePos.tileSize + tilePos.tileSize / 2,
           },
           config: {
             duration: transition.duration - 100,
-            easing: easings.easeInOutBack, //easeBackInOut,
+            easing: easings.easeInOutBack,
             clamp: true,
           },
         }
@@ -45,63 +68,61 @@ function Tile({ type, id, transition, ...props }: any) {
       case GameTransitions.DRAIN: {
         const { x, y, ...rest } = props
         const to = { ...rest }
-        const from = {
-          ...props,
-          alpha: 1,
-          width: tileSize,
-          height: tileSize,
-        }
 
         switch (transition.variation) {
-          case GameTransitions.DRAIN_GLOW: {
-            break
-          }
-          case GameTransitions.DRAIN_FADE: {
-            to.alpha = 0
-            break
-          }
+          // case GameTransitions.DRAIN_GLOW: {
+          //   break
+          // }
+          // case GameTransitions.DRAIN_FADE: {
+          //   to.alpha = 0
+          //   break
+          // }
           default: {
-            to.x = isPortrait ? tileSize * 4 : -tileSize
-            to.y = isPortrait ? tileSize * 9 : tileSize * 2
+            to.x = isPortrait ? tilePos.tileSize * 4 : -tilePos.tileSize
+            to.y = isPortrait ? tilePos.tileSize * 9 : tilePos.tileSize * 2
             to.alpha = 0
-            to.width = tileSize * 0.5
-            to.height = tileSize * 0.5
+            to.width = tilePos.tileSize * 0.5
+            to.height = tilePos.tileSize * 0.5
+
+            if (transition.asOpponent) {
+              to.x = isPortrait ? tilePos.tileSize * 4 : tilePos.tileSize * 9
+              to.y = isPortrait ? -tilePos.tileSize : tilePos.tileSize * 2
+            }
           }
         }
 
         return {
+          from: props,
           to,
-          from,
           config: {
             duration: transition.duration - 100,
-            easing: easings.easeInBack, // easeBackIn,
+            easing: easings.easeInBack,
             clamp: true,
           },
         }
       }
       case GameTransitions.CAST: {
-        const { x, y, ...rest } = props
-        const to = {
-          ...rest,
-          y: (y - 1) * tileSize,
-          alpha: 0,
-        }
-        const from = {
-          ...props,
-          alpha: 1,
-          width: tileSize,
-          height: tileSize,
-        }
-
-        return {
-          to,
-          from,
-          config: {
-            duration: transition.duration - 100,
-            easing: easings.easeOutCubic,
-            clamp: true,
-          },
-        }
+        // const { x, y, ...rest } = props
+        // const to = {
+        //   ...rest,
+        //   y: (y - 1) * tileSize,
+        //   alpha: 0,
+        // }
+        // const from = {
+        //   ...props,
+        //   alpha: 1,
+        //   width: tileSize,
+        //   height: tileSize,
+        // }
+        // return {
+        //   to,
+        //   from,
+        //   config: {
+        //     duration: transition.duration - 100,
+        //     easing: easings.easeOutCubic,
+        //     clamp: true,
+        //   },
+        // }
       }
       case GameTransitions.FILL: {
         const { x, y, ...rest } = props
@@ -109,12 +130,12 @@ function Tile({ type, id, transition, ...props }: any) {
           to: props,
           from: {
             ...rest,
-            x: transition.from.x * tileSize,
-            y: transition.from.y * tileSize,
+            x: transition.from.x * tilePos.tileSize + tilePos.tileSize / 2,
+            y: transition.from.y * tilePos.tileSize + tilePos.tileSize / 2,
           },
           config: {
             duration: transition.duration - 100,
-            easing: easings.easeOutBounce, //easeBounceOut,
+            easing: easings.easeOutBounce,
             clamp: true,
           },
         }
@@ -129,10 +150,11 @@ function Tile({ type, id, transition, ...props }: any) {
         clamp: true,
       },
     }
-  }, [transition, tileSize, isPortrait, props])
+  }, [tilePos, isPortrait, transition, props])
 
   // use different key every transition change
   // so that the 'from' transition works correctly
+  // TODO: replace random
   const forceKey = useMemo(() => {
     return `${id}_${Math.floor(Math.random() * 100000)}`
   }, [id, transition])
@@ -141,11 +163,25 @@ function Tile({ type, id, transition, ...props }: any) {
 
   return (
     <Spring {...transitionProps} key={forceKey}>
-      {(props: any) => (
-        <AnimatedSprite
-          texture={skin !== null ? Texture.from(`/sym_${skin}.png`) : undefined}
-          {...props}
-        />
+      {({ props, x, y }: any) => (
+        <>
+          <AnimatedContainer {...props} x={x} y={y} anchor='0.5,0.5'>
+            <Sprite
+              width={tileSize}
+              height={tileSize}
+              anchor='0.5,0.5'
+              texture={
+                skin !== null ? Texture.from(`/sym_${skin}.png`) : undefined
+              }
+            />
+            {/* <MagicCircle
+              anchor='0.5,0.5'
+              alpha={0.5}
+              width={tileSize}
+              height={tileSize}
+            /> */}
+          </AnimatedContainer>
+        </>
       )}
     </Spring>
   )

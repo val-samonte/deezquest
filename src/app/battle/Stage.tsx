@@ -64,31 +64,26 @@ export default function Stage() {
     stack.tiles &&
       setTiles(
         stack.tiles.map((type: any, i: number) => {
-          const props = {
-            type,
-            x: i % 8,
-            y: Math.floor(i / 8),
-          }
-
           if (stack.nodes?.[i]) {
-            const transition = {
+            const transition: any = {
               id: stack.type,
               type: stack.nodes[i].type,
+              asOpponent: stack.turn !== player,
               variation: stack.nodes[i].variation,
               duration: stack.duration,
-              from: {
-                x: stack.nodes[i].from.x,
-                y: stack.nodes[i].from.y,
-              },
+            }
+
+            if (stack.nodes[i].from) {
+              transition.from = { ...stack.nodes[i].from }
             }
 
             return {
-              ...props,
+              type,
               transition,
             }
           }
 
-          return props
+          return { type }
         }),
       )
 
