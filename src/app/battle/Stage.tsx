@@ -45,10 +45,15 @@ export default function Stage() {
 
   const setDamage = useSetAtom(heroDamagedAtom)
 
+  // TODO: refactor this, use queue (push, shift)
+  const sequenceGuard = useRef(false) // this doesn't work
+
   useEffect(() => {
     if (transitionStack.length === 0) return
 
     const sequence = async () => {
+      if (sequenceGuard.current) return
+
       let stack: any
       for (let i = 0; i < transitionStack.length; i++) {
         if (stackCounter < transitionStack[i].order) {
@@ -104,7 +109,9 @@ export default function Stage() {
         setDamage({ hero: stack.damage, amount: 10 })
       }
 
-      await sleep(stack.duration ? stack.duration + 100 : 0)
+      sequenceGuard.current = true
+      await sleep(stack.duration ? stack.duration + 100 : 100)
+      sequenceGuard.current = false
 
       setStackCounter(stack.order)
     }

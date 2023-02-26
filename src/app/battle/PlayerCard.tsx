@@ -16,12 +16,12 @@ export const heroDisplayAtom = atomFamily((pubkey: string) =>
 
 export const updateHeroesAtom = atom(
   null,
-  (_, set, update: { [key: string]: Hero }) => {
-    if (typeof update === 'object') {
-      Object.entries(update).map(([pubkey, hero]) => {
-        set(heroDisplayAtom(pubkey), hero)
-      })
-    }
+  (get, set, update?: { [key: string]: Hero }) => {
+    Object.entries(
+      typeof update === 'object' ? update : get(gameStateAtom)?.players ?? {},
+    ).map(([pubkey, hero]) => {
+      set(heroDisplayAtom(pubkey), hero)
+    })
   },
 )
 

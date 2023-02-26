@@ -159,7 +159,6 @@ export const gameFunctions = atom(
       case GameStateFunctions.SWAP_NODE: {
         if (isTransitioning) return
         if (action.data.publicKey !== gameState.currentTurn) return
-
         playerHero.turnTime -= 100
 
         const stack = get(gameTransitionStackAtom)
@@ -411,6 +410,12 @@ export const gameFunctions = atom(
           [gameState.currentTurn]: playerHero,
           [opponentPubkey]: opponentHero,
         }
+
+        stack.push({
+          type: GameTransitions.SET,
+          order: ++stackCounter,
+          heroes: { ...gameState.players },
+        })
 
         set(gameTransitionStackAtom, [...stack])
         break

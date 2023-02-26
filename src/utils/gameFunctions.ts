@@ -68,12 +68,12 @@ export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
   const bytes = publicKey.toBytes()
 
   return {
-    hp: 100 + vit * 2,
-    hpCap: 100 + vit * 2,
+    hp: 80 + vit * 2,
+    hpCap: 80 + vit * 2,
     armor: 0,
     shell: 0,
     turnTime: 0,
-    baseDmg: 0,
+    baseDmg: str,
     fireMp: 0,
     fireMpCap: 10 + int,
     windMp: 0,
@@ -233,10 +233,12 @@ export const burningPunch: SkillFn = ({
   gameHash,
   preCommandHero,
 }) => {
-  // Deals ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.
-  const atk = player.baseDmg + commandLevel
+  // Deals x2 of ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.
+  // LVL 3 deals x2 of the mana gap instead.
+
+  const atk = (player.baseDmg + commandLevel) * 2
   const mag = Math.abs((preCommandHero?.fireMp ?? 0) - opponent.fireMp)
-  const dmgHero = applyDamage(opponent, atk, mag)
+  const dmgHero = applyDamage(opponent, atk, mag * (commandLevel === 3 ? 2 : 1))
 
   return { player, opponent: dmgHero, tiles, gameHash }
 }
@@ -248,12 +250,17 @@ export const swiftStrike: SkillFn = ({
   tiles,
   gameHash,
 }) => {
-  // Deals 3|4|5 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.
-  let mag = commandLevel + 2
+  // Deals 6|8|10 MAGIC DMG.
+  // Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.
+  // LVL 3 stuns the opponent.
+
+  let mag = [6, 8, 10][commandLevel - 1]
+  let dmgHero = { ...opponent }
   if (commandLevel === 3) {
     mag += player.spd > opponent.spd ? player.spd - opponent.spd : 0
+    dmgHero.turnTime -= 100
   }
-  const dmgHero = applyDamage(opponent, 0, mag)
+  dmgHero = applyDamage(opponent, 0, mag)
 
   return { player, opponent: dmgHero, tiles, gameHash }
 }
@@ -265,9 +272,11 @@ export const aquaShot: SkillFn = ({
   tiles,
   gameHash,
 }) => {
-  // Deals 2|6|8 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes. LVL 3 pierces through SHELL.
+  // Deals 4|12|16 MAGIC DMG.
+  // Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes.
+  // LVL 3 pierces through SHELL.
 
-  let mag = [2, 6, 8][commandLevel - 1]
+  let mag = [4, 12, 16][commandLevel - 1]
   if (commandLevel === 3) {
     mag += player.vit > opponent.vit ? player.vit - opponent.vit : 0
   }
@@ -284,10 +293,11 @@ export const crushingBlow: SkillFn = ({
   gameHash,
   preCommandHero,
 }) => {
-  // Deals 1 MAGIC DMG per EARTH MANA of the hero.
+  // Deals 2 MAGIC DMG per EARTH MANA of the hero.
   // LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5.
   // LVL 3 destroys ARMOR after damage is applied.
-  let mag = preCommandHero?.eartMp ?? 1
+
+  let mag = (preCommandHero?.eartMp ?? 1) * 2
   let atk = 0
   if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
     atk = player.str
@@ -307,8 +317,9 @@ export const empower: SkillFn = ({
   tiles,
   gameHash,
 }) => {
-  // Adds 1|2|3 to ATTACK DMG during the match, stacks indefinitely.
-  player.baseDmg += commandLevel
+  // Adds 3|6|9 to ATTACK DMG during the match, stacks indefinitely.
+
+  player.baseDmg += commandLevel * 3
   return { player: { ...player }, opponent, tiles, gameHash }
 }
 
@@ -319,7 +330,8 @@ export const tailwind: SkillFn = ({
   tiles,
   gameHash,
 }) => {
-  // Adds 1|2|3 to SPD during the match, stacks indefinitely.
+  // Adds 3|6|9 to SPD during the match, stacks indefinitely.
+
   player.spd += commandLevel
   return { player, opponent, tiles, gameHash }
 }
@@ -331,10 +343,13 @@ export const healing: SkillFn = ({
   tiles,
   gameHash,
 }) => {
-  // Recover 3|4|5 HP. LVL 3 adds current value of VIT as HP.
-  let heal = 2 + commandLevel
+  // Recover 6|8|10 HP.
+  // LVL 3 adds x2 value of VIT as HP.
+
+  let heal = [6, 8, 10][commandLevel - 1]
+
   if (commandLevel === 3) {
-    heal += player.vit
+    heal += player.vit * 2
   }
   player = addHp(player, heal)
   return { player, opponent, tiles, gameHash }
@@ -350,6 +365,7 @@ export const manaWall: SkillFn = ({
 }) => {
   // Converts all EARTH MANA into SHELL.
   // Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.
+
   player.shell += preCommandHero?.eartMp ?? 1
   if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
     player.armor += player.str
@@ -422,7 +438,9 @@ export interface Skill {
 export const skills: Skill[] = [
   {
     name: 'Burning Punch',
-    desc: 'Deals ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.',
+    desc:
+      'Deals x2 of ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.\n' +
+      'LVL 3 deals x2 of the mana gap instead.',
     type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
@@ -432,7 +450,10 @@ export const skills: Skill[] = [
   },
   {
     name: 'Swift Strike',
-    desc: 'Deals 3|4|5 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.',
+    desc:
+      'Deals 6|8|10 MAGIC DMG.\n' +
+      'Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.\n' +
+      'LVL 3 stuns the opponent.',
     type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
@@ -442,7 +463,10 @@ export const skills: Skill[] = [
   },
   {
     name: 'Aquashot',
-    desc: 'Deals 2|6|8 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes. LVL 3 pierces through SHELL.',
+    desc:
+      'Deals 4|12|16 MAGIC DMG.\n' +
+      'Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes.\n' +
+      'LVL 3 pierces through SHELL.',
     type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
@@ -452,7 +476,10 @@ export const skills: Skill[] = [
   },
   {
     name: 'Crushing Blow',
-    desc: 'Deals 1 MAGIC DMG per EARTH MANA of the hero. LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5. LVL 3 destroys ARMOR after damage is applied.',
+    desc:
+      'Deals 2 MAGIC DMG per EARTH MANA of the hero.\n' +
+      'LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5.\n' +
+      'LVL 3 destroys ARMOR after damage is applied.',
     type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
@@ -462,7 +489,7 @@ export const skills: Skill[] = [
   },
   {
     name: 'Empower',
-    desc: 'Adds 1|2|3 to ATTACK DMG during the match, stacks indefinitely.',
+    desc: 'Adds 3|6|9 to ATTACK DMG during the match, stacks indefinitely.',
     type: SkillTypes.SUPPORT,
     target: TargetHero.SELF,
     cost: {
@@ -482,7 +509,7 @@ export const skills: Skill[] = [
   },
   {
     name: 'Healing',
-    desc: 'Recover 3|4|5 HP. LVL 3 adds current value of VIT as HP.',
+    desc: 'Recover 6|8|10 HP.\n' + 'LVL 3 adds x2 value of VIT as HP.',
     type: SkillTypes.SUPPORT,
     target: TargetHero.SELF,
     cost: {
@@ -492,7 +519,9 @@ export const skills: Skill[] = [
   },
   {
     name: 'Manawall',
-    desc: 'Converts all EARTH MANA into SHELL. Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.',
+    desc:
+      'Converts all EARTH MANA into SHELL.\n' +
+      'Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.',
     type: SkillTypes.SUPPORT,
     target: TargetHero.SELF,
     cost: {
