@@ -307,7 +307,7 @@ export const gameFunctions = atom(
                 commandLevel: command.lvl ?? 1,
                 player: playerHero,
                 preCommandHero,
-                opponent: opponentHero,
+                opponent: { ...opponentHero },
                 tiles: newTiles,
                 gameHash: hash,
               })

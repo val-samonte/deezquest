@@ -10,43 +10,7 @@ import { trimAddress } from '@/utils/trimAddress'
 import { usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { useRouter } from 'next/navigation'
-
-function SkillView({ skill }: { skill: Skill }) {
-  return (
-    <div className='flex flex-col w-full'>
-      <div className='flex items-center border-b border-b-white/5 pb-2 mb-3'>
-        <h3 className='text-xl font-bold flex-auto'>{skill.name}</h3>
-        <p className='flex items-center gap-3 font-bold'>
-          {typeof skill.cost.fire === 'number' && (
-            <span className='flex items-center gap-2'>
-              <img src='/elem_fire.svg' className='w-8 h-8' />
-              {isNaN(skill.cost.fire) ? 'ALL' : skill.cost.fire}
-            </span>
-          )}
-          {typeof skill.cost.wind === 'number' && (
-            <span className='flex items-center gap-2'>
-              <img src='/elem_wind.svg' className='w-8 h-8' />
-              {isNaN(skill.cost.wind) ? 'ALL' : skill.cost.wind}
-            </span>
-          )}
-          {typeof skill.cost.water === 'number' && (
-            <span className='flex items-center gap-2'>
-              <img src='/elem_water.svg' className='w-8 h-8' />
-              {isNaN(skill.cost.water) ? 'ALL' : skill.cost.water}
-            </span>
-          )}
-          {typeof skill.cost.earth === 'number' && (
-            <span className='flex items-center gap-2'>
-              <img src='/elem_earth.svg' className='w-8 h-8' />
-              {isNaN(skill.cost.earth) ? 'ALL' : skill.cost.earth}
-            </span>
-          )}
-        </p>
-      </div>
-      <p className='text-sm text-neutral-300'>{skill.desc}</p>
-    </div>
-  )
-}
+import SkillView from '@/components/SkillView'
 
 export default function HeroSelect() {
   const router = useRouter()
@@ -185,15 +149,15 @@ export default function HeroSelect() {
           <div className='flex flex-col'>
             <h2 className='text-xl font-bold mb-3'>Skills</h2>
             <ul className='flex flex-col gap-5'>
-              <li className='flex gap-5'>
+              <li className='flex gap-5 items-center'>
                 <img src='/cmd_attack.svg' className='w-20 h-20' />
                 <SkillView skill={stats.skills[SkillTypes.ATTACK]} />
               </li>
-              <li className='flex gap-5'>
+              <li className='flex gap-5 items-center'>
                 <img src='/cmd_support.svg' className='w-20 h-20' />
                 <SkillView skill={stats.skills[SkillTypes.SUPPORT]} />
               </li>
-              <li className='flex gap-5'>
+              <li className='flex gap-5 items-center'>
                 <img src='/cmd_special.svg' className='w-20 h-20' />
                 <SkillView skill={stats.skills[SkillTypes.SPECIAL]} />
               </li>

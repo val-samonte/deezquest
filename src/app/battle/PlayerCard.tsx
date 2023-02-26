@@ -2,8 +2,9 @@
 
 import { gameStateAtom, isGameTransitioningAtom } from '@/atoms/gameStateAtom'
 import AnimatedCounter from '@/components/AnimatedCounter'
+import SkillView from '@/components/SkillView'
 import StatCounter from '@/components/StatCounter'
-import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
+import { Hero, heroFromPublicKey, skills } from '@/utils/gameFunctions'
 import classNames from 'classnames'
 import { atom, useAtomValue } from 'jotai'
 import { atomFamily } from 'jotai/utils'
@@ -204,7 +205,7 @@ export default function PlayerCard({
                     )}
                   />
                   <span className='text-right font-bold ml-auto'>
-                    <span className='hidden md:inline'>Your</span> Turn
+                    <span className='hidden 2xl:inline'>Your</span> Turn
                   </span>
                 </span>
               ) : (
@@ -357,6 +358,21 @@ export default function PlayerCard({
             </div>
           </div>
         </div>
+
+        <ul className='hidden lg:flex flex-col gap-5 flex-auto p-5'>
+          <li className='flex flex-auto gap-5 h-8'>
+            <img src='/cmd_attack.svg' className='aspect-square h-full' />
+            <SkillView skill={skills[hero.offensiveSkill]} hideDesc />
+          </li>
+          <li className='flex flex-auto gap-5 h-8'>
+            <img src='/cmd_support.svg' className='aspect-square h-full' />
+            <SkillView skill={skills[hero.supportiveSkill]} hideDesc />
+          </li>
+          <li className='flex flex-auto gap-5 h-8'>
+            <img src='/cmd_special.svg' className='aspect-square h-full' />
+            <SkillView skill={skills[hero.specialSkill]} hideDesc />
+          </li>
+        </ul>
       </div>
     </div>
   )
