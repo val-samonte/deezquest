@@ -219,7 +219,7 @@ export const gameFunctions = atom(
           // count: [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
           playerHero = absorbMana(playerHero, count.slice(3))
           const { flags, stacks: commandsStacks } = executableCommands(
-            playerHero,
+            { ...playerHero },
             count.slice(0, 3),
           )
 
@@ -260,7 +260,10 @@ export const gameFunctions = atom(
 
           commandsStacks.forEach((command) => {
             if (command.attack) {
-              opponentHero = applyDamage(opponentHero, command.attack)
+              opponentHero = applyDamage(
+                opponentHero,
+                playerHero.baseDmg + command.attack,
+              )
               stack.push({
                 type: GameTransitions.ATTACK_NORMAL,
                 order: ++stackCounter,
@@ -283,6 +286,7 @@ export const gameFunctions = atom(
                 duration: 100,
               })
             } else if (command.skill) {
+              const preCommandHero = { ...playerHero }
               playerHero.fireMp = command.hero.fireMp
               playerHero.windMp = command.hero.windMp
               playerHero.watrMp = command.hero.watrMp
@@ -312,18 +316,19 @@ export const gameFunctions = atom(
                 duration: 1500,
               })
 
-              const postCommand = command.skill.fn(
-                command.lvl ?? 1,
-                playerHero,
-                opponentHero,
-                newTiles,
-                hash,
-              )
+              const postCommand = command.skill.fn({
+                commandLevel: command.lvl ?? 1,
+                player: playerHero,
+                preCommandHero,
+                opponent: opponentHero,
+                tiles: newTiles,
+                gameHash: hash,
+              })
 
               playerHero = postCommand.player
               opponentHero = postCommand.opponent
-              newTiles = postCommand.tiles
-              hash = postCommand.gameHash
+              newTiles = postCommand.tiles ?? newTiles
+              hash = postCommand.gameHash ?? hash
 
               const spotlight: any = []
               const heroes: any = {}

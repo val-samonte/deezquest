@@ -110,7 +110,7 @@ export const applyDamage = (
     }
   }
 
-  if (ignoreShell) {
+  if (!ignoreShell) {
     if (hero.shell < magical) {
       magical -= hero.shell
       hero.shell = 0
@@ -209,136 +209,195 @@ export const getNextTurn = (
   return { hero: hero2, pubkey: pubkey2 }
 }
 
-export type SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
+interface SkillFnParams {
+  commandLevel: number
   player: Hero
   opponent: Hero
-  tiles: (number | null)[]
-  gameHash: Uint8Array
+  tiles?: (number | null)[]
+  gameHash?: Uint8Array
+  preCommandHero?: Hero
 }
 
-export const burningPunch: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
+export type SkillFn = (params: SkillFnParams) => {
+  player: Hero
+  opponent: Hero
+  tiles?: (number | null)[]
+  gameHash?: Uint8Array
+}
+
+export const burningPunch: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Deals ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.
+  const atk = player.baseDmg + commandLevel
+  const mag = Math.abs(player.fireMp - opponent.fireMp)
+  const dmgHero = applyDamage(opponent, atk, mag)
+
+  return { player, opponent: dmgHero, tiles, gameHash }
+}
+
+export const swiftStrike: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Deals 3|4|5 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.
+  let mag = commandLevel + 2
+  if (commandLevel === 3) {
+    mag += player.spd > opponent.spd ? player.spd - opponent.spd : 0
+  }
+  const dmgHero = applyDamage(opponent, 0, mag)
+
+  return { player, opponent: dmgHero, tiles, gameHash }
+}
+
+export const aquaShot: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Deals 2|6|8 MAGIC DMG. Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes. LVL 3 pierces through SHELL.
+
+  let mag = [2, 6, 8][commandLevel - 1]
+  if (commandLevel === 3) {
+    mag += player.vit > opponent.vit ? player.vit - opponent.vit : 0
+  }
+  const dmgHero = applyDamage(opponent, 0, mag, false, commandLevel === 3)
+
+  return { player, opponent: dmgHero, tiles, gameHash }
+}
+
+export const crushingBlow: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+  preCommandHero,
+}) => {
+  // Deals 1 MAGIC DMG per EARTH MANA of the hero.
+  // LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5.
+  // LVL 3 destroys ARMOR after damage is applied.
+  let mag = preCommandHero?.eartMp ?? 1
+  let atk = 0
+  if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
+    atk = player.str
+  }
+  const dmgHero = applyDamage(opponent, atk, mag)
+  if (commandLevel === 3) {
+    dmgHero.armor = 0
+  }
+
+  return { player, opponent: dmgHero, tiles, gameHash }
+}
+
+export const empower: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Adds 1|2|3 to ATTACK DMG during the match, stacks indefinitely.
+  player.baseDmg += commandLevel
+  return { player: { ...player }, opponent, tiles, gameHash }
+}
+
+export const tailwind: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Adds 1|2|3 to SPD during the match, stacks indefinitely.
+  player.spd += commandLevel
   return { player, opponent, tiles, gameHash }
 }
 
-export const swiftStrike: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
+export const healing: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Recover 3|4|5 HP. LVL 3 adds current value of VIT as HP.
+  let heal = 2 + commandLevel
+  if (commandLevel === 3) {
+    heal += player.vit
+  }
+  player = addHp(player, heal)
   return { player, opponent, tiles, gameHash }
 }
 
-export const aquaShot: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
+export const manaWall: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+  preCommandHero,
+}) => {
+  // Converts all EARTH MANA into SHELL.
+  // Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.
+  player.shell += preCommandHero?.eartMp ?? 1
+  if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
+    player.armor += player.str
+  }
+
   return { player, opponent, tiles, gameHash }
 }
 
-export const crushingBlow: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
+export const combustion: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Converts all WATER MANA in the board into FIRE MANA, deals MAGIC DMG on how many are converted.
   return { player, opponent, tiles, gameHash }
 }
 
-export const empower: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
+export const tornado: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Shuffles the board, deals MAGIC DMG based on how many WIND + EARTH MANA appear after the shuffle.
   return { player, opponent, tiles, gameHash }
 }
 
-export const tailwind: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
+export const extinguish: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Converts all FIRE MANA in the board into WATER MANA, recover HP based on how many are converted.
   return { player, opponent, tiles, gameHash }
 }
 
-export const healing: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
-  return { player, opponent, tiles, gameHash }
-}
-
-export const manaWall: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
-  return { player, opponent, tiles, gameHash }
-}
-
-export const combustion: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
-  return { player, opponent, tiles, gameHash }
-}
-
-export const tornado: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
-  return { player, opponent, tiles, gameHash }
-}
-
-export const extinguish: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
-  return { player, opponent, tiles, gameHash }
-}
-
-export const quake: SkillFn = (
-  commandLevel: number,
-  player: Hero,
-  opponent: Hero,
-  tiles: (number | null)[],
-  gameHash: Uint8Array,
-) => {
+export const quake: SkillFn = ({
+  commandLevel,
+  player,
+  opponent,
+  tiles,
+  gameHash,
+}) => {
+  // Deals 30 MAGIC DMG on both players. Damage is reduced based on each respective heroes' WIND MANA.
   return { player, opponent, tiles, gameHash }
 }
 

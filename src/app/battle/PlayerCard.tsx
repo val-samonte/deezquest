@@ -1,6 +1,7 @@
 'use client'
 
 import { gameStateAtom, isGameTransitioningAtom } from '@/atoms/gameStateAtom'
+import AnimatedCounter from '@/components/AnimatedCounter'
 import StatCounter from '@/components/StatCounter'
 import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
 import classNames from 'classnames'
@@ -54,7 +55,7 @@ export default function PlayerCard({
           : hero.armor > 0
           ? 'text-cyan-400'
           : hero.shell > 0
-          ? 'text-pink-600'
+          ? 'text-fuchsia-600'
           : '',
     }
   }, [hero.hp, hero.hpCap, hero.armor, hero.shell])
@@ -91,16 +92,17 @@ export default function PlayerCard({
               highlight,
             )}
           >
-            <span className='text-3xl md:text-4xl xl:text-7xl xs:font-bold flex-none'>
-              {hero.hp}
-            </span>
+            <AnimatedCounter
+              className='text-3xl md:text-4xl xl:text-7xl xs:font-bold flex-none'
+              value={hero.hp}
+            />
             <span className='xs:font-bold xl:hidden whitespace-nowrap'>
               / {hero.hpCap}
             </span>
           </div>
 
           {/* HP Bar & Time */}
-          <div className='flex flex-auto flex-col gap-1 xl:gap-2'>
+          <div className={classNames('flex flex-auto flex-col gap-1 xl:gap-2')}>
             <div
               className={classNames(
                 'relative flex items-center gap-1 xl:gap-2 bg-black/20 p-1 xs:px-2 ',
@@ -146,9 +148,11 @@ export default function PlayerCard({
               >
                 / {hero.hpCap}
               </span>
-              <span className='mx-auto' />
+              <span className='mx-auto'></span>
               <StatCounter img='/armor.svg' value={hero.armor} />
-              <StatCounter img='/shell.svg' value={hero.shell} />
+              {hero.shell > 0 && (
+                <StatCounter img='/shell.svg' value={hero.shell} />
+              )}
             </div>
             <div
               className={classNames(

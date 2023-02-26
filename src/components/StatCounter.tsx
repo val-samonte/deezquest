@@ -2,6 +2,7 @@
 
 import classNames from 'classnames'
 import { ReactNode } from 'react'
+import AnimatedCounter from './AnimatedCounter'
 
 interface StatCounterProps {
   img: string
@@ -38,9 +39,10 @@ export default function StatCounter({
           {children}
         </span>
       )}
-      <span className={classNames('text-right font-bold ml-auto', className)}>
-        {value}
-      </span>
+      <AnimatedCounter
+        value={value}
+        className={classNames('text-right font-bold ml-auto', className)}
+      />
     </div>
   )
 }

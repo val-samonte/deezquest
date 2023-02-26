@@ -91,6 +91,7 @@ export default function Stage() {
       )
 
     if (stack.heroes) {
+      // console.log(stack.type, opponent && stack.heroes[opponent])
       updateHeroes(stack.heroes)
     }
 
