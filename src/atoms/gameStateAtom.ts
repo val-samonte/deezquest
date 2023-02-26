@@ -69,12 +69,7 @@ export const gameStateAtom = atom(
 )
 
 export const isGameTransitioningAtom = atom(false)
-export const gameTransitionStackAtom = atom<any[]>([])
-export const gameTransitionStackCounterAtom = atom(0)
-export const resetGameTransitionStackAtom = atom(null, (_, set) => {
-  set(gameTransitionStackCounterAtom, 0)
-  set(gameTransitionStackAtom, [])
-})
+export const gameTransitionQueueAtom = atom<any[]>([])
 
 export const gameFunctions = atom(
   null,
@@ -130,7 +125,6 @@ export const gameFunctions = atom(
     }
 
     let isTransitioning = get(isGameTransitioningAtom)
-    let stackCounter = get(gameTransitionStackCounterAtom)
     let hash = bs58.decode(gameState.hashes[gameState.hashes.length - 1])
 
     // NOTE: treatment of player vs opponent depends on context
@@ -143,17 +137,16 @@ export const gameFunctions = atom(
 
     switch (action.type) {
       case GameStateFunctions.INIT: {
-        const stack = get(gameTransitionStackAtom)
+        const queue = get(gameTransitionQueueAtom)
 
-        stack.push({
+        queue.push({
           type: GameTransitions.SET,
-          order: ++stackCounter,
           turn: gameState.currentTurn,
           tiles: gameState.tiles,
           heroes: gameState.players,
         })
 
-        set(gameTransitionStackAtom, [...stack])
+        set(gameTransitionQueueAtom, [...queue])
         break
       }
       case GameStateFunctions.SWAP_NODE: {
@@ -161,8 +154,8 @@ export const gameFunctions = atom(
         if (action.data.publicKey !== gameState.currentTurn) return
         playerHero.turnTime -= 100
 
-        const stack = get(gameTransitionStackAtom)
-        const tiles = gameState.tiles // stack[stack.length - 1].tiles
+        const queue = get(gameTransitionQueueAtom)
+        const tiles = gameState.tiles // queue[queue.length - 1].tiles
 
         const node1 = action.data.node1.y * 8 + action.data.node1.x
         const node2 = action.data.node2.y * 8 + action.data.node2.x
@@ -173,9 +166,8 @@ export const gameFunctions = atom(
         newTiles[node1] = tiles[node2]
         newTiles[node2] = tiles[node1]
 
-        stack.push({
+        queue.push({
           type: GameTransitions.SWAP,
-          order: ++stackCounter,
           turn: gameState.currentTurn,
           tiles: [...newTiles],
           heroes: {
@@ -217,15 +209,14 @@ export const gameFunctions = atom(
 
           // count: [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
           playerHero = absorbMana(playerHero, count.slice(3))
-          const { flags, stacks: commandsStacks } = executableCommands(
+          const { flags, queue: commandsQueues } = executableCommands(
             { ...playerHero },
             count.slice(0, 3),
           )
 
           newTiles = subtract(newTiles, matches)
-          stack.push({
+          queue.push({
             type: GameTransitions.DRAIN,
-            order: ++stackCounter,
             turn: gameState.currentTurn,
             tiles: [...newTiles],
             heroes: {
@@ -257,15 +248,14 @@ export const gameFunctions = atom(
             duration: 600,
           })
 
-          commandsStacks.forEach((command) => {
+          commandsQueues.forEach((command) => {
             if (command.attack) {
               opponentHero = applyDamage(
                 opponentHero,
                 playerHero.baseDmg + command.attack,
               )
-              stack.push({
+              queue.push({
                 type: GameTransitions.ATTACK_NORMAL,
-                order: ++stackCounter,
                 turn: gameState!.currentTurn,
                 damage: opponentPubkey,
                 heroes: {
@@ -275,9 +265,8 @@ export const gameFunctions = atom(
               })
             } else if (command.armor) {
               playerHero.armor += command.armor
-              stack.push({
+              queue.push({
                 type: GameTransitions.BUFF_ARMOR,
-                order: ++stackCounter,
                 turn: gameState!.currentTurn,
                 heroes: {
                   [gameState!.currentTurn]: { ...playerHero },
@@ -291,9 +280,8 @@ export const gameFunctions = atom(
               playerHero.watrMp = command.hero.watrMp
               playerHero.eartMp = command.hero.eartMp
 
-              stack.push({
+              queue.push({
                 type: GameTransitions.CAST,
-                order: ++stackCounter,
                 turn: gameState!.currentTurn,
                 spotlight: [gameState!.currentTurn],
                 heroes: {
@@ -352,9 +340,8 @@ export const gameFunctions = atom(
                 heroes[opponentPubkey] = { ...opponentHero }
               }
 
-              stack.push({
+              queue.push({
                 type,
-                order: ++stackCounter,
                 turn: gameState!.currentTurn,
                 spotlight,
                 damage:
@@ -384,9 +371,8 @@ export const gameFunctions = atom(
 
           newTiles = fill(newTiles, fillers, depths)
 
-          stack.push({
+          queue.push({
             type: GameTransitions.FILL,
-            order: ++stackCounter,
             turn: gameState.currentTurn,
             tiles: [...newTiles],
             nodes: matches.reduce((acc, _, i) => {
@@ -411,13 +397,12 @@ export const gameFunctions = atom(
           [opponentPubkey]: opponentHero,
         }
 
-        stack.push({
+        queue.push({
           type: GameTransitions.SET,
-          order: ++stackCounter,
           heroes: { ...gameState.players },
         })
 
-        set(gameTransitionStackAtom, [...stack])
+        set(gameTransitionQueueAtom, [...queue])
         break
       }
     }
@@ -434,8 +419,6 @@ export const gameFunctions = atom(
       ...gameState,
       currentTurn: bs58.encode(nextTurn.pubkey),
     })
-
-    set(gameTransitionStackCounterAtom, stackCounter)
   },
 )
 

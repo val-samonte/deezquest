@@ -2,13 +2,12 @@
 
 import {
   gameFunctions,
-  gameTransitionStackAtom,
+  gameTransitionQueueAtom,
   isGameTransitioningAtom,
   playerKpAtom,
-  resetGameTransitionStackAtom,
 } from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { Application, ICanvas } from 'pixi.js'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AppContext, Container, Stage as PixiStage } from 'react-pixi-fiber'
@@ -26,9 +25,8 @@ export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
   const updateHeroes = useSetAtom(updateHeroesAtom)
   const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
-  const transitionStack = useAtomValue(gameTransitionStackAtom)
-  const [stackCounter, setStackCounter] = useState(-1)
-  const resetTransitionStack = useSetAtom(resetGameTransitionStackAtom)
+  const [transitionQueue, setTransitionQueue] = useAtom(gameTransitionQueueAtom)
+  const setDamage = useSetAtom(heroDamagedAtom)
   const [tiles, setTiles] = useState<any[]>([])
   const [skill, setSkill] = useState<{
     name: string
@@ -43,48 +41,35 @@ export default function Stage() {
   )
   const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
 
-  const setDamage = useSetAtom(heroDamagedAtom)
-
-  // TODO: refactor this, use queue (push, shift)
-  const sequenceGuard = useRef(false) // this doesn't work
-
+  const currentTransition = useRef<any>(null)
   useEffect(() => {
-    if (transitionStack.length === 0) return
-
-    const sequence = async () => {
-      if (sequenceGuard.current) return
-
-      let stack: any
-      for (let i = 0; i < transitionStack.length; i++) {
-        if (stackCounter < transitionStack[i].order) {
-          stack = transitionStack[i]
-          break
-        }
-      }
-
-      if (!stack) {
+    if (currentTransition.current) return
+    ;(async () => {
+      if (transitionQueue.length === 0) {
         setIsTransitioning(false)
-        setStackCounter(-1)
-        resetTransitionStack()
         return
       }
 
+      const [next, ...queue] = transitionQueue
+      currentTransition.current = next
+      console.log('PROCESSING', next.type)
+
       setIsTransitioning(true)
 
-      stack.tiles &&
+      next.tiles &&
         setTiles(
-          stack.tiles.map((type: any, i: number) => {
-            if (stack.nodes?.[i]) {
+          next.tiles.map((type: any, i: number) => {
+            if (next.nodes?.[i]) {
               const transition: any = {
-                id: stack.type,
-                type: stack.nodes[i].type,
-                asOpponent: stack.turn !== player,
-                variation: stack.nodes[i].variation,
-                duration: stack.duration,
+                id: next.type,
+                type: next.nodes[i].type,
+                asOpponent: next.turn !== player,
+                variation: next.nodes[i].variation,
+                duration: next.duration,
               }
 
-              if (stack.nodes[i].from) {
-                transition.from = { ...stack.nodes[i].from }
+              if (next.nodes[i].from) {
+                transition.from = { ...next.nodes[i].from }
               }
 
               return {
@@ -97,37 +82,31 @@ export default function Stage() {
           }),
         )
 
-      if (stack.heroes) {
-        updateHeroes(stack.heroes)
+      if (next.heroes) {
+        updateHeroes(next.heroes)
       }
 
-      if (stack.type === GameTransitions.CAST) {
-        setSkill(stack.skill)
+      if (next.type === GameTransitions.CAST) {
+        setSkill(next.skill)
       }
 
-      if (stack.damage) {
-        setDamage({ hero: stack.damage, amount: 10 })
+      if (next.damage) {
+        setDamage({ hero: next.damage, amount: 10 })
       }
 
-      sequenceGuard.current = true
-      await sleep(stack.duration ? stack.duration + 100 : 100)
-      sequenceGuard.current = false
+      await sleep(next.duration ? next.duration + 100 : 100)
+      currentTransition.current = null
 
-      setStackCounter(stack.order)
-    }
-
-    sequence()
+      setTransitionQueue(queue)
+    })()
   }, [
-    transitionStack,
-    stackCounter,
-    player,
-    opponent,
-    resetTransitionStack,
-    setTiles,
-    setIsTransitioning,
-    setSkill,
-    setDamage,
+    transitionQueue,
+    setTransitionQueue,
     updateHeroes,
+    setIsTransitioning,
+    setDamage,
+    setTiles,
+    setSkill,
   ])
 
   const loaded = useRef(false)

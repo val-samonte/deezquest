@@ -598,7 +598,7 @@ export const executableCommands = (
   const offensiveSkill = skills[hero.offensiveSkill]
   const supportiveSkill = skills[hero.supportiveSkill]
   const specialSkill = skills[hero.specialSkill]
-  const stacks: {
+  const queue: {
     hero: Hero
     lvl?: number
     skill?: Skill
@@ -612,7 +612,7 @@ export const executableCommands = (
   if (absorbedCommands[2] > 3) {
     if (isExecutable(hero, specialSkill.cost)) {
       hero = deductMana(hero, specialSkill.cost)
-      stacks.push({
+      queue.push({
         hero: { ...hero },
         skill: specialSkill,
       })
@@ -623,14 +623,14 @@ export const executableCommands = (
   if (absorbedCommands[1] > 2) {
     if (isExecutable(hero, supportiveSkill.cost)) {
       hero = deductMana(hero, supportiveSkill.cost)
-      stacks.push({
+      queue.push({
         hero: { ...hero },
         lvl: absorbedCommands[1] > 4 ? 3 : absorbedCommands[1] === 4 ? 2 : 1,
         skill: supportiveSkill,
       })
       flags[1] = true
     } else {
-      stacks.push({
+      queue.push({
         armor: absorbedCommands[1],
         hero: { ...hero },
       })
@@ -640,14 +640,14 @@ export const executableCommands = (
   if (absorbedCommands[0] > 2) {
     if (isExecutable(hero, offensiveSkill.cost)) {
       hero = deductMana(hero, offensiveSkill.cost)
-      stacks.push({
+      queue.push({
         hero: { ...hero },
         lvl: absorbedCommands[0] > 4 ? 3 : absorbedCommands[0] === 4 ? 2 : 1,
         skill: offensiveSkill,
       })
       flags[0] = true
     } else {
-      stacks.push({
+      queue.push({
         attack: absorbedCommands[0],
         hero: { ...hero },
       })
@@ -656,6 +656,6 @@ export const executableCommands = (
 
   return {
     flags,
-    stacks,
+    queue,
   }
 }
