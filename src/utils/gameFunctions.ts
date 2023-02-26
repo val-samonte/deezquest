@@ -231,10 +231,11 @@ export const burningPunch: SkillFn = ({
   opponent,
   tiles,
   gameHash,
+  preCommandHero,
 }) => {
   // Deals ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.
   const atk = player.baseDmg + commandLevel
-  const mag = Math.abs(player.fireMp - opponent.fireMp)
+  const mag = Math.abs((preCommandHero?.fireMp ?? 0) - opponent.fireMp)
   const dmgHero = applyDamage(opponent, atk, mag)
 
   return { player, opponent: dmgHero, tiles, gameHash }
@@ -365,6 +366,7 @@ export const combustion: SkillFn = ({
   gameHash,
 }) => {
   // Converts all WATER MANA in the board into FIRE MANA, deals MAGIC DMG on how many are converted.
+
   return { player, opponent, tiles, gameHash }
 }
 

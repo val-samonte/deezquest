@@ -20,6 +20,7 @@ import CastingDisplay from './CastingDisplay'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { GameTransitions } from '@/enums/GameTransitions'
 import { heroDamagedAtom } from './HeroPortrait'
+import { sleep } from '@/utils/sleep'
 
 export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
@@ -47,68 +48,68 @@ export default function Stage() {
   useEffect(() => {
     if (transitionStack.length === 0) return
 
-    let stack: any
-    for (let i = 0; i < transitionStack.length; i++) {
-      if (stackCounter < transitionStack[i].order) {
-        stack = transitionStack[i]
-        break
+    const sequence = async () => {
+      let stack: any
+      for (let i = 0; i < transitionStack.length; i++) {
+        if (stackCounter < transitionStack[i].order) {
+          stack = transitionStack[i]
+          break
+        }
       }
-    }
 
-    if (!stack) {
-      setIsTransitioning(false)
-      setStackCounter(-1)
-      resetTransitionStack()
-      return
-    }
+      if (!stack) {
+        setIsTransitioning(false)
+        setStackCounter(-1)
+        resetTransitionStack()
+        return
+      }
 
-    setIsTransitioning(true)
+      setIsTransitioning(true)
 
-    stack.tiles &&
-      setTiles(
-        stack.tiles.map((type: any, i: number) => {
-          if (stack.nodes?.[i]) {
-            const transition: any = {
-              id: stack.type,
-              type: stack.nodes[i].type,
-              asOpponent: stack.turn !== player,
-              variation: stack.nodes[i].variation,
-              duration: stack.duration,
+      stack.tiles &&
+        setTiles(
+          stack.tiles.map((type: any, i: number) => {
+            if (stack.nodes?.[i]) {
+              const transition: any = {
+                id: stack.type,
+                type: stack.nodes[i].type,
+                asOpponent: stack.turn !== player,
+                variation: stack.nodes[i].variation,
+                duration: stack.duration,
+              }
+
+              if (stack.nodes[i].from) {
+                transition.from = { ...stack.nodes[i].from }
+              }
+
+              return {
+                type,
+                transition,
+              }
             }
 
-            if (stack.nodes[i].from) {
-              transition.from = { ...stack.nodes[i].from }
-            }
+            return { type }
+          }),
+        )
 
-            return {
-              type,
-              transition,
-            }
-          }
+      if (stack.heroes) {
+        updateHeroes(stack.heroes)
+      }
 
-          return { type }
-        }),
-      )
+      if (stack.type === GameTransitions.CAST) {
+        setSkill(stack.skill)
+      }
 
-    if (stack.heroes) {
-      // console.log(stack.type, opponent && stack.heroes[opponent])
-      updateHeroes(stack.heroes)
+      if (stack.damage) {
+        setDamage({ hero: stack.damage, amount: 10 })
+      }
+
+      await sleep(stack.duration ? stack.duration + 100 : 0)
+
+      setStackCounter(stack.order)
     }
 
-    if (stack.type === GameTransitions.CAST) {
-      setSkill(stack.skill)
-    }
-
-    if (stack.damage) {
-      setDamage({ hero: stack.damage, amount: 10 })
-    }
-
-    setTimeout(
-      () => {
-        setStackCounter(stack.order)
-      },
-      stack.duration ? stack.duration + 100 : 0,
-    )
+    sequence()
   }, [
     transitionStack,
     stackCounter,

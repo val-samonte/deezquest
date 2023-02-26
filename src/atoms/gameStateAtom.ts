@@ -412,16 +412,6 @@ export const gameFunctions = atom(
           [opponentPubkey]: opponentHero,
         }
 
-        stack.push({
-          type: GameTransitions.SET,
-          order: ++stackCounter,
-          turn: gameState.currentTurn,
-          tiles: gameState.tiles,
-          heroes: gameState.players,
-        })
-
-        // console.log(stack, gameState)
-
         set(gameTransitionStackAtom, [...stack])
         break
       }
