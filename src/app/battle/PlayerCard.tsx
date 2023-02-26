@@ -5,9 +5,9 @@ import AnimatedCounter from '@/components/AnimatedCounter'
 import StatCounter from '@/components/StatCounter'
 import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
 import classNames from 'classnames'
-import { atom, useAtom, useAtomValue } from 'jotai'
+import { atom, useAtomValue } from 'jotai'
 import { atomFamily } from 'jotai/utils'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import HeroPortrait from './HeroPortrait'
 
 export const heroDisplayAtom = atomFamily((pubkey: string) =>

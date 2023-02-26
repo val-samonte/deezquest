@@ -251,7 +251,7 @@ export const gameFunctions = atom(
           commandsQueues.forEach((command) => {
             if (command.attack) {
               opponentHero = applyDamage(
-                opponentHero,
+                { ...opponentHero }, // modifying the atom value directly will take effect
                 playerHero.baseDmg + command.attack,
               )
               queue.push({

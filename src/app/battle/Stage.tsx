@@ -52,7 +52,6 @@ export default function Stage() {
 
       const [next, ...queue] = transitionQueue
       currentTransition.current = next
-      console.log('PROCESSING', next.type)
 
       setIsTransitioning(true)
 
