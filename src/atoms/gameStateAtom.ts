@@ -135,6 +135,10 @@ export const gameFunctions = atom(
       (p) => p[0] !== gameState!.currentTurn,
     )!
 
+    // directly mutating this will affect the display, so clone them
+    playerHero = { ...playerHero }
+    opponentHero = { ...opponentHero }
+
     switch (action.type) {
       case GameStateFunctions.INIT: {
         const queue = get(gameTransitionQueueAtom)
@@ -251,7 +255,7 @@ export const gameFunctions = atom(
           commandsQueues.forEach((command) => {
             if (command.attack) {
               opponentHero = applyDamage(
-                { ...opponentHero }, // modifying the atom value directly will take effect
+                { ...opponentHero }, // TODO: reduce unnecessary object clones
                 playerHero.baseDmg + command.attack,
               )
               queue.push({
