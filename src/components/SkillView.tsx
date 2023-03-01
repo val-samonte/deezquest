@@ -42,7 +42,6 @@ export default function SkillView({
       'rgb(253,169,10)',
     ]
     const dominant = useDetails.ratio.findIndex((i) => typeof i === 'number')
-    console.log(useDetails.ratio, dominant)
 
     return {
       count: useDetails.useCount,

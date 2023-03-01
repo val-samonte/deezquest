@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
-import { atomWithStorage, createJSONStorage } from 'jotai/utils'
+import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
 
 export interface PeerMessage {
   from: string // base58 encoded
@@ -14,24 +14,20 @@ export interface PeerMessage {
   signature: string // base58 encoded
 }
 
-const peerBaseAtom = atom<Peer | null>(null)
+// const peerBaseAtom = atom<Peer | null>(null)
+
+const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
 const peerOpenAtom = atom(false)
 const connectionListAtom = atom<DataConnection[]>([])
-// const storage = createJSONStorage<PeerMessage[]>(() => sessionStorage)
-// const messagesAtom = atomWithStorage<PeerMessage[]>(
-//   'demo_messages',
-//   [],
-//   storage,
-// )
 const messagesAtom = atom<PeerMessage[]>([])
 
 // always end up overengineering this ¯\_(ツ)_/¯
 export function usePeer(keypair: Keypair) {
-  const [peer, setPeer] = useAtom(peerBaseAtom)
+  const peerId = useMemo(() => keypair?.publicKey.toBase58(), [keypair])
+  const [peer, setPeer] = useAtom(peerListAtom(peerId))
   const [isOpen, setOpen] = useAtom(peerOpenAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
   const [messages, setMessages] = useAtom(messagesAtom)
-  const peerId = useMemo(() => keypair?.publicKey.toBase58(), [keypair])
 
   const setupConnection = useCallback(
     (conn: DataConnection) => {
@@ -41,7 +37,7 @@ export function usePeer(keypair: Keypair) {
       conn.on('data', (payload) => {
         const { data, from, signature } = payload as PeerMessage
 
-        // console.log(`Recieving data from ${from}: `, data)
+        console.log(`Recieving data from ${from}: `, data)
 
         const valid = sign.detached.verify(
           Buffer.from(JSON.stringify(data)),
@@ -63,7 +59,7 @@ export function usePeer(keypair: Keypair) {
           return connections
         }
 
-        // console.log(`Connection established ${conn.peer}`)
+        console.log(`Connection established ${conn.peer}`)
 
         return [...connections, conn]
       })
@@ -79,32 +75,33 @@ export function usePeer(keypair: Keypair) {
       }
       debounceId.current = window.setTimeout(() => {
         setPeer((oldPeer) => {
-          if (
-            oldPeer?.id === peerId &&
-            !(oldPeer.destroyed || oldPeer.disconnected)
-          ) {
-            return oldPeer
-          }
+          // if (
+          //   oldPeer?.id === peerId &&
+          //   !(oldPeer.destroyed || oldPeer.disconnected)
+          // ) {
+          //   return oldPeer
+          // }
 
-          oldPeer?.destroy()
+          // oldPeer?.destroy()
 
-          if (peerId === null) return null
+          // if (peerId === null) return null
 
           const newPeer = new Peer(peerId)
 
           newPeer.on('connection', setupConnection)
 
           newPeer.on('open', () => {
-            // console.log(`Peer opened ${peerId}`)
+            console.log(`Peer opened ${peerId}`)
             setOpen(true)
           })
 
           newPeer.on('error', (err) => {
-            // console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
+            console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
           })
 
           newPeer.on('close', () => {
-            // console.log(`Peer closed ${peerId}`)
+            console.log(`Peer closed ${peerId}`)
+            setPeer(null)
             setOpen(false)
           })
 
@@ -118,11 +115,11 @@ export function usePeer(keypair: Keypair) {
       }, 50)
     }
     return () => {
-      if (peer !== null) {
-        // this will ensure creation of a fresh peer client
-        peer.disconnected && peer.destroy()
-        setPeer(null)
-      }
+      // if (peer !== null) {
+      //   // this will ensure creation of a fresh peer client
+      //   peer.disconnected && peer.destroy()
+      //   setPeer(null)
+      // }
     }
   }, [peer, peerId, setPeer, setOpen, setConnections])
 
@@ -179,7 +176,7 @@ export function usePeer(keypair: Keypair) {
       }
 
       setupConnection(connection)
-      // console.log(`Sending message to ${receiverId}: `, message)
+      console.log(`Sending message to ${receiverId}: `, message)
 
       connection.send(payload, false)
     },
