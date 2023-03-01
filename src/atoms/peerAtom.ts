@@ -14,9 +14,9 @@ export interface PeerMessage {
   signature: string // base58 encoded
 }
 
-// const peerBaseAtom = atom<Peer | null>(null)
+const peerBaseAtom = atom<Peer | null>(null)
 
-const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
+// const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
 const peerOpenAtom = atom(false)
 const connectionListAtom = atom<DataConnection[]>([])
 const messagesAtom = atom<PeerMessage[]>([])
@@ -24,7 +24,7 @@ const messagesAtom = atom<PeerMessage[]>([])
 // always end up overengineering this ¯\_(ツ)_/¯
 export function usePeer(keypair: Keypair) {
   const peerId = useMemo(() => keypair?.publicKey.toBase58(), [keypair])
-  const [peer, setPeer] = useAtom(peerListAtom(peerId))
+  const [peer, setPeer] = useAtom(peerBaseAtom)
   const [isOpen, setOpen] = useAtom(peerOpenAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
   const [messages, setMessages] = useAtom(messagesAtom)
@@ -75,16 +75,16 @@ export function usePeer(keypair: Keypair) {
       }
       debounceId.current = window.setTimeout(() => {
         setPeer((oldPeer) => {
-          // if (
-          //   oldPeer?.id === peerId &&
-          //   !(oldPeer.destroyed || oldPeer.disconnected)
-          // ) {
-          //   return oldPeer
-          // }
+          if (
+            oldPeer?.id === peerId &&
+            !(oldPeer.destroyed || oldPeer.disconnected)
+          ) {
+            return oldPeer
+          }
 
-          // oldPeer?.destroy()
+          oldPeer?.destroy()
 
-          // if (peerId === null) return null
+          if (peerId === null) return null
 
           const newPeer = new Peer(peerId)
 
@@ -115,11 +115,11 @@ export function usePeer(keypair: Keypair) {
       }, 50)
     }
     return () => {
-      // if (peer !== null) {
-      //   // this will ensure creation of a fresh peer client
-      //   peer.disconnected && peer.destroy()
-      //   setPeer(null)
-      // }
+      if (peer !== null) {
+        // this will ensure creation of a fresh peer client
+        peer.disconnected && peer.destroy()
+        setPeer(null)
+      }
     }
   }, [peer, peerId, setPeer, setOpen, setConnections])
 

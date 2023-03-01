@@ -4,7 +4,7 @@ import { GameTransitions } from '@/enums/GameTransitions'
 import { animated, easings, Spring, useSpring } from '@react-spring/web'
 import { Texture } from 'pixi.js'
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { Container, Sprite, usePixiTicker } from 'react-pixi-fiber'
+import { Container, Sprite, usePixiTicker } from 'react-pixi-fiber/index.js'
 import { useAtomValue } from 'jotai'
 import { isPortraitAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
 

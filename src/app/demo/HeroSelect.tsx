@@ -197,8 +197,8 @@ export default function HeroSelect() {
           <>
             <p className='mx-5 mb-5'>
               Click <span className='font-bold'>Copy Match Link</span> and share
-              it with someone you would like to play with, or let'em scan this
-              QR code.
+              it with someone you would like to play with, or let&apos;em scan
+              this QR code.
             </p>
             <QRCodeCanvas
               className='mx-auto mb-5'
