@@ -153,7 +153,6 @@ function Tile({ type, id, transition, ...props }: any) {
         }
       }
       case GameTransitions.NODE_OUT: {
-        console.log('OUT', id)
         return {
           delay: transition.delay ?? 0,
           from: props,
@@ -168,7 +167,6 @@ function Tile({ type, id, transition, ...props }: any) {
         }
       }
       case GameTransitions.NODE_IN: {
-        console.log('IN', id)
         return {
           delay: transition.delay ?? 0,
           from: {

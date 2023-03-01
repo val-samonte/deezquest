@@ -55,7 +55,6 @@ export default function Stage() {
 
       setIsTransitioning(true)
 
-      console.log(next.type, next)
       next.tiles &&
         setTiles(
           next.tiles.map((type: any, i: number) => {
@@ -92,7 +91,7 @@ export default function Stage() {
       }
 
       if (next.damage) {
-        setDamage({ hero: next.damage, amount: 10 })
+        setDamage(next.damage)
       }
 
       await sleep(next.duration ? next.duration + 100 : 100)

@@ -281,6 +281,7 @@ export const gameFunctions = atom(
               })
             } else if (command.skill) {
               const preCommandHero = { ...playerHero }
+              const preCommandOpponent = { ...opponentHero }
               playerHero.fireMp = command.hero.fireMp
               playerHero.windMp = command.hero.windMp
               playerHero.watrMp = command.hero.watrMp
@@ -327,7 +328,7 @@ export const gameFunctions = atom(
 
                 queue.push({
                   type: GameTransitions.NODE_OUT,
-                  tile: [...newTiles],
+                  tiles: [...newTiles],
                   nodes: newTiles.reduce((acc: any, cur, i) => {
                     if (
                       cur !== null &&
@@ -346,7 +347,7 @@ export const gameFunctions = atom(
 
                 queue.push({
                   type: GameTransitions.NODE_IN,
-                  tile: [...(postCommand.tiles ?? newTiles)],
+                  tiles: [...(postCommand.tiles ?? newTiles)],
                   nodes: (postCommand.tiles ?? []).reduce(
                     (acc: any, cur, i) => {
                       if (cur !== null && (updateAll || cur !== newTiles[i])) {
@@ -390,17 +391,23 @@ export const gameFunctions = atom(
                 heroes[opponentPubkey] = { ...opponentHero }
               }
 
+              // const heroDmgAmt = preCommandHero.hp - playerHero.hp
+              const opponentDmgAmt = preCommandOpponent.hp - opponentHero.hp
+
+              // TODO: included BOTH
+              let damage = null
+              if (opponentDmgAmt > 0) {
+                damage = { hero: opponentPubkey, amount: opponentDmgAmt }
+              }
+
               queue.push({
                 type,
                 turn: gameState!.currentTurn,
                 spotlight,
+                // TODO: fade transition
                 // tiles: [...newTiles],
                 // nodes (check DRAIN)
-                damage:
-                  // TODO: included both
-                  type === GameTransitions.ATTACK_SPELL
-                    ? opponentPubkey
-                    : undefined,
+                damage,
                 heroes,
                 duration: 100,
               })
