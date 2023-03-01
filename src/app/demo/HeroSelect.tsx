@@ -2,7 +2,7 @@
 
 import { Dialog } from '@/components/Dialog'
 import { SkillTypes } from '@/enums/SkillTypes'
-import { getHeroAttributes, Skill, skills } from '@/utils/gameFunctions'
+import { getHeroAttributes, skills } from '@/utils/gameFunctions'
 import { Keypair } from '@solana/web3.js'
 import { useEffect, useMemo, useState } from 'react'
 import bs58 from 'bs58'
@@ -11,7 +11,7 @@ import { usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { useRouter } from 'next/navigation'
 import SkillView from '@/components/SkillView'
-import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react'
+import { QRCodeCanvas } from 'qrcode.react'
 
 export default function HeroSelect() {
   const router = useRouter()

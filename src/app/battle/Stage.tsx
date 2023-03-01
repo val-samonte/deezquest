@@ -1,10 +1,12 @@
 'use client'
 
 import {
+  gameStateAtom,
   gameFunctions,
   gameTransitionQueueAtom,
   isGameTransitioningAtom,
   playerKpAtom,
+  gameResultAtom,
 } from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
@@ -20,8 +22,12 @@ import { SkillTypes } from '@/enums/SkillTypes'
 import { GameTransitions } from '@/enums/GameTransitions'
 import { heroDamagedAtom } from './HeroPortrait'
 import { sleep } from '@/utils/sleep'
+import { usePeer } from '@/atoms/peerAtom'
+import { PeerMessages } from '@/enums/PeerMessages'
+import { useRouter } from 'next/navigation'
 
 export default function Stage() {
+  const router = useRouter()
   const gameFn = useSetAtom(gameFunctions)
   const updateHeroes = useSetAtom(updateHeroesAtom)
   const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
@@ -33,6 +39,8 @@ export default function Stage() {
     lvl: number
     type: SkillTypes
   }>()
+  const setGameState = useSetAtom(gameStateAtom)
+  const [gameResult, setGameResult] = useAtom(gameResultAtom)
 
   const playerKp = useAtomValue(playerKpAtom)
   const player = useMemo(
@@ -40,6 +48,7 @@ export default function Stage() {
     [playerKp],
   )
   const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
+  const { sendMessage } = usePeer(playerKp!)
 
   const currentTransition = useRef<any>(null)
   useEffect(() => {
@@ -94,6 +103,14 @@ export default function Stage() {
         setDamage(next.damage)
       }
 
+      if (next.type === GameTransitions.WIN) {
+        setGameResult('win')
+      } else if (next.type === GameTransitions.LOSE) {
+        setGameResult('lose')
+      } else if (next.type === GameTransitions.DRAW) {
+        setGameResult('draw')
+      }
+
       await sleep(next.duration ? next.duration + 100 : 100)
       currentTransition.current = null
 
@@ -104,6 +121,7 @@ export default function Stage() {
     setTransitionQueue,
     updateHeroes,
     setIsTransitioning,
+    setGameResult,
     setDamage,
     setTiles,
     setSkill,
@@ -152,6 +170,62 @@ export default function Stage() {
       <div className='relative p-2 w-full h-full'>
         {opponent && <PlayerCard asOpponent publicKey={opponent} />}
       </div>
+      {gameResult && (
+        <div className='absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-5'>
+          <img
+            src={
+              { win: '/you_win.png', lose: '/you_lose.png', draw: '/draw.png' }[
+                gameResult
+              ]
+            }
+            className='m-10 mb-5 max-h-32 lg:max-h-none'
+          />
+          <p className='max-w-xs w-full mx-10 text-center lg:text-xl'>
+            Thanks for playing the demo! <br />
+            Please message us on{' '}
+            <a
+              href='https://twitter.com/deezquest'
+              target='_blank'
+              rel='noreferrer'
+              className='underline'
+            >
+              twitter
+            </a>{' '}
+            for your feedback!
+          </p>
+          <div className='flex gap-5 mx-5'>
+            <button
+              className='px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded'
+              onClick={() => {
+                window.sessionStorage.clear()
+                setGameState(null)
+                gameFn({
+                  type: GameStateFunctions.INIT,
+                })
+                setGameResult('')
+                opponent &&
+                  sendMessage(opponent, {
+                    type: PeerMessages.REMATCH,
+                  })
+              }}
+            >
+              Rematch
+            </button>
+            <button
+              className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+              onClick={() => {
+                window.sessionStorage.clear()
+                window.localStorage.removeItem('demo_opponent')
+                setGameState(null)
+                setGameResult('')
+                router.push('/demo')
+              }}
+            >
+              Return to Hero Select
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

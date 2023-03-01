@@ -15,4 +15,5 @@ export enum GameTransitions {
   FILL = 'FILL',
   WIN = 'WIN',
   LOSE = 'LOSE',
+  DRAW = 'DRAW',
 }

@@ -67,7 +67,7 @@ export const gameStateAtom = atom(
 
     return get(gamesStateAtom(matchId)) ?? null
   },
-  (get, set, data: GameState) => {
+  (get, set, data: GameState | null) => {
     const matchId = get(matchIdAtom)
     if (!matchId) return null
 
@@ -77,14 +77,15 @@ export const gameStateAtom = atom(
 
 export const isGameTransitioningAtom = atom(false)
 export const gameTransitionQueueAtom = atom<any[]>([])
+export const gameResultAtom = atom('')
 
 export const gameFunctions = atom(
   null,
   (get, set, action: { type: string; data?: any }) => {
     let gameState = get(gameStateAtom)
+    const playerKp = get(playerKpAtom)
 
     if (!gameState) {
-      const playerKp = get(playerKpAtom)
       const opponentPubkey = window.localStorage.getItem('demo_opponent')
 
       if (!playerKp || !opponentPubkey)
@@ -161,6 +162,7 @@ export const gameFunctions = atom(
         break
       }
       case GameStateFunctions.SWAP_NODE: {
+        if (get(gameResultAtom) !== '') return
         if (isTransitioning) return
         if (action.data.publicKey !== gameState.currentTurn) return
         playerHero.turnTime -= 100
@@ -412,12 +414,7 @@ export const gameFunctions = atom(
                 duration: 100,
               })
             }
-
-            // TODO
-            checkWinner(playerHero, opponentHero)
           })
-
-          // TODO: issue with shuffle skills
 
           const { tiles, gravity } = applyGravity(newTiles, depths)
           newTiles = tiles
@@ -444,6 +441,24 @@ export const gameFunctions = atom(
               return acc
             }, {}),
             duration: 850,
+          })
+        }
+
+        // TODO
+        // checkWinner(playerHero, opponentHero)
+        const isMe = playerKp?.publicKey.toBase58() === gameState?.currentTurn
+
+        if (playerHero.hp > 0 && opponentHero.hp <= 0) {
+          queue.push({
+            type: isMe ? GameTransitions.WIN : GameTransitions.LOSE,
+          })
+        } else if (playerHero.hp <= 0 && opponentHero.hp > 0) {
+          queue.push({
+            type: isMe ? GameTransitions.LOSE : GameTransitions.WIN,
+          })
+        } else if (playerHero.hp <= 0 && opponentHero.hp <= 0) {
+          queue.push({
+            type: GameTransitions.DRAW,
           })
         }
 

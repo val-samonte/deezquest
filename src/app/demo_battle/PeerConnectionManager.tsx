@@ -10,6 +10,7 @@ import { sleep } from '@/utils/sleep'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import {
   gameFunctions,
+  gameResultAtom,
   GameState,
   gameStateAtom,
   playerKpAtom,
@@ -23,6 +24,7 @@ export default function PeerConnectionManager() {
   const { isOpen, connections, messages, sendMessage } = usePeer(playerKp!)
   const gameFn = useSetAtom(gameFunctions)
   const [gameState, setGameState] = useAtom(gameStateAtom)
+  const setGameResult = useSetAtom(gameResultAtom)
 
   const lastMessage = useRef<PeerMessage | null>(null)
   useEffect(() => {
@@ -66,9 +68,25 @@ export default function PeerConnectionManager() {
           }
           break
         }
+        case PeerMessages.REMATCH: {
+          window.sessionStorage.clear()
+          setGameState(null)
+          setGameResult('')
+          gameFn({
+            type: GameStateFunctions.INIT,
+          })
+        }
       }
     }
-  }, [isOpen, messages, gameState, opponent, gameFn, sendMessage])
+  }, [
+    isOpen,
+    messages,
+    gameState,
+    opponent,
+    gameFn,
+    sendMessage,
+    setGameResult,
+  ])
 
   useEffect(() => {
     if (!playerKp || !opponent) {

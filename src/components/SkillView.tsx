@@ -36,12 +36,13 @@ export default function SkillView({
   const bars = useMemo(() => {
     if (!useDetails) return { count: 0, color: null }
     const colors = [
-      'rgb(246,0,0,0)',
+      'rgb(246,0,0)',
       'rgb(35,220,31)',
       'rgb(19,113,255)',
       'rgb(253,169,10)',
     ]
     const dominant = useDetails.ratio.findIndex((i) => typeof i === 'number')
+    console.log(useDetails.ratio, dominant)
 
     return {
       count: useDetails.useCount,
