@@ -16,6 +16,7 @@ import { atom, useAtomValue } from 'jotai'
 import { atomFamily } from 'jotai/utils'
 import { useMemo } from 'react'
 import HeroPortrait from './HeroPortrait'
+import MiniSkillDisplay from './MiniSkillDisplay'
 
 export const heroDisplayAtom = atomFamily((pubkey: string) =>
   atom<Hero>(heroFromPublicKey(pubkey)),
@@ -128,7 +129,7 @@ export default function PlayerCard({
     <div
       className={classNames(
         'flex-auto w-full h-full bg-neutral-900 rounded',
-        'flex landscape:flex-col overflow-hidden transition-all',
+        'flex landscape:flex-col transition-all',
         asOpponent && 'portrait:flex-row-reverse',
         !currentTurn && 'brightness-90',
       )}
@@ -369,115 +370,61 @@ export default function PlayerCard({
         {/* Skills */}
         <div className='relative h-full landscape:lg:hidden'>
           <div className='absolute inset-x-2 inset-y-0 flex'>
-            <div
-              className={classNames(
-                'relative w-1/3 h-full',
-                offensive.useCount === 0 && 'opacity-20',
-              )}
-            >
-              <div className='absolute inset-0 flex flex-col items-center justify-center'>
-                <div className='xs:hidden'>
-                  <StatCounter
-                    img='/cmd_attack.svg'
-                    value={offensive.useCount}
-                  />
-                </div>
-                <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
-                  <img
-                    src='/cmd_attack.svg'
-                    className='w-full aspect-square '
-                  />
-                  <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    {offensive.useCount}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div
-              className={classNames(
-                'relative w-1/3 h-full',
-                supportive.useCount === 0 && 'opacity-20',
-              )}
-            >
-              <div className='absolute inset-0 flex flex-col items-center justify-center'>
-                <div className='xs:hidden'>
-                  <StatCounter
-                    img='/cmd_support.svg'
-                    value={supportive.useCount}
-                  />
-                </div>
-                <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
-                  <img
-                    src='/cmd_support.svg'
-                    className='w-full aspect-square '
-                  />
-                  <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    {supportive.useCount}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div
-              className={classNames(
-                'relative w-1/3 h-full',
-                special.useCount === 0 && 'opacity-20',
-              )}
-            >
-              <div className='absolute inset-0 flex flex-col items-center justify-center '>
-                <div className='xs:hidden'>
-                  <StatCounter
-                    img='/cmd_special.svg'
-                    value={special.useCount}
-                  />
-                </div>
-                <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
-                  <img
-                    src='/cmd_special.svg'
-                    className='w-full aspect-square '
-                  />
-                  <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    {special.useCount}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <MiniSkillDisplay
+              iconSrc='/cmd_attack.svg'
+              useDetails={offensive}
+              skill={skills[hero.offensiveSkill]}
+            />
+            <MiniSkillDisplay
+              iconSrc='/cmd_support.svg'
+              useDetails={supportive}
+              skill={skills[hero.supportiveSkill]}
+            />
+            <MiniSkillDisplay
+              iconSrc='/cmd_special.svg'
+              useDetails={special}
+              skill={skills[hero.specialSkill]}
+            />
           </div>
         </div>
 
         <ul className='hidden lg:flex flex-col gap-5 flex-auto p-5'>
-          <li
-            className={classNames(
-              'flex flex-auto gap-5 h-8',
-              offensive.useCount === 0 && 'opacity-20',
-            )}
-          >
-            <img src='/cmd_attack.svg' className='aspect-square h-full' />
+          <li className={classNames('flex flex-auto gap-5 h-8')}>
+            <img
+              src='/cmd_attack.svg'
+              className={classNames(
+                'aspect-square h-full',
+                offensive.useCount === 0 && 'opacity-20',
+              )}
+            />
             <SkillView
               skill={skills[hero.offensiveSkill]}
               hideDesc
               useDetails={offensive}
             />
           </li>
-          <li
-            className={classNames(
-              'flex flex-auto gap-5 h-8',
-              supportive.useCount === 0 && 'opacity-20',
-            )}
-          >
-            <img src='/cmd_support.svg' className='aspect-square h-full' />
+          <li className={classNames('flex flex-auto gap-5 h-8')}>
+            <img
+              src='/cmd_support.svg'
+              className={classNames(
+                'aspect-square h-full',
+                supportive.useCount === 0 && 'opacity-20',
+              )}
+            />
             <SkillView
               skill={skills[hero.supportiveSkill]}
               hideDesc
               useDetails={supportive}
             />
           </li>
-          <li
-            className={classNames(
-              'flex flex-auto gap-5 h-8',
-              special.useCount === 0 && 'opacity-20',
-            )}
-          >
-            <img src='/cmd_special.svg' className='aspect-square h-full' />
+          <li className={classNames('flex flex-auto gap-5 h-8')}>
+            <img
+              src='/cmd_special.svg'
+              className={classNames(
+                'aspect-square h-full',
+                special.useCount === 0 && 'opacity-20',
+              )}
+            />
             <SkillView
               skill={skills[hero.specialSkill]}
               hideDesc

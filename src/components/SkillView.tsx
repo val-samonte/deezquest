@@ -68,7 +68,10 @@ export default function SkillView({
         ) : (
           <Popover className='relative flex-auto'>
             <Popover.Button
-              className='text-sm xl:text-lg 2xl:text-xl font-bold'
+              className={classNames(
+                'text-sm xl:text-lg 2xl:text-xl font-bold',
+                useDetails?.useCount === 0 && 'opacity-20',
+              )}
               ref={setReferenceElement as any}
             >
               {skill.name}
@@ -83,7 +86,12 @@ export default function SkillView({
             </Popover.Panel>
           </Popover>
         )}
-        <p className='flex items-center gap-3 font-bold'>
+        <p
+          className={classNames(
+            'flex items-center gap-3 font-bold',
+            useDetails?.useCount === 0 && 'opacity-20',
+          )}
+        >
           {typeof skill.cost.fire === 'number' && (
             <span className='flex items-center xl:gap-2'>
               <img
