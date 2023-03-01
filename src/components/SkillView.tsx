@@ -3,18 +3,51 @@
 import { Skill } from '@/utils/gameFunctions'
 import { Popover } from '@headlessui/react'
 import classNames from 'classnames'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { usePopper } from 'react-popper'
 
 interface SkillViewProps {
   skill: Skill
   hideDesc?: boolean
+  useDetails?: {
+    useCount: number
+    maxUseCount: number
+    useCountPerElement: (number | undefined)[]
+    maxUseCountPerElement: (number | undefined)[]
+    ratio: (number | undefined)[]
+  }
 }
 
-export default function SkillView({ skill, hideDesc }: SkillViewProps) {
+export default function SkillView({
+  skill,
+  hideDesc,
+  useDetails,
+}: SkillViewProps) {
   let [referenceElement, setReferenceElement] = useState()
   let [popperElement, setPopperElement] = useState()
   let { styles, attributes } = usePopper(referenceElement, popperElement)
+
+  const emptyBars = useMemo(() => {
+    if (!useDetails) return 0
+    return useDetails.maxUseCount - useDetails.useCount
+  }, [useDetails])
+
+  const bars = useMemo(() => {
+    if (!useDetails) return { count: 0, color: null }
+    const colors = [
+      'rgb(246,0,0,0)',
+      'rgb(35,220,31)',
+      'rgb(19,113,255)',
+      'rgb(253,169,10)',
+    ]
+    const dominant = useDetails.ratio.findIndex((i) => typeof i === 'number')
+
+    return {
+      count: useDetails.useCount,
+      color: colors[dominant],
+    }
+  }, [useDetails])
+
   return (
     <div
       className={classNames(
@@ -22,7 +55,12 @@ export default function SkillView({ skill, hideDesc }: SkillViewProps) {
         hideDesc && 'justify-center',
       )}
     >
-      <div className='flex items-center border-b border-b-white/5 pb-2 mb-3'>
+      <div
+        className={classNames(
+          'flex items-center',
+          !useDetails ? 'pb-2 mb-3 border-b border-b-white/5' : 'pb-1',
+        )}
+      >
         {!hideDesc ? (
           <h3 className='text-sm xl:text-lg 2xl:text-xl font-bold flex-auto'>
             {skill.name}
@@ -52,7 +90,7 @@ export default function SkillView({ skill, hideDesc }: SkillViewProps) {
                 src='/elem_fire.svg'
                 className='w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
               />
-              {isNaN(skill.cost.fire) ? 'ALL' : skill.cost.fire}
+              {skill.cost.fire === 0 ? 'ALL' : skill.cost.fire}
             </span>
           )}
           {typeof skill.cost.wind === 'number' && (
@@ -61,7 +99,7 @@ export default function SkillView({ skill, hideDesc }: SkillViewProps) {
                 src='/elem_wind.svg'
                 className='w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
               />
-              {isNaN(skill.cost.wind) ? 'ALL' : skill.cost.wind}
+              {skill.cost.wind === 0 ? 'ALL' : skill.cost.wind}
             </span>
           )}
           {typeof skill.cost.water === 'number' && (
@@ -70,7 +108,7 @@ export default function SkillView({ skill, hideDesc }: SkillViewProps) {
                 src='/elem_water.svg'
                 className='w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
               />
-              {isNaN(skill.cost.water) ? 'ALL' : skill.cost.water}
+              {skill.cost.water === 0 ? 'ALL' : skill.cost.water}
             </span>
           )}
           {typeof skill.cost.earth === 'number' && (
@@ -79,11 +117,28 @@ export default function SkillView({ skill, hideDesc }: SkillViewProps) {
                 src='/elem_earth.svg'
                 className='w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
               />
-              {isNaN(skill.cost.earth) ? 'ALL' : skill.cost.earth}
+              {skill.cost.earth === 0 ? 'ALL' : skill.cost.earth}
             </span>
           )}
         </p>
       </div>
+
+      {useDetails && (
+        <>
+          <div className='flex gap-2 mb-2'>
+            {Array.from(Array(bars.count)).map((_, i) => (
+              <div
+                className='h-2 flex-auto'
+                key={`key_${i}`}
+                style={{ backgroundColor: bars.color ?? '' }}
+              />
+            ))}
+            {Array.from(Array(emptyBars)).map((_, i) => (
+              <div className='h-2 bg-black/20 flex-auto' key={`key_${i}`} />
+            ))}
+          </div>
+        </>
+      )}
       {!hideDesc && <p className='text-sm text-neutral-300'>{skill.desc}</p>}
     </div>
   )

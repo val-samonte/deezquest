@@ -483,7 +483,7 @@ export const skills: Skill[] = [
     type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
-      earth: NaN,
+      earth: 0,
     },
     fn: crushingBlow,
   },
@@ -525,7 +525,7 @@ export const skills: Skill[] = [
     type: SkillTypes.SUPPORT,
     target: TargetHero.SELF,
     cost: {
-      earth: NaN,
+      earth: 0,
     },
     fn: manaWall,
   },
@@ -571,20 +571,39 @@ export const skills: Skill[] = [
   },
 ]
 
+export const skillCountPerMana = (mana: number[], cost: SkillCost) => {
+  const costs = [cost.fire, cost.wind, cost.water, cost.earth]
+
+  return mana.map((mp, i) => {
+    if (typeof costs[i] === 'undefined') return undefined
+
+    if (costs[i] === 0) {
+      return mp >= 1 ? 1 : 0
+    }
+
+    return mp / costs[i]!
+  })
+}
+
 export const isExecutable = (hero: Hero, cost: SkillCost) => {
-  return (
-    hero.fireMp >= (isNaN(cost.fire ?? 0) ? 1 : cost.fire ?? 0) &&
-    hero.windMp >= (isNaN(cost.wind ?? 0) ? 1 : cost.wind ?? 0) &&
-    hero.watrMp >= (isNaN(cost.water ?? 0) ? 1 : cost.water ?? 0) &&
-    hero.eartMp >= (isNaN(cost.earth ?? 0) ? 1 : cost.earth ?? 0)
+  const count = skillCountPerMana(
+    [hero.fireMp, hero.windMp, hero.watrMp, hero.eartMp],
+    cost,
   )
+
+  return count.every((n) => {
+    if (typeof n === 'undefined') return true
+    if (n >= 1) return true
+
+    return false
+  })
 }
 
 export const deductMana = (hero: Hero, cost: SkillCost) => {
-  hero.fireMp -= isNaN(cost.fire ?? 0) ? hero.fireMp : cost.fire ?? 0
-  hero.windMp -= isNaN(cost.wind ?? 0) ? hero.windMp : cost.wind ?? 0
-  hero.watrMp -= isNaN(cost.water ?? 0) ? hero.watrMp : cost.water ?? 0
-  hero.eartMp -= isNaN(cost.earth ?? 0) ? hero.eartMp : cost.earth ?? 0
+  hero.fireMp -= cost.fire === 0 ? hero.fireMp : cost.fire ?? 0
+  hero.windMp -= cost.wind === 0 ? hero.windMp : cost.wind ?? 0
+  hero.watrMp -= cost.water === 0 ? hero.watrMp : cost.water ?? 0
+  hero.eartMp -= cost.earth === 0 ? hero.eartMp : cost.earth ?? 0
 
   return hero
 }

@@ -212,7 +212,7 @@ export const gameFunctions = atom(
           const { matches, depths, count } = getMatches(newTiles)
 
           // count: [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-          playerHero = absorbMana(playerHero, count.slice(3))
+          playerHero = absorbMana(playerHero, count.slice(3)) // TODO: implement mana overflow
           const { flags, queue: commandsQueues } = executableCommands(
             { ...playerHero },
             count.slice(0, 3),

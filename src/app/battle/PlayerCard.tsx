@@ -4,7 +4,13 @@ import { gameStateAtom, isGameTransitioningAtom } from '@/atoms/gameStateAtom'
 import AnimatedCounter from '@/components/AnimatedCounter'
 import SkillView from '@/components/SkillView'
 import StatCounter from '@/components/StatCounter'
-import { Hero, heroFromPublicKey, skills } from '@/utils/gameFunctions'
+import {
+  Hero,
+  heroFromPublicKey,
+  isExecutable,
+  skillCountPerMana,
+  skills,
+} from '@/utils/gameFunctions'
 import classNames from 'classnames'
 import { atom, useAtomValue } from 'jotai'
 import { atomFamily } from 'jotai/utils'
@@ -60,6 +66,61 @@ export default function PlayerCard({
           : '',
     }
   }, [hero.hp, hero.hpCap, hero.armor, hero.shell])
+
+  const [offensive, supportive, special] = useMemo(() => {
+    return [
+      skills[hero.offensiveSkill],
+      skills[hero.supportiveSkill],
+      skills[hero.specialSkill],
+    ].map((skill) => {
+      const useCountPerElement = skillCountPerMana(
+        [hero.fireMp, hero.windMp, hero.watrMp, hero.eartMp],
+        skill.cost,
+      )
+
+      const maxUseCountPerElement = skillCountPerMana(
+        [hero.fireMpCap, hero.windMpCap, hero.watrMpCap, hero.eartMpCap],
+        skill.cost,
+      ).map((e) => e && Math.floor(e))
+
+      const { fire, wind, water, earth } = skill.cost
+      const elem = [fire, wind, water, earth]
+      const elemSum = (fire ?? 0) + (wind ?? 0) + (water ?? 0) + (earth ?? 0)
+      const ratio = elem.map((e) => {
+        if (typeof e === 'undefined') return undefined
+        if (e === 0) return 1
+        return e / elemSum
+      })
+
+      return {
+        useCount: Math.min(
+          ...useCountPerElement
+            .filter((n) => typeof n === 'number')
+            .map((n) => Math.floor(n ?? 0)),
+        ),
+        maxUseCount: Math.min(
+          ...maxUseCountPerElement
+            .filter((n) => typeof n === 'number')
+            .map((n) => n ?? 0),
+        ),
+        useCountPerElement,
+        maxUseCountPerElement,
+        ratio,
+      }
+    })
+  }, [
+    hero.fireMp,
+    hero.fireMpCap,
+    hero.windMp,
+    hero.windMpCap,
+    hero.watrMp,
+    hero.watrMpCap,
+    hero.eartMp,
+    hero.eartMpCap,
+    hero.offensiveSkill,
+    hero.supportiveSkill,
+    hero.specialSkill,
+  ])
 
   const currentTurn = gameState?.currentTurn === publicKey && !isTransitioning
 
@@ -306,12 +367,20 @@ export default function PlayerCard({
         </ul>
 
         {/* Skills */}
-        <div className='relative h-full landscape:lg:hidden opacity-20'>
+        <div className='relative h-full landscape:lg:hidden'>
           <div className='absolute inset-x-2 inset-y-0 flex'>
-            <div className='relative w-1/3 h-full'>
+            <div
+              className={classNames(
+                'relative w-1/3 h-full',
+                offensive.useCount === 0 && 'opacity-20',
+              )}
+            >
               <div className='absolute inset-0 flex flex-col items-center justify-center'>
                 <div className='xs:hidden'>
-                  <StatCounter img='/cmd_attack.svg' value={1} />
+                  <StatCounter
+                    img='/cmd_attack.svg'
+                    value={offensive.useCount}
+                  />
                 </div>
                 <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
                   <img
@@ -319,15 +388,23 @@ export default function PlayerCard({
                     className='w-full aspect-square '
                   />
                   <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    0
+                    {offensive.useCount}
                   </span>
                 </div>
               </div>
             </div>
-            <div className='relative w-1/3 h-full'>
+            <div
+              className={classNames(
+                'relative w-1/3 h-full',
+                supportive.useCount === 0 && 'opacity-20',
+              )}
+            >
               <div className='absolute inset-0 flex flex-col items-center justify-center'>
                 <div className='xs:hidden'>
-                  <StatCounter img='/cmd_support.svg' value={1} />
+                  <StatCounter
+                    img='/cmd_support.svg'
+                    value={supportive.useCount}
+                  />
                 </div>
                 <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
                   <img
@@ -335,15 +412,23 @@ export default function PlayerCard({
                     className='w-full aspect-square '
                   />
                   <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    0
+                    {supportive.useCount}
                   </span>
                 </div>
               </div>
             </div>
-            <div className='relative w-1/3 h-full'>
+            <div
+              className={classNames(
+                'relative w-1/3 h-full',
+                special.useCount === 0 && 'opacity-20',
+              )}
+            >
               <div className='absolute inset-0 flex flex-col items-center justify-center '>
                 <div className='xs:hidden'>
-                  <StatCounter img='/cmd_special.svg' value={1} />
+                  <StatCounter
+                    img='/cmd_special.svg'
+                    value={special.useCount}
+                  />
                 </div>
                 <div className='hidden relative xs:flex flex-col w-full aspect-square items-center justify-center p-3'>
                   <img
@@ -351,7 +436,7 @@ export default function PlayerCard({
                     className='w-full aspect-square '
                   />
                   <span className='xs:font-bold md:text-lg absolute bottom-0 xs:bottom-1 md:bottom-2 right-2 text-right'>
-                    0
+                    {special.useCount}
                   </span>
                 </div>
               </div>
@@ -360,17 +445,44 @@ export default function PlayerCard({
         </div>
 
         <ul className='hidden lg:flex flex-col gap-5 flex-auto p-5'>
-          <li className='flex flex-auto gap-5 h-8'>
+          <li
+            className={classNames(
+              'flex flex-auto gap-5 h-8',
+              offensive.useCount === 0 && 'opacity-20',
+            )}
+          >
             <img src='/cmd_attack.svg' className='aspect-square h-full' />
-            <SkillView skill={skills[hero.offensiveSkill]} hideDesc />
+            <SkillView
+              skill={skills[hero.offensiveSkill]}
+              hideDesc
+              useDetails={offensive}
+            />
           </li>
-          <li className='flex flex-auto gap-5 h-8'>
+          <li
+            className={classNames(
+              'flex flex-auto gap-5 h-8',
+              supportive.useCount === 0 && 'opacity-20',
+            )}
+          >
             <img src='/cmd_support.svg' className='aspect-square h-full' />
-            <SkillView skill={skills[hero.supportiveSkill]} hideDesc />
+            <SkillView
+              skill={skills[hero.supportiveSkill]}
+              hideDesc
+              useDetails={supportive}
+            />
           </li>
-          <li className='flex flex-auto gap-5 h-8'>
+          <li
+            className={classNames(
+              'flex flex-auto gap-5 h-8',
+              special.useCount === 0 && 'opacity-20',
+            )}
+          >
             <img src='/cmd_special.svg' className='aspect-square h-full' />
-            <SkillView skill={skills[hero.specialSkill]} hideDesc />
+            <SkillView
+              skill={skills[hero.specialSkill]}
+              hideDesc
+              useDetails={special}
+            />
           </li>
         </ul>
       </div>

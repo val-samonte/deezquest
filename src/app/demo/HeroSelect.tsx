@@ -11,6 +11,7 @@ import { usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { useRouter } from 'next/navigation'
 import SkillView from '@/components/SkillView'
+import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react'
 
 export default function HeroSelect() {
   const router = useRouter()
@@ -196,12 +197,22 @@ export default function HeroSelect() {
           <>
             <p className='mx-5 mb-5'>
               Click <span className='font-bold'>Copy Match Link</span> and share
-              it with someone you would like to play with.
+              it with someone you would like to play with, or let'em scan this
+              QR code.
             </p>
+            <QRCodeCanvas
+              className='mx-auto mb-5'
+              size={200}
+              includeMargin
+              value={`${
+                window.location.origin
+              }/demo?opponent=${kp.publicKey.toBase58()}`}
+            />
             <p className='mx-5 mb-5'>
               If the link has already been shared, please standby and wait for
               the other player to set up. The game will commence automatically.
             </p>
+
             <div className='flex-auto'></div>
             <button
               type='button'
