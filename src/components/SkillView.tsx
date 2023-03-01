@@ -1,5 +1,6 @@
 'use client'
 
+import { SkillTypes } from '@/enums/SkillTypes'
 import { Skill } from '@/utils/gameFunctions'
 import { Popover } from '@headlessui/react'
 import classNames from 'classnames'
@@ -82,7 +83,14 @@ export default function SkillView({
               style={styles.popper}
               {...attributes.popper}
             >
-              <div className='min-w-[200px]'>{skill.desc}</div>
+              <div className='min-w-[200px] flex flex-col'>
+                <span>{skill.desc}</span>
+                {skill.type === SkillTypes.SPECIAL && (
+                  <span className='mt-2 pt-2 border-t border-t-white/5 italic'>
+                    A Special Skill needs 4 or more amulet matches to be used.
+                  </span>
+                )}
+              </div>
             </Popover.Panel>
           </Popover>
         )}
@@ -130,7 +138,6 @@ export default function SkillView({
           )}
         </p>
       </div>
-
       {useDetails && (
         <>
           <div className='flex gap-2 mb-2'>
@@ -147,7 +154,16 @@ export default function SkillView({
           </div>
         </>
       )}
-      {!hideDesc && <p className='text-sm text-neutral-300'>{skill.desc}</p>}
+      {!hideDesc && (
+        <p className='text-sm text-neutral-300 flex flex-col'>
+          <span>{skill.desc}</span>
+          {skill.type === SkillTypes.SPECIAL && (
+            <span className='mt-2 pt-2 border-t border-t-white/5 italic'>
+              A Special Skill needs 4 or more amulet matches to be used.
+            </span>
+          )}
+        </p>
+      )}
     </div>
   )
 }
