@@ -55,6 +55,7 @@ export default function Stage() {
 
       setIsTransitioning(true)
 
+      console.log(next.type, next)
       next.tiles &&
         setTiles(
           next.tiles.map((type: any, i: number) => {
@@ -65,6 +66,7 @@ export default function Stage() {
                 asOpponent: next.turn !== player,
                 variation: next.nodes[i].variation,
                 duration: next.duration,
+                delay: next.nodes[i].delay,
               }
 
               if (next.nodes[i].from) {
@@ -122,7 +124,7 @@ export default function Stage() {
 
   return (
     <div className='relative w-full h-full flex portrait:flex-col-reverse'>
-      <div className='p-2 w-full h-full'>
+      <div className='relative p-2 w-full h-full'>
         {player && <PlayerCard publicKey={player} />}
       </div>
       <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5 backdrop-blur-sm '>
@@ -148,7 +150,7 @@ export default function Stage() {
         </div>
         <CastingDisplay skill={skill} />
       </div>
-      <div className='p-2 w-full h-full'>
+      <div className='relative p-2 w-full h-full'>
         {opponent && <PlayerCard asOpponent publicKey={opponent} />}
       </div>
     </div>

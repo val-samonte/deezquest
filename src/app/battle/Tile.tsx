@@ -152,21 +152,51 @@ function Tile({ type, id, transition, ...props }: any) {
           config,
         }
       }
-      case GameTransitions.ATTACK_SPELL:
-      case GameTransitions.BUFF_SPELL: {
-        // TODO: not working (fade)
+      case GameTransitions.NODE_OUT: {
+        console.log('OUT', id)
         return {
+          delay: transition.delay ?? 0,
           from: props,
           to: {
             alpha: 0,
           },
           config: {
-            duration: transition.duration - 100,
+            duration: transition.duration,
             easing: easings.easeOutCubic,
             clamp: true,
           },
         }
       }
+      case GameTransitions.NODE_IN: {
+        console.log('IN', id)
+        return {
+          delay: transition.delay ?? 0,
+          from: {
+            ...props,
+            alpha: 0,
+          },
+          to: props,
+          config: {
+            duration: transition.duration,
+            easing: easings.easeOutCubic,
+            clamp: true,
+          },
+        }
+      }
+      // case GameTransitions.ATTACK_SPELL:
+      // case GameTransitions.BUFF_SPELL: {
+      //   return {
+      //     from: props,
+      //     to: {
+      //       alpha: 0,
+      //     },
+      //     config: {
+      //       duration: transition.duration - 100,
+      //       easing: easings.easeOutCubic,
+      //       clamp: true,
+      //     },
+      //   }
+      // }
       case GameTransitions.FILL: {
         const { x, y, ...rest } = props
         return {

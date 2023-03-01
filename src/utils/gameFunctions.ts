@@ -2,6 +2,7 @@ import { SkillTypes } from '@/enums/SkillTypes'
 import { TargetHero } from '@/enums/TargetHero'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
+import { getNextHash } from './getNextHash'
 
 export interface Hero {
   hp: number
@@ -216,6 +217,7 @@ interface SkillFnParams {
   tiles?: (number | null)[]
   gameHash?: Uint8Array
   preCommandHero?: Hero
+  depths?: number[]
 }
 
 export type SkillFn = (params: SkillFnParams) => {
@@ -223,6 +225,7 @@ export type SkillFn = (params: SkillFnParams) => {
   opponent: Hero
   tiles?: (number | null)[]
   gameHash?: Uint8Array
+  depths?: number[]
 }
 
 export const burningPunch: SkillFn = ({
@@ -238,9 +241,9 @@ export const burningPunch: SkillFn = ({
 
   const atk = (player.baseDmg + commandLevel) * 2
   const mag = Math.abs((preCommandHero?.fireMp ?? 0) - opponent.fireMp)
-  const dmgHero = applyDamage(opponent, atk, mag * (commandLevel === 3 ? 2 : 1))
+  opponent = applyDamage(opponent, atk, mag * (commandLevel === 3 ? 2 : 1))
 
-  return { player, opponent: dmgHero, tiles, gameHash }
+  return { player, opponent, tiles, gameHash }
 }
 
 export const swiftStrike: SkillFn = ({
@@ -255,14 +258,13 @@ export const swiftStrike: SkillFn = ({
   // LVL 3 stuns the opponent.
 
   let mag = [6, 8, 10][commandLevel - 1]
-  let dmgHero = { ...opponent }
   if (commandLevel === 3) {
     mag += player.spd > opponent.spd ? player.spd - opponent.spd : 0
-    dmgHero.turnTime -= 100
+    opponent.turnTime -= 100
   }
-  dmgHero = applyDamage(opponent, 0, mag)
+  opponent = applyDamage(opponent, 0, mag)
 
-  return { player, opponent: dmgHero, tiles, gameHash }
+  return { player, opponent, tiles, gameHash }
 }
 
 export const aquaShot: SkillFn = ({
@@ -280,9 +282,9 @@ export const aquaShot: SkillFn = ({
   if (commandLevel === 3) {
     mag += player.vit > opponent.vit ? player.vit - opponent.vit : 0
   }
-  const dmgHero = applyDamage(opponent, 0, mag, false, commandLevel === 3)
+  opponent = applyDamage(opponent, 0, mag, false, commandLevel === 3)
 
-  return { player, opponent: dmgHero, tiles, gameHash }
+  return { player, opponent, tiles, gameHash }
 }
 
 export const crushingBlow: SkillFn = ({
@@ -302,12 +304,12 @@ export const crushingBlow: SkillFn = ({
   if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
     atk = player.str
   }
-  const dmgHero = applyDamage(opponent, atk, mag)
+  opponent = applyDamage(opponent, atk, mag)
   if (commandLevel === 3) {
-    dmgHero.armor = 0
+    opponent.armor = 0
   }
 
-  return { player, opponent: dmgHero, tiles, gameHash }
+  return { player, opponent, tiles, gameHash }
 }
 
 export const empower: SkillFn = ({
@@ -381,9 +383,25 @@ export const combustion: SkillFn = ({
   tiles,
   gameHash,
 }) => {
-  // Converts all WATER MANA in the board into FIRE MANA, deals MAGIC DMG on how many are converted.
+  // Converts all WATER MANA in the board into FIRE MANA, deals x2 MAGIC DMG per each converted WATER MANA.
+  if (!tiles) return { player, opponent, tiles, gameHash }
 
-  return { player, opponent, tiles, gameHash }
+  let count = 0
+  let newTiles = [...tiles]
+  for (let i = 0; i < tiles.length; i++) {
+    // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+    if (tiles[i] === 5) {
+      count++
+      newTiles[i] = 3
+    }
+  }
+
+  if (count === 0) return { player, opponent, tiles, gameHash }
+
+  let mag = count * 2
+  opponent = applyDamage(opponent, undefined, mag)
+
+  return { player, opponent, tiles: newTiles, gameHash }
 }
 
 export const tornado: SkillFn = ({
@@ -394,7 +412,24 @@ export const tornado: SkillFn = ({
   gameHash,
 }) => {
   // Shuffles the board, deals MAGIC DMG based on how many WIND + EARTH MANA appear after the shuffle.
-  return { player, opponent, tiles, gameHash }
+  if (!gameHash || !tiles) return { player, opponent, tiles, gameHash }
+
+  const newHash = getNextHash([Buffer.from('SHUFFLE'), gameHash])
+  const newTiles = hashToTiles(newHash) as (number | null)[]
+
+  let count = 0
+  for (let i = 0; i < tiles.length; i++) {
+    if (tiles[i] === null) {
+      newTiles[i] = null
+    } else if (tiles[i] === 4 || tiles[i] === 6) {
+      // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+      count++
+    }
+  }
+
+  opponent = applyDamage(opponent, undefined, count)
+
+  return { player, opponent, tiles: newTiles, gameHash: newHash }
 }
 
 export const extinguish: SkillFn = ({
@@ -404,8 +439,25 @@ export const extinguish: SkillFn = ({
   tiles,
   gameHash,
 }) => {
-  // Converts all FIRE MANA in the board into WATER MANA, recover HP based on how many are converted.
-  return { player, opponent, tiles, gameHash }
+  // Converts all FIRE MANA in the board into WATER MANA, recover 2 HP per each converted FIRE MANA.
+  if (!tiles) return { player, opponent, tiles, gameHash }
+
+  let count = 0
+  let newTiles = [...tiles]
+  for (let i = 0; i < tiles.length; i++) {
+    // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+    if (tiles[i] === 3) {
+      count++
+      newTiles[i] = 5
+    }
+  }
+
+  if (count === 0) return { player, opponent, tiles, gameHash }
+
+  let restoredHp = count * 2
+  player = addHp(player, restoredHp)
+
+  return { player, opponent, tiles: newTiles, gameHash }
 }
 
 export const quake: SkillFn = ({
@@ -416,6 +468,13 @@ export const quake: SkillFn = ({
   gameHash,
 }) => {
   // Deals 30 MAGIC DMG on both players. Damage is reduced based on each respective heroes' WIND MANA.
+
+  const playerDmg = Math.max(30 - player.windMp, 0)
+  const opponentDmg = Math.max(30 - opponent.windMp, 0)
+
+  player = applyDamage(player, undefined, playerDmg)
+  opponent = applyDamage(opponent, undefined, opponentDmg)
+
   return { player, opponent, tiles, gameHash }
 }
 
@@ -531,11 +590,11 @@ export const skills: Skill[] = [
   },
   {
     name: 'Combustion',
-    desc: 'Converts all WATER MANA in the board into FIRE MANA, deals MAGIC DMG on how many are converted.',
+    desc: 'Converts all WATER MANA in the board into FIRE MANA, deals x2 MAGIC DMG per each converted WATER MANA.',
     type: SkillTypes.SPECIAL,
     target: TargetHero.ENEMY,
     cost: {
-      fire: 6,
+      fire: 8,
     },
     fn: combustion,
   },
@@ -551,7 +610,7 @@ export const skills: Skill[] = [
   },
   {
     name: 'Extinguish',
-    desc: 'Converts all FIRE MANA in the board into WATER MANA, recover HP based on how many are converted.',
+    desc: 'Converts all FIRE MANA in the board into WATER MANA, recover 2 HP per each converted FIRE MANA.',
     type: SkillTypes.SPECIAL,
     target: TargetHero.SELF,
     cost: {
@@ -677,4 +736,168 @@ export const executableCommands = (
     flags,
     queue,
   }
+}
+
+export function checkWinner(player: Hero, opponent: Hero) {
+  // TODO: HP check after each command
+  // win, lose, draw
+}
+
+export function hashToTiles(hash: Uint8Array): number[] {
+  const tiles = new Array(64)
+
+  for (let i = 0; i < 32; i++) {
+    const byte = hash[i]
+    tiles[i] = (byte & 0xf) % 7
+    tiles[i + 32] = ((byte >> 4) & 0xf) % 7
+  }
+
+  return tiles
+}
+
+export function hasMatch(tiles: (number | null)[]) {
+  for (let i = 0; i < 64; i++) {
+    const type = tiles[i]
+    const col = i % 8
+    const row = Math.floor(i / 8)
+
+    // vertical
+    if (row < 6) {
+      if (type !== null && type === tiles[i + 8] && type === tiles[i + 16]) {
+        return true
+      }
+    }
+
+    // horizontal
+    if (col < 6) {
+      if (type !== null && type === tiles[i + 1] && type === tiles[i + 2]) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+export function getMatches(tiles: (number | null)[]) {
+  const matches = new Array(64).fill(null)
+  const count = new Array(7).fill(0)
+  const depths = new Array(8).fill(0)
+
+  for (let i = 0; i < 64; i++) {
+    const type = tiles[i]
+    const col = i % 8
+    const row = Math.floor(i / 8)
+
+    // vertical
+    if (row < 6) {
+      if (type !== null && type === tiles[i + 8] && type === tiles[i + 16]) {
+        if (matches[i] === null) {
+          depths[col]++
+          count[type]++
+          matches[i] = type
+        }
+        if (matches[i + 8] === null) {
+          depths[col]++
+          count[type]++
+          matches[i + 8] = type
+        }
+        if (matches[i + 16] === null) {
+          depths[col]++
+          count[type]++
+          matches[i + 16] = type
+        }
+      }
+    }
+
+    // horizontal
+    if (col < 6) {
+      if (type !== null && type === tiles[i + 1] && type === tiles[i + 2]) {
+        if (matches[i] === null) {
+          depths[col]++
+          count[type]++
+          matches[i] = type
+        }
+        if (matches[i + 1] === null) {
+          depths[col + 1]++
+          count[type]++
+          matches[i + 1] = type
+        }
+        if (matches[i + 2] === null) {
+          depths[col + 2]++
+          count[type]++
+          matches[i + 2] = type
+        }
+      }
+    }
+  }
+
+  return {
+    matches,
+    depths,
+    count,
+  }
+}
+
+export function subtract(tiles: (number | null)[], mask: (number | null)[]) {
+  const result = new Array(64).fill(null)
+
+  for (let i = 0; i < 64; i++) {
+    if (mask[i] === null) result[i] = tiles[i]
+  }
+
+  return result
+}
+
+export function applyGravity(tiles: (number | null)[], depths: number[]) {
+  const gravityMap = new Array(64).fill(null)
+
+  for (let i = 0; i < 8; i++) {
+    if (depths[i] === 0) continue
+    let gravity = 0
+    let blanks = []
+    for (let j = 7; j >= 0; j--) {
+      const id = j * 8 + i
+      if (tiles[id] === null) {
+        gravity++
+        blanks.push(id)
+        continue
+      }
+
+      for (let k = 0; k < blanks.length; k++) {
+        gravityMap[blanks[k]] = gravity + (gravityMap[blanks[k]] ?? 0)
+      }
+      blanks = []
+
+      const node = tiles[id]
+      const dest = (j + gravity) * 8 + i
+      tiles[id] = null
+      tiles[dest] = node
+      gravityMap[id] = gravity
+    }
+
+    for (let k = 0; k < blanks.length; k++) {
+      gravityMap[blanks[k]] = gravity + (gravityMap[blanks[k]] ?? 0)
+    }
+  }
+
+  return {
+    gravity: gravityMap,
+    tiles: [...tiles],
+  }
+}
+
+export function fill(
+  tiles: (number | null)[],
+  fillers: (number | null)[],
+  depths: number[],
+) {
+  for (let i = 0; i < 8; i++) {
+    if (depths[i] === 0) continue
+    for (let j = 0; j < depths[i]; j++) {
+      const id = j * 8 + i
+      tiles[id] = fillers[id]
+    }
+  }
+
+  return [...tiles]
 }

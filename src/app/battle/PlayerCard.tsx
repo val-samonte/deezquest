@@ -134,7 +134,7 @@ export default function PlayerCard({
         !currentTurn && 'brightness-90',
       )}
     >
-      <div className='bg-black/20 flex-1 overflow-hidden flex items-center justify-center relative'>
+      <div className='bg-black/20 flex-1 overflow-hidden flex items-center justify-center relative rounded-t'>
         <HeroPortrait
           publicKey={publicKey}
           flip={asOpponent}

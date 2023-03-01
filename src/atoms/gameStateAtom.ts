@@ -1,5 +1,4 @@
 import { atom } from 'jotai'
-import crypto from 'crypto'
 import bs58 from 'bs58'
 import { GameTransitions } from '@/enums/GameTransitions'
 import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
@@ -8,14 +7,22 @@ import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
 import {
   absorbMana,
   applyDamage,
+  applyGravity,
+  checkWinner,
   executableCommands,
+  fill,
+  getMatches,
   getNextTurn,
+  hashToTiles,
+  hasMatch,
   Hero,
   heroFromPublicKey,
+  subtract,
 } from '@/utils/gameFunctions'
 import { TargetHero } from '@/enums/TargetHero'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
+import { getNextHash } from '@/utils/getNextHash'
 
 export interface GameState {
   hashes: string[]
@@ -108,7 +115,7 @@ export const gameFunctions = atom(
         if (!hasMatch(tiles)) {
           break
         }
-        hash = crypto.createHash('sha256').update(hash).digest()
+        hash = getNextHash([hash])
       }
 
       gameState = {
@@ -196,17 +203,12 @@ export const gameFunctions = atom(
           duration: 450,
         })
 
-        hash = crypto
-          .createHash('sha256')
-          .update(
-            Buffer.concat([
-              Buffer.from('SWAP'),
-              hash,
-              Buffer.from(action.data.origin),
-              bs58.decode(gameState.currentTurn),
-            ]),
-          )
-          .digest()
+        hash = getNextHash([
+          Buffer.from('SWAP'),
+          hash,
+          Buffer.from(action.data.origin),
+          bs58.decode(gameState.currentTurn),
+        ])
 
         while (hasMatch(newTiles)) {
           const { matches, depths, count } = getMatches(newTiles)
@@ -311,15 +313,59 @@ export const gameFunctions = atom(
                 commandLevel: command.lvl ?? 1,
                 player: playerHero,
                 preCommandHero,
-                opponent: { ...opponentHero },
+                opponent: opponentHero,
                 tiles: newTiles,
                 gameHash: hash,
               })
 
               playerHero = postCommand.player
               opponentHero = postCommand.opponent
-              newTiles = postCommand.tiles ?? newTiles
+
+              // do shuffle check
+              if (newTiles !== postCommand.tiles) {
+                const updateAll = hash !== postCommand.gameHash
+
+                queue.push({
+                  type: GameTransitions.NODE_OUT,
+                  tile: [...newTiles],
+                  nodes: newTiles.reduce((acc: any, cur, i) => {
+                    if (
+                      cur !== null &&
+                      (updateAll || cur !== postCommand.tiles?.[i])
+                    ) {
+                      const x = i % 8
+                      const y = Math.floor(i / 8)
+                      acc[i] = {
+                        delay: (x + y) * 50,
+                      }
+                    }
+                    return acc
+                  }, {}),
+                  duration: 400,
+                })
+
+                queue.push({
+                  type: GameTransitions.NODE_IN,
+                  tile: [...(postCommand.tiles ?? newTiles)],
+                  nodes: (postCommand.tiles ?? []).reduce(
+                    (acc: any, cur, i) => {
+                      if (cur !== null && (updateAll || cur !== newTiles[i])) {
+                        const x = i % 8
+                        const y = Math.floor(i / 8)
+                        acc[i] = {
+                          delay: (x + y) * 50,
+                        }
+                      }
+                      return acc
+                    },
+                    {},
+                  ),
+                  duration: 400,
+                })
+              }
+
               hash = postCommand.gameHash ?? hash
+              newTiles = postCommand.tiles ?? newTiles
 
               const spotlight: any = []
               const heroes: any = {}
@@ -348,18 +394,20 @@ export const gameFunctions = atom(
                 type,
                 turn: gameState!.currentTurn,
                 spotlight,
+                // tiles: [...newTiles],
+                // nodes (check DRAIN)
                 damage:
                   // TODO: included both
                   type === GameTransitions.ATTACK_SPELL
                     ? opponentPubkey
                     : undefined,
                 heroes,
-                // tiles: [...newTiles]
                 duration: 100,
               })
             }
 
-            // TODO: HP check after each command
+            // TODO
+            checkWinner(playerHero, opponentHero)
           })
 
           // TODO: issue with shuffle skills
@@ -367,10 +415,8 @@ export const gameFunctions = atom(
           const { tiles, gravity } = applyGravity(newTiles, depths)
           newTiles = tiles
 
-          hash = crypto
-            .createHash('sha256')
-            .update(Buffer.concat([Buffer.from('REFILL'), hash]))
-            .digest()
+          hash = getNextHash([Buffer.from('REFILL'), hash])
+
           const fillers = hashToTiles(hash)
 
           newTiles = fill(newTiles, fillers, depths)
@@ -425,162 +471,3 @@ export const gameFunctions = atom(
     })
   },
 )
-
-function hashToTiles(hash: Uint8Array): number[] {
-  const tiles = new Array(64)
-
-  for (let i = 0; i < 32; i++) {
-    const byte = hash[i]
-    tiles[i] = (byte & 0xf) % 7
-    tiles[i + 32] = ((byte >> 4) & 0xf) % 7
-  }
-
-  return tiles
-}
-
-function hasMatch(tiles: (number | null)[]) {
-  for (let i = 0; i < 64; i++) {
-    const type = tiles[i]
-    const col = i % 8
-    const row = Math.floor(i / 8)
-
-    // vertical
-    if (row < 6) {
-      if (type !== null && type === tiles[i + 8] && type === tiles[i + 16]) {
-        return true
-      }
-    }
-
-    // horizontal
-    if (col < 6) {
-      if (type !== null && type === tiles[i + 1] && type === tiles[i + 2]) {
-        return true
-      }
-    }
-  }
-  return false
-}
-
-function getMatches(tiles: (number | null)[]) {
-  const matches = new Array(64).fill(null)
-  const count = new Array(7).fill(0)
-  const depths = new Array(8).fill(0)
-
-  for (let i = 0; i < 64; i++) {
-    const type = tiles[i]
-    const col = i % 8
-    const row = Math.floor(i / 8)
-
-    // vertical
-    if (row < 6) {
-      if (type !== null && type === tiles[i + 8] && type === tiles[i + 16]) {
-        if (matches[i] === null) {
-          depths[col]++
-          count[type]++
-          matches[i] = type
-        }
-        if (matches[i + 8] === null) {
-          depths[col]++
-          count[type]++
-          matches[i + 8] = type
-        }
-        if (matches[i + 16] === null) {
-          depths[col]++
-          count[type]++
-          matches[i + 16] = type
-        }
-      }
-    }
-
-    // horizontal
-    if (col < 6) {
-      if (type !== null && type === tiles[i + 1] && type === tiles[i + 2]) {
-        if (matches[i] === null) {
-          depths[col]++
-          count[type]++
-          matches[i] = type
-        }
-        if (matches[i + 1] === null) {
-          depths[col + 1]++
-          count[type]++
-          matches[i + 1] = type
-        }
-        if (matches[i + 2] === null) {
-          depths[col + 2]++
-          count[type]++
-          matches[i + 2] = type
-        }
-      }
-    }
-  }
-
-  return {
-    matches,
-    depths,
-    count,
-  }
-}
-
-function subtract(tiles: (number | null)[], mask: (number | null)[]) {
-  const result = new Array(64).fill(null)
-
-  for (let i = 0; i < 64; i++) {
-    if (mask[i] === null) result[i] = tiles[i]
-  }
-
-  return result
-}
-
-function applyGravity(tiles: (number | null)[], depths: number[]) {
-  const gravityMap = new Array(64).fill(null)
-
-  for (let i = 0; i < 8; i++) {
-    if (depths[i] === 0) continue
-    let gravity = 0
-    let blanks = []
-    for (let j = 7; j >= 0; j--) {
-      const id = j * 8 + i
-      if (tiles[id] === null) {
-        gravity++
-        blanks.push(id)
-        continue
-      }
-
-      for (let k = 0; k < blanks.length; k++) {
-        gravityMap[blanks[k]] = gravity + (gravityMap[blanks[k]] ?? 0)
-      }
-      blanks = []
-
-      const node = tiles[id]
-      const dest = (j + gravity) * 8 + i
-      tiles[id] = null
-      tiles[dest] = node
-      gravityMap[id] = gravity
-    }
-
-    for (let k = 0; k < blanks.length; k++) {
-      gravityMap[blanks[k]] = gravity + (gravityMap[blanks[k]] ?? 0)
-    }
-  }
-
-  return {
-    gravity: gravityMap,
-    tiles: [...tiles],
-  }
-}
-
-function fill(
-  tiles: (number | null)[],
-  fillers: (number | null)[],
-  depths: number[],
-) {
-  for (let i = 0; i < 8; i++) {
-    if (depths[i] === 0) continue
-    for (let j = 0; j < depths[i]; j++) {
-      const id = j * 8 + i
-      tiles[id] = fillers[id]
-    }
-  }
-
-  return [...tiles]
-}

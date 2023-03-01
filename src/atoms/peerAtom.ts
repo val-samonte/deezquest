@@ -41,7 +41,7 @@ export function usePeer(keypair: Keypair) {
       conn.on('data', (payload) => {
         const { data, from, signature } = payload as PeerMessage
 
-        console.log(`Recieving data from ${from}: `, data)
+        // console.log(`Recieving data from ${from}: `, data)
 
         const valid = sign.detached.verify(
           Buffer.from(JSON.stringify(data)),
@@ -63,7 +63,7 @@ export function usePeer(keypair: Keypair) {
           return connections
         }
 
-        console.log(`Connection established ${conn.peer}`)
+        // console.log(`Connection established ${conn.peer}`)
 
         return [...connections, conn]
       })
@@ -95,16 +95,16 @@ export function usePeer(keypair: Keypair) {
           newPeer.on('connection', setupConnection)
 
           newPeer.on('open', () => {
-            console.log(`Peer opened ${peerId}`)
+            // console.log(`Peer opened ${peerId}`)
             setOpen(true)
           })
 
           newPeer.on('error', (err) => {
-            console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
+            // console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
           })
 
           newPeer.on('close', () => {
-            console.log(`Peer closed ${peerId}`)
+            // console.log(`Peer closed ${peerId}`)
             setOpen(false)
           })
 
@@ -179,7 +179,7 @@ export function usePeer(keypair: Keypair) {
       }
 
       setupConnection(connection)
-      console.log(`Sending message to ${receiverId}: `, message)
+      // console.log(`Sending message to ${receiverId}: `, message)
 
       connection.send(payload, false)
     },

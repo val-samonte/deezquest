@@ -69,7 +69,7 @@ export default function SkillView({
           <Popover className='relative flex-auto'>
             <Popover.Button
               className={classNames(
-                'text-sm xl:text-lg 2xl:text-xl font-bold',
+                'text-sm xl:text-lg 2xl:text-xl font-bold outline-none',
                 useDetails?.useCount === 0 && 'opacity-20',
               )}
               ref={setReferenceElement as any}
@@ -77,7 +77,7 @@ export default function SkillView({
               {skill.name}
             </Popover.Button>
             <Popover.Panel
-              className='absolute z-10 bg-neutral-800 py-3 px-5 rounded text-xs xl:text-sm shadow'
+              className='absolute z-50 bg-neutral-800 py-3 px-5 rounded text-xs xl:text-sm shadow'
               ref={setPopperElement as any}
               style={styles.popper}
               {...attributes.popper}

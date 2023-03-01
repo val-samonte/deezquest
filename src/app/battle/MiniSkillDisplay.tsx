@@ -32,7 +32,7 @@ export default function MiniSkillDisplay({
     <Popover className={classNames('relative w-1/3 h-full')}>
       <Popover.Button
         className={classNames(
-          'absolute inset-0 flex flex-col items-center justify-center',
+          'absolute inset-0 flex flex-col items-center justify-center outline-none',
           useDetails.useCount === 0 && 'opacity-20',
         )}
         ref={setReferenceElement as any}
@@ -48,7 +48,7 @@ export default function MiniSkillDisplay({
         </div>
       </Popover.Button>
       <Popover.Panel
-        className='absolute z-10 bg-neutral-800 py-3 px-5 rounded text-xs xl:text-sm shadow'
+        className='absolute z-50 bg-neutral-800 py-3 px-5 rounded text-xs xl:text-sm shadow'
         ref={setPopperElement as any}
         style={styles.popper}
         {...attributes.popper}
