@@ -16,7 +16,9 @@ export default function Battle() {
           </Suspense>
         </div>
       </div>
-      <div className='flex-none h-14 w-full bg-black/80'></div>
+      <div className='flex-none h-14 w-full bg-black/80'>
+        <img src='/DeezQuest.png' className='h-full aspect-square' />
+      </div>
     </main>
   )
 }

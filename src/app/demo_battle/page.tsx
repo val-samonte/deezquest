@@ -17,7 +17,10 @@ export default function DemoBattle() {
           </Suspense>
         </div>
       </div>
-      <div className='flex-none h-14 w-full'></div>
+      <div className='flex-none h-14 w-full flex items-center justify-center'>
+        <img src='/DeezQuest.png' className='h-full aspect-square' />
+        <span className='text-lg font-bold'>DeezQuest</span>
+      </div>
     </main>
   )
 }
