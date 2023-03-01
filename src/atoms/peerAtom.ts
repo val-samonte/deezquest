@@ -95,8 +95,12 @@ export function usePeer(keypair: Keypair) {
             setOpen(true)
           })
 
-          newPeer.on('error', (err) => {
+          newPeer.on('error', (err: any) => {
             console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
+            if (err.type === 'unavailable-id') {
+              // TODO: hard refresh browser for now
+              window.location.reload()
+            }
           })
 
           newPeer.on('close', () => {
