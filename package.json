@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.11",
+    "@metaplex-foundation/js": "^0.18.3",
     "@next/font": "13.1.6",
     "@react-spring/web": "^9.6.1",
     "@solana/wallet-adapter-base": "^0.9.20",
@@ -25,6 +26,7 @@
     "encoding": "^0.1.13",
     "eslint": "8.33.0",
     "eslint-config-next": "13.1.6",
+    "idb": "^7.1.1",
     "jotai": "^2.0.0",
     "next": "13.1.6",
     "peerjs": "^1.4.7",

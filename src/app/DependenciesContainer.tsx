@@ -4,8 +4,9 @@ import { userWalletAtom } from '@/atoms/userWalletAtom'
 import { useWallet, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
-import { useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { idbAtom } from '@/atoms/idbAtom'
 
 export default function DependenciesContainer({
   children,
@@ -25,6 +26,12 @@ export default function DependenciesContainer({
 }
 
 export function AtomsInitializer() {
+  ///////////////////////////
+  // PRELOAD IDB
+  ///////////////////////////
+
+  useAtomValue(idbAtom)
+
   ///////////////////////////
   // USER WALLET ATOM
   ///////////////////////////
