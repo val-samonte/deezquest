@@ -131,7 +131,7 @@ export default function PlayerCard({
         'flex-auto w-full h-full bg-neutral-900 rounded',
         'flex landscape:flex-col transition-all',
         asOpponent && 'portrait:flex-row-reverse',
-        !currentTurn && 'brightness-90',
+        // !currentTurn && 'brightness-90',
       )}
     >
       <div className='bg-black/20 flex-1 overflow-hidden flex items-center justify-center relative rounded-t'>

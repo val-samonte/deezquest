@@ -60,7 +60,6 @@ export default function MiniSkillDisplay({
             {typeof skill.cost.fire === 'number' && (
               <span className='flex items-center xl:gap-2'>
                 <img src='/elem_fire.svg' className='w-4 h-4 lg:w-6 lg:h-6' />
-                ``
                 {skill.cost.fire === 0 ? 'ALL' : skill.cost.fire}
               </span>
             )}
