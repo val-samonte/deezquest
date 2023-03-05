@@ -1,3 +1,5 @@
+'use client'
+
 import { atom } from 'jotai'
 import { DBSchema, openDB } from 'idb'
 import { rpcEndpointAtom } from './rpcEndpointAtom'
