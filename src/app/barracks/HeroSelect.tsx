@@ -99,23 +99,30 @@ export default function HeroSelect({ onMint }: HeroSelectProps) {
     setBusy(true)
 
     try {
-      const output = await metaplex.nfts().create({
-        useNewMint: mintKeypair,
-        name: metadata.name ?? 'Sample Hero',
-        sellerFeeBasisPoints: metadata.seller_fee_basis_points ?? 420,
-        uri,
-      })
+      const output = await metaplex.nfts().create(
+        {
+          useNewMint: mintKeypair,
+          name: metadata.name ?? 'Sample Hero',
+          sellerFeeBasisPoints: metadata.seller_fee_basis_points ?? 420,
+          uri,
+        },
+        { commitment: 'confirmed' },
+      )
+
       onMint({
         address: mintKeypair.publicKey.toBase58(),
         image: metadata.image ?? '',
         tx: output.response.signature,
       })
+
+      controller.current.abort()
+      setMintKeypair(Keypair.generate())
     } catch (e) {
       // TODO: error here
     }
 
     setBusy(false)
-  }, [mintKeypair, metaplex, uri, metadata, setBusy])
+  }, [mintKeypair, metaplex, uri, metadata, setBusy, setMintKeypair])
 
   return (
     <div className='flex flex-col max-w-3xl gap-5 mx-auto px-5 bg-neutral-900 rounded'>
@@ -129,7 +136,7 @@ export default function HeroSelect({ onMint }: HeroSelectProps) {
                   className='w-full h-full object-contain'
                 />
                 <div className='absolute inset-x-0 bottom-0 text-center font-bold text-xl bg-red-600/80 text-white'>
-                  DEMO ONLY
+                  DUMMY NFT ONLY
                 </div>
               </>
             ) : (

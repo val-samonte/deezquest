@@ -1,6 +1,6 @@
 import { userWalletAtom } from '@/atoms/userWalletAtom'
 import { useAtomValue } from 'jotai'
-import { ReactNode } from 'react'
+import { ReactNode, Suspense } from 'react'
 import ListLayout from '../ListLayout'
 import HeroContentPage from './HeroContentPage'
 
@@ -12,7 +12,7 @@ export default function BarracksLayout({ children }: { children: ReactNode }) {
       basePath={basePath}
       content={<HeroContentPage basePath={basePath} />}
     >
-      {children}
+      <Suspense fallback={'Loading'}>{children}</Suspense>
     </ListLayout>
   )
 }
