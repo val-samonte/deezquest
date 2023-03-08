@@ -6,7 +6,7 @@ import MenuIcon from '@/components/MenuIcon'
 import classNames from 'classnames'
 import { useSetAtom } from 'jotai'
 import { usePathname, useRouter } from 'next/navigation'
-import { ReactNode } from 'react'
+import { ReactNode, Suspense } from 'react'
 import { showMenuAtom } from './MainMenu'
 
 interface ListLayoutProps {
@@ -17,6 +17,7 @@ interface ListLayoutProps {
 }
 
 export default function ListLayout({
+  title,
   basePath,
   content,
   children,
@@ -35,12 +36,12 @@ export default function ListLayout({
           'flex-auto flex flex-col',
         )}
       >
-        {content}
+        <Suspense fallback={null}>{content}</Suspense>
         <nav
           className={classNames(
             'h-14 xl:h-16 px-3 xl:px-5 py-3',
             'w-screen sm:w-auto',
-            'flex-none flex justify-between bg-neutral-800',
+            'flex-none flex justify-between bg-neutral-900',
           )}
         >
           <div className='h-full flex items-center whitespace-nowrap'>
@@ -48,7 +49,7 @@ export default function ListLayout({
               src='/logo.png'
               className='h-full aspect-square mr-3 xl:mr-5'
             />
-            <h1 className='text-lg xl:text-2xl'>Barracks</h1>
+            <h1 className='text-lg xl:text-2xl'>{title}</h1>
           </div>
           <button
             type='button'
@@ -64,7 +65,7 @@ export default function ListLayout({
         className={classNames(
           detailsOpen ? 'w-screen sm:w-[35vw] xl:w-[25vw]' : 'w-0',
           'transition-all duration-500',
-          'flex-none flex flex-col bg-white/5',
+          'flex-none flex flex-col bg-neutral-900/50',
         )}
       >
         <div
@@ -73,12 +74,14 @@ export default function ListLayout({
             'flex-auto overflow-y-auto overflow-x-hidden p-3 xl:p-5',
           )}
         >
-          <div className='flex flex-col'>{children}</div>
+          <div className='flex flex-col'>
+            <Suspense fallback={null}>{children}</Suspense>
+          </div>
         </div>
         <div
           className={classNames(
             'w-screen sm:w-[35vw] xl:w-[25vw]',
-            'flex-none h-14 xl:h-16 bg-white/10',
+            'flex-none h-14 xl:h-16 bg-neutral-900',
             'flex items-center px-3 xl:px-5',
           )}
         >

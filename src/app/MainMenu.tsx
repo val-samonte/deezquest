@@ -64,6 +64,7 @@ export default function MainMenu() {
                     <Link
                       href={'/barracks'}
                       className='flex items-center gap-3 outline-none'
+                      onClick={() => setOpen(false)}
                     >
                       <img src='/menu_barracks.svg' className='w-12 h-12' />
                       Barracks
@@ -80,6 +81,7 @@ export default function MainMenu() {
                     <Link
                       href={'/inventory'}
                       className='flex items-center gap-3 outline-none'
+                      onClick={() => setOpen(false)}
                     >
                       <img src='/menu_inventory.svg' className='w-12 h-12' />
                       Inventory
@@ -96,6 +98,7 @@ export default function MainMenu() {
                     <Link
                       href={'/shop'}
                       className='flex items-center gap-3 outline-none'
+                      onClick={() => setOpen(false)}
                     >
                       <img src='/menu_shop.svg' className='w-12 h-12' />
                       Shop
@@ -112,6 +115,7 @@ export default function MainMenu() {
                     <Link
                       href={'/tutorial'}
                       className='flex items-center gap-3 outline-none'
+                      onClick={() => setOpen(false)}
                     >
                       <img src='/stat_int.svg' className='w-12 h-12' />
                       Tutorial
