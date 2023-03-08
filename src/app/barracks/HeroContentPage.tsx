@@ -5,11 +5,10 @@ import { userWalletAtom } from '@/atoms/userWalletAtom'
 import { Dialog } from '@/components/Dialog'
 import WalletGuard from '@/components/WalletGuard'
 import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
-import { Keypair } from '@solana/web3.js'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { HeroCard } from './HeroCard'
 import HeroSelect from './HeroSelect'
 
@@ -107,21 +106,32 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
                   />
                 )
               })}
-              <div className='flex flex-col gap-5 w-40 xl:w-60 aspect-[3/4] bg-neutral-900 p-5 justify-center rounded'>
-                <button
-                  type='button'
-                  className={classNames(
-                    'px-3 py-2',
-                    'flex items-center justify-center',
-                    'bg-purple-700 hover:bg-purple-600 rounded',
-                  )}
-                  onClick={() => setHeroSelectOpen(true)}
+              <button
+                type='button'
+                onClick={() => setHeroSelectOpen(true)}
+                className={classNames(
+                  'p-3 gap-2 w-40 xl:w-60 aspect-[3/4]',
+                  'bg-neutral-900 hover:bg-neutral-800 rounded',
+                  'flex flex-col justify-center items-center',
+                )}
+              >
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  strokeWidth={1.5}
+                  stroke='currentColor'
+                  className='w-14 h-14'
                 >
-                  Hire a new Hero
-                </button>
-                <hr className='border-0 border-b border-white/5' />
-                <Marketplaces forceCol />
-              </div>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M12 4.5v15m7.5-7.5h-15'
+                  />
+                </svg>
+                New Hero
+              </button>
+              {/* <Marketplaces forceCol /> */}
             </div>
           </div>
         )

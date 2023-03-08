@@ -58,7 +58,7 @@ export default function HeroDetailsPage() {
   }, [address, metaplex])
 
   return (
-    <div className='flex flex-col gap-10'>
+    <div className='flex flex-col gap-8'>
       <div className='relative w-full xl:max-w-xs mx-auto aspect-square rounded bg-neutral-900 overflow-hidden'>
         {metadata ? (
           <>
@@ -75,14 +75,23 @@ export default function HeroDetailsPage() {
       </div>
       {stats && (
         <>
-          <div className='flex gap-5 text-2xl justify-center items-center'>
-            <span>
-              HP:{' '}
-              <span className='font-bold'>{80 + stats.attributes.vit * 2}</span>
-            </span>
-            <span>
-              MP: <span className='font-bold'>{10 + stats.attributes.int}</span>
-            </span>
+          <div className='flex flex-col gap-2 justify-center items-center'>
+            <h2 className='text-center text-2xl font-bold'>
+              {metadata?.name ?? <span className='opacity-0'>Loading</span>}
+            </h2>
+
+            <div className='flex gap-5 text-xl'>
+              <span>
+                HP:{' '}
+                <span className='font-bold'>
+                  {80 + stats.attributes.vit * 2}
+                </span>
+              </span>
+              <span>
+                MP:{' '}
+                <span className='font-bold'>{10 + stats.attributes.int}</span>
+              </span>
+            </div>
           </div>
           <div className='flex flex-col gap-5'>
             <h2 className='text-xl font-bold'>Attributes</h2>

@@ -73,7 +73,7 @@ export default function ListLayout({
         <div
           className={classNames(
             'w-screen sm:w-[35vw] xl:w-[25vw]',
-            'flex-auto overflow-y-auto overflow-x-hidden p-3 xl:p-5',
+            'flex-auto overflow-y-auto overflow-x-hidden p-5',
           )}
         >
           <div className='flex flex-col'>

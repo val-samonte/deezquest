@@ -1,8 +1,7 @@
 'use client'
 
 import SpinnerIcon from '@/components/SpinnerIcon'
-import { SkillTypes } from '@/enums/SkillTypes'
-import { getHeroAttributes, skills } from '@/utils/gameFunctions'
+import { getHeroAttributes } from '@/utils/gameFunctions'
 import { JsonMetadata } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
@@ -74,20 +73,20 @@ export function HeroCard({ uri, basePath, address }: HeroCardProps) {
             <SpinnerIcon />
           </div>
         )}
-        <div className='absolute inset-x-0 bottom-0 grid grid-cols-4 gap-2 p-2 text-sm font-bold'>
-          <div className='flex items-center bg-neutral-900 rounded px-2 py-1'>
+        <div className='absolute inset-x-0 bottom-0 grid grid-cols-4 gap-1 p-1 text-xs sm:gap-2 sm:p-2 sm:text-sm font-bold'>
+          <div className='flex items-center justify-center bg-neutral-900 rounded p-1 sm:px-2'>
             <img src='/stat_int.svg' className='w-4 h-4 flex-none' />
             <span className='ml-auto'>{stats.int}</span>
           </div>
-          <div className='flex items-center bg-neutral-900 rounded px-2 py-1'>
+          <div className='flex items-center justify-center bg-neutral-900 rounded p-1 sm:px-2'>
             <img src='/stat_spd.svg' className='w-4 h-4 flex-none' />
             <span className='ml-auto'>{stats.spd}</span>
           </div>
-          <div className='flex items-center bg-neutral-900 rounded px-2 py-1'>
+          <div className='flex items-center justify-center bg-neutral-900 rounded p-1 sm:px-2'>
             <img src='/stat_vit.svg' className='w-4 h-4 flex-none' />
             <span className='ml-auto'>{stats.vit}</span>
           </div>
-          <div className='flex items-center bg-neutral-900 rounded px-2 py-1'>
+          <div className='flex items-center justify-center bg-neutral-900 rounded p-1 sm:px-2'>
             <img src='/stat_str.svg' className='w-4 h-4 flex-none' />
             <span className='ml-auto'>{stats.str}</span>
           </div>

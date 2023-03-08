@@ -1,7 +1,6 @@
 import DependenciesContainer from './DependenciesContainer'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
-import Navigation from './Navigation'
 import MainMenu from './MainMenu'
 
 export default function RootLayout({
