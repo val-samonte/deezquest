@@ -7,6 +7,7 @@ import { JsonMetadata } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 interface HeroCardProps {
@@ -17,6 +18,14 @@ interface HeroCardProps {
 
 export function HeroCard({ uri, basePath, address }: HeroCardProps) {
   const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
+  const pathname = usePathname()
+  const pathAddress = useMemo(
+    () =>
+      pathname?.includes('/barracks/')
+        ? pathname?.replace(`/barracks/`, '')
+        : null,
+    [pathname],
+  )
 
   const stats = useMemo(() => {
     const pubkey = new PublicKey(address)
@@ -51,7 +60,15 @@ export function HeroCard({ uri, basePath, address }: HeroCardProps) {
         )}
       >
         {metadata ? (
-          <img className='h-full object-cover' src={metadata.image} />
+          <img
+            className={classNames(
+              pathAddress !== null &&
+                pathAddress !== address &&
+                'grayscale brightness-50',
+              'h-full object-cover transition-all',
+            )}
+            src={metadata.image}
+          />
         ) : (
           <div className='absolute inset-0 flex items-center justify-center'>
             <SpinnerIcon />

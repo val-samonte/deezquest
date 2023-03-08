@@ -15,7 +15,13 @@ export default function HeroDetailsPage() {
   const pathname = usePathname()
   const metaplex = useAtomValue(metaplexAtom)
   const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
-  const address = useMemo(() => pathname?.replace(`/barracks/`, ''), [pathname])
+  const address = useMemo(
+    () =>
+      pathname?.includes('/barracks/')
+        ? pathname?.replace(`/barracks/`, '')
+        : null,
+    [pathname],
+  )
 
   const stats = useMemo(() => {
     if (!address) return null
@@ -55,7 +61,12 @@ export default function HeroDetailsPage() {
     <div className='flex flex-col gap-10'>
       <div className='relative w-full xl:max-w-xs mx-auto aspect-square rounded bg-neutral-900 overflow-hidden'>
         {metadata ? (
-          <img className='w-full h-full object-contain' src={metadata.image} />
+          <>
+            <img
+              className='w-full h-full object-contain'
+              src={metadata.image}
+            />
+          </>
         ) : (
           <div className='absolute inset-0 flex items-center justify-center'>
             <SpinnerIcon />
@@ -64,6 +75,15 @@ export default function HeroDetailsPage() {
       </div>
       {stats && (
         <>
+          <div className='flex gap-5 text-2xl justify-center items-center'>
+            <span>
+              HP:{' '}
+              <span className='font-bold'>{80 + stats.attributes.vit * 2}</span>
+            </span>
+            <span>
+              MP: <span className='font-bold'>{10 + stats.attributes.int}</span>
+            </span>
+          </div>
           <div className='flex flex-col gap-5'>
             <h2 className='text-xl font-bold'>Attributes</h2>
             <ul className='grid grid-cols-1 xl:grid-cols-2 gap-y-3 gap-x-10 text-lg'>
