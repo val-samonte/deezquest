@@ -2,11 +2,9 @@
 
 import { SkillTypes } from '@/enums/SkillTypes'
 import { clusterApiUrl, Connection, Keypair, PublicKey } from '@solana/web3.js'
-import { trimAddress } from '@/utils/trimAddress'
 import SkillView from '@/components/SkillView'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getHeroAttributes, skills } from '@/utils/gameFunctions'
-import { CachedImage } from '@/components/CachedImage'
 import { metaplexAtom } from '@/atoms/metaplexAtom'
 import { useAtomValue } from 'jotai'
 import { nftCollections } from './nft_collections'
@@ -15,7 +13,11 @@ import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import classNames from 'classnames'
 import SpinnerIcon from '@/components/SpinnerIcon'
 
-export default function HeroSelect() {
+interface HeroSelectProps {
+  onMint: (params: { address: string; tx: string; image: string }) => void
+}
+
+export default function HeroSelect({ onMint }: HeroSelectProps) {
   const [mintKeypair, setMintKeypair] = useState(Keypair.generate())
   const metaplex = useAtomValue(metaplexAtom)
   const [uri, setUri] = useState<string | null>(null)
@@ -97,13 +99,17 @@ export default function HeroSelect() {
     setBusy(true)
 
     try {
-      await metaplex.nfts().create({
+      const output = await metaplex.nfts().create({
         useNewMint: mintKeypair,
         name: metadata.name ?? 'Sample Hero',
         sellerFeeBasisPoints: metadata.seller_fee_basis_points ?? 420,
         uri,
       })
-      // TODO: reload NFT collection
+      onMint({
+        address: mintKeypair.publicKey.toBase58(),
+        image: metadata.image ?? '',
+        tx: output.response.signature,
+      })
     } catch (e) {
       // TODO: error here
     }
@@ -142,7 +148,6 @@ export default function HeroSelect() {
             </span>
           </div>
           <div className='flex flex-col'>
-            {/* <h2 className='text-xl font-bold mb-3'>Attributes</h2> */}
             <ul className='grid grid-cols-1 portrait:sm:grid-cols-2 gap-y-3 gap-x-10 text-lg'>
               <li className='flex items-center justify-center gap-2'>
                 <img src='/stat_int.svg' className='w-8 h-8' />
@@ -199,7 +204,9 @@ export default function HeroSelect() {
       <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5'>
         <button
           type='button'
+          disabled={busy}
           className={classNames(
+            busy && 'opacity-20',
             'px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded',
           )}
           onClick={() => {
@@ -214,7 +221,7 @@ export default function HeroSelect() {
           disabled={!uri || !metadata || busy}
           className={classNames(
             (!uri || !metadata || busy) && 'opacity-20',
-            'px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded',
+            'portrait:flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded flex items-center justify-center',
           )}
           onClick={() => mint()}
         >

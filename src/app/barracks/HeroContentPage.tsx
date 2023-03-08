@@ -23,6 +23,12 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
     [basePath],
   )
   const [heroSelectOpen, setHeroSelectOpen] = useState(false)
+  const [successOpen, setSuccessOpen] = useState(false)
+  const [newMintParams, setNewMintParams] = useState<{
+    address: string
+    tx: string
+    image: string
+  } | null>(null)
 
   if (!connected) {
     return <WalletGuard />
@@ -32,7 +38,7 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
     <>
       <div className='absolute inset-0 flex items-center justify-center'>
         <div className='w-full max-h-full overflow-auto p-5'>
-          <div className='p-5 rounded bg-neutral-900 shadow max-w-sm w-full mx-auto  flex flex-col gap-5'>
+          <div className='p-5 rounded bg-neutral-900 shadow min-w-min max-w-sm w-full mx-auto  flex flex-col gap-5'>
             <h3 className='text-lg font-bold'>Welcome Adventurer!</h3>
             <p className='text-stone-300'>
               It seems that thou art a new arrival to these parts. Let us employ
@@ -123,7 +129,78 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
         className='max-w-3xl'
         onClose={() => setHeroSelectOpen(false)}
       >
-        <HeroSelect />
+        <HeroSelect
+          onMint={(onMintParams) => {
+            setNewMintParams(onMintParams)
+            setSuccessOpen(true)
+          }}
+        />
+      </Dialog>
+      <Dialog
+        title={'Hired a New Hero!'}
+        show={successOpen && !!newMintParams}
+        className='max-w-xs'
+        onClose={() => setSuccessOpen(false)}
+      >
+        {newMintParams && (
+          <div className='flex flex-col gap-5 px-5'>
+            <div className='bg-black/20 w-60 h-60 mx-auto portrait:h-auto aspect-square relative overflow-hidden rounded'>
+              <img
+                src={newMintParams.image}
+                className='w-full h-full object-contain '
+              />
+            </div>
+            <q className='text-center'>
+              I am a mercenary of the highest caliber, and my blade is at your
+              service.
+            </q>
+            <div className='flex items-center justify-between'>
+              <a
+                target='_blank'
+                rel='noreferrer'
+                className='underline'
+                href={`https://solscan.io/token/${newMintParams.address}?cluster=devnet`}
+              >
+                View Explorer
+              </a>
+              <a
+                target='_blank'
+                rel='noreferrer'
+                className='underline'
+                href={`https://solscan.io/tx/${newMintParams.tx}?cluster=devnet`}
+              >
+                View Transaction
+              </a>
+            </div>
+            <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5'>
+              <button
+                type='button'
+                className={classNames(
+                  'px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded flex items-center',
+                )}
+                onClick={() => {
+                  setSuccessOpen(false)
+                }}
+              >
+                Close
+              </button>
+              <button
+                type='button'
+                className={classNames(
+                  'flex items-center justify-center',
+                  'flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded',
+                )}
+                onClick={() => {
+                  setSuccessOpen(false)
+                  setHeroSelectOpen(false)
+                  router.push(`${basePath}/${newMintParams.address}`)
+                }}
+              >
+                View Hero
+              </button>
+            </div>
+          </div>
+        )}
       </Dialog>
     </>
   )
