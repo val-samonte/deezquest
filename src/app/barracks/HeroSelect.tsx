@@ -1,18 +1,27 @@
 'use client'
 
 import { SkillTypes } from '@/enums/SkillTypes'
-import { Keypair } from '@solana/web3.js'
+import { clusterApiUrl, Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { trimAddress } from '@/utils/trimAddress'
 import SkillView from '@/components/SkillView'
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getHeroAttributes, skills } from '@/utils/gameFunctions'
 import { CachedImage } from '@/components/CachedImage'
+import { metaplexAtom } from '@/atoms/metaplexAtom'
+import { useAtomValue } from 'jotai'
+import { nftCollections } from './nft_collections'
+import { JsonMetadata, Metaplex } from '@metaplex-foundation/js'
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
+import classNames from 'classnames'
+import SpinnerIcon from '@/components/SpinnerIcon'
 
 export default function HeroSelect() {
   const [mintKeypair, setMintKeypair] = useState(Keypair.generate())
-  // const mintPubkey = useMemo(() => {
-  //   return trimAddress(mintKeypair.publicKey.toBase58())
-  // }, [mintKeypair])
+  const metaplex = useAtomValue(metaplexAtom)
+  const [uri, setUri] = useState<string | null>(null)
+  const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
+  const [busy, setBusy] = useState(false)
+  const controller = useRef(new AbortController())
 
   const stats = useMemo(() => {
     const attribs = getHeroAttributes(mintKeypair.publicKey)
@@ -34,20 +43,95 @@ export default function HeroSelect() {
     }
   }, [mintKeypair])
 
+  useEffect(() => {
+    if (!metaplex) return
+    if (!mintKeypair) return
+
+    const demoAddress =
+      nftCollections[Math.floor(Math.random() * nftCollections.length)]
+
+    setUri(null)
+    setMetadata(null)
+
+    if (controller.current) {
+      controller.current.abort()
+      controller.current = new AbortController()
+    }
+
+    Metaplex.make(
+      new Connection(
+        process.env.NEXT_PUBLIC_MAINNET ??
+          clusterApiUrl(WalletAdapterNetwork.Mainnet),
+      ),
+    )
+      .nfts()
+      .findByMint(
+        {
+          mintAddress: new PublicKey(demoAddress),
+        },
+        {
+          signal: controller.current.signal,
+        },
+      )
+      .then((mint) => {
+        setUri(mint.uri)
+        return fetch(`/api/proxy_json?uri=${encodeURIComponent(mint.uri)}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal: controller.current.signal,
+        })
+      })
+      .then((response) => response.json())
+      .then((metadata) => setMetadata(metadata))
+      .catch(() => {})
+
+    return () => {
+      controller.current.abort()
+    }
+  }, [mintKeypair, metaplex, setMetadata, setUri])
+
+  const mint = useCallback(async () => {
+    if (!uri || !metadata || busy) return
+
+    setBusy(true)
+
+    try {
+      await metaplex.nfts().create({
+        useNewMint: mintKeypair,
+        name: metadata.name ?? 'Sample Hero',
+        sellerFeeBasisPoints: metadata.seller_fee_basis_points ?? 420,
+        uri,
+      })
+      // TODO: reload NFT collection
+    } catch (e) {
+      // TODO: error here
+    }
+
+    setBusy(false)
+  }, [mintKeypair, metaplex, uri, metadata, setBusy])
+
   return (
     <div className='flex flex-col max-w-3xl gap-5 mx-auto px-5 bg-neutral-900 rounded'>
       <div className='flex gap-5 portrait:flex-col'>
         <div className='flex flex-col gap-5 flex-none'>
-          <div className='bg-black/20 w-60 h-60 portrait:w-full portrait:h-auto aspect-square relative overflow-hidden'>
-            <CachedImage
-              className='w-full h-full object-contain'
-              src='https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png'
-            />
-            <div className='absolute inset-x-0 bottom-0 text-center font-bold text-xl bg-black/80 text-white'>
-              DEMO ONLY
-            </div>
+          <div className='bg-black/20 w-60 h-60 mx-auto portrait:h-auto aspect-square relative overflow-hidden'>
+            {metadata ? (
+              <>
+                <img
+                  src={metadata.image}
+                  className='w-full h-full object-contain'
+                />
+                <div className='absolute inset-x-0 bottom-0 text-center font-bold text-xl bg-red-600/80 text-white'>
+                  DEMO ONLY
+                </div>
+              </>
+            ) : (
+              <div className='flex items-center justify-center absolute inset-0'>
+                <SpinnerIcon />
+              </div>
+            )}
           </div>
-          {/* <div>Hero ID: {mintPubkey}</div> */}
           <div className='flex gap-5 text-2xl'>
             <span>
               HP:{' '}
@@ -59,7 +143,7 @@ export default function HeroSelect() {
           </div>
           <div className='flex flex-col'>
             {/* <h2 className='text-xl font-bold mb-3'>Attributes</h2> */}
-            <ul className='grid grid-cols-1 gap-y-3 gap-x-10 text-lg'>
+            <ul className='grid grid-cols-1 portrait:sm:grid-cols-2 gap-y-3 gap-x-10 text-lg'>
               <li className='flex items-center justify-center gap-2'>
                 <img src='/stat_int.svg' className='w-8 h-8' />
                 Intelligence
@@ -115,8 +199,11 @@ export default function HeroSelect() {
       <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5'>
         <button
           type='button'
-          className='px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded'
+          className={classNames(
+            'px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded',
+          )}
           onClick={() => {
+            controller.current.abort()
             setMintKeypair(Keypair.generate())
           }}
         >
@@ -124,10 +211,21 @@ export default function HeroSelect() {
         </button>
         <button
           type='button'
-          className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-          onClick={() => {}}
+          disabled={!uri || !metadata || busy}
+          className={classNames(
+            (!uri || !metadata || busy) && 'opacity-20',
+            'px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded',
+          )}
+          onClick={() => mint()}
         >
-          Mint NFT
+          {busy ? (
+            <>
+              <SpinnerIcon />
+              <span className='ml-2'>Minting your hero</span>
+            </>
+          ) : (
+            'Mint NFT'
+          )}
         </button>
       </div>
     </div>
