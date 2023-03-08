@@ -6,3 +6,5 @@ export default function ShopDetailsPage() {
     />
   )
 }
+
+export const dynamic = 'force-dynamic'

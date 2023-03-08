@@ -6,3 +6,5 @@ export default function InventoryDetailsPage() {
     />
   )
 }
+
+export const dynamic = 'force-dynamic'

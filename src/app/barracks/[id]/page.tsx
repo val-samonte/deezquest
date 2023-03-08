@@ -12,6 +12,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 export default function HeroDetailsPage() {
+  // https://beta.nextjs.org/docs/routing/defining-routes#typescript
   const pathname = usePathname()
   const metaplex = useAtomValue(metaplexAtom)
   const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
@@ -158,3 +159,5 @@ export default function HeroDetailsPage() {
     </div>
   )
 }
+
+export const dynamic = 'force-dynamic'
