@@ -36,7 +36,9 @@ export default function ListLayout({
           'flex-auto flex flex-col',
         )}
       >
-        <Suspense fallback={null}>{content}</Suspense>
+        <div className='flex-auto w-full h-full relative'>
+          <Suspense fallback={null}>{content}</Suspense>
+        </div>
         <nav
           className={classNames(
             'h-14 xl:h-16 px-3 xl:px-5 py-3',
@@ -90,8 +92,8 @@ export default function ListLayout({
             className='mr-3 md:mr-5 portrait:mr-5 flex items-center'
             onClick={() => router.push(basePath)}
           >
-            <BackIcon />
-            <CloseIcon />
+            <BackIcon className='sm:hidden' />
+            <CloseIcon className='hidden sm:block' />
             <span className='ml-2 hidden md:block'>Close</span>
             <span className='ml-2 sm:hidden'>Back</span>
           </button>

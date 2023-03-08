@@ -191,6 +191,7 @@ export default function HeroSelect() {
       <Dialog
         show={startMatch}
         title='DEMO Match'
+        className='max-w-sm'
         onClose={() => setStartMatch(false)}
       >
         {!opponent ? (

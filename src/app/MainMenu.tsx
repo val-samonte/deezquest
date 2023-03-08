@@ -1,8 +1,11 @@
 'use client'
 
+import { userWalletAtom } from '@/atoms/userWalletAtom'
+import BackIcon from '@/components/BackIcon'
+import { trimAddress } from '@/utils/trimAddress'
 import { Dialog, Transition } from '@headlessui/react'
 import classNames from 'classnames'
-import { atom, useAtom } from 'jotai'
+import { atom, useAtom, useAtomValue } from 'jotai'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Fragment } from 'react'
@@ -10,6 +13,7 @@ import { Fragment } from 'react'
 export const showMenuAtom = atom(false)
 
 export default function MainMenu() {
+  const { connected, publicKey, disconnect } = useAtomValue(userWalletAtom)
   const pathname = usePathname()
   const [open, setOpen] = useAtom(showMenuAtom)
 
@@ -53,6 +57,23 @@ export default function MainMenu() {
                     'flex flex-col',
                   )}
                 >
+                  {connected && (
+                    <li className='flex items-center justify-between text-base py-5'>
+                      <span>
+                        Connected as:{' '}
+                        <span className='font-bold'>
+                          {trimAddress(publicKey?.toBase58() ?? '')}
+                        </span>
+                      </span>
+                      <button
+                        type='button'
+                        className='underline font-bold'
+                        onClick={() => disconnect()}
+                      >
+                        Disconnect
+                      </button>
+                    </li>
+                  )}
                   <li
                     className={classNames(
                       ' rounded shadow-sm p-3 px-5',
@@ -122,7 +143,12 @@ export default function MainMenu() {
                     </Link>
                   </li>
                   <li>
-                    <ul className='text-base grid grid-cols-3 py-2'>
+                    <ul className='text-base grid grid-cols-4 py-2'>
+                      <li className='flex items-center justify-center gap-2 font-bold'>
+                        <button type='button' onClick={() => setOpen(false)}>
+                          <BackIcon className='flex-none' />
+                        </button>
+                      </li>
                       <li className='flex items-center justify-center gap-3'>
                         <a
                           href='https://twitter.com/deezquest'
