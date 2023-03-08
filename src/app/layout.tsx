@@ -2,6 +2,7 @@ import DependenciesContainer from './DependenciesContainer'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
 import Navigation from './Navigation'
+import MainMenu from './MainMenu'
 
 export default function RootLayout({
   children,
@@ -20,10 +21,10 @@ export default function RootLayout({
           <div className='w-full h-full overflow-y-auto'>
             <DependenciesContainer>
               <div className='w-full h-full flex flex-col'>
-                <Navigation />
                 <div className='flex flex-auto relative overflow-hidden'>
                   {children}
                 </div>
+                <MainMenu />
               </div>
             </DependenciesContainer>
           </div>

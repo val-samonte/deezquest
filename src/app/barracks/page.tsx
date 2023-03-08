@@ -1,8 +1,12 @@
 'use client'
 
+import BackIcon from '@/components/BackIcon'
+import CloseIcon from '@/components/CloseIcon'
+import MenuIcon from '@/components/MenuIcon'
 import classNames from 'classnames'
-import { atom, useAtom } from 'jotai'
+import { atom, useAtom, useSetAtom } from 'jotai'
 import { useRouter } from 'next/navigation'
+import { showMenuAtom } from '../MainMenu'
 import { HeroCard } from './HeroCard'
 
 const openAtom = atom(true)
@@ -10,6 +14,8 @@ const openAtom = atom(true)
 export default function Barracks() {
   const router = useRouter()
   const [open, setOpen] = useAtom(openAtom)
+  const showMenu = useSetAtom(showMenuAtom)
+
   return (
     <div className='flex w-full'>
       <div
@@ -44,7 +50,11 @@ export default function Barracks() {
             />
             <h1 className='text-lg xl:text-2xl'>Barracks</h1>
           </div>
-          <button type='button' className='flex items-center'>
+          <button
+            type='button'
+            className='flex items-center'
+            onClick={() => showMenu(true)}
+          >
             <MenuIcon />
             <span className='ml-3'>Menu</span>
           </button>
@@ -101,62 +111,5 @@ export default function Barracks() {
         </div>
       </div>
     </div>
-  )
-}
-
-function MenuIcon() {
-  return (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      fill='none'
-      viewBox='0 0 24 24'
-      strokeWidth={1.5}
-      stroke='currentColor'
-      className='w-6 h-6'
-    >
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        d='M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5'
-      />
-    </svg>
-  )
-}
-
-function BackIcon() {
-  return (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      fill='none'
-      viewBox='0 0 24 24'
-      strokeWidth={1.5}
-      stroke='currentColor'
-      className='w-6 h-6 hidden sm:block'
-    >
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        d='M6 18L18 6M6 6l12 12'
-      />
-    </svg>
-  )
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      fill='none'
-      viewBox='0 0 24 24'
-      strokeWidth={1.5}
-      stroke='currentColor'
-      className='w-6 h-6 sm:hidden'
-    >
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        d='M15.75 19.5L8.25 12l7.5-7.5'
-      />
-    </svg>
   )
 }
