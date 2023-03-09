@@ -8,11 +8,15 @@ import { useMemo } from 'react'
 
 const baseUserWalletAtom = atom<
   Promise<WalletContextState> | WalletContextState
->(new Promise(() => {}) as Promise<WalletContextState>)
+>(
+  new Promise((_, reject) => {
+    setTimeout(() => reject(), 3000)
+  }) as Promise<WalletContextState>,
+)
 
 export const userWalletAtom = atom(
   async (get) => {
-    return get(baseUserWalletAtom)
+    return await get(baseUserWalletAtom)
   },
   (_, set, update: Promise<WalletContextState> | WalletContextState) => {
     set(baseUserWalletAtom, update)
@@ -21,6 +25,7 @@ export const userWalletAtom = atom(
 
 export const useWallet = () => {
   useHydrateAtoms([[userWalletAtom, {}]] as any)
+
   const { setVisible } = useWalletModal()
   const wallet = useAtomValue(userWalletAtom)
   return useMemo(

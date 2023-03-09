@@ -1,7 +1,9 @@
 import DependenciesContainer from './DependenciesContainer'
+import dynamic from 'next/dynamic'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
-import MainMenu from './MainMenu'
+
+const MainMenu = dynamic(() => import('./MainMenu'), { ssr: false })
 
 export default function RootLayout({
   children,
