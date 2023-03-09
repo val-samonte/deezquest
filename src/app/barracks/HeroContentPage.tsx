@@ -7,6 +7,7 @@ import WalletGuard from '@/components/WalletGuard'
 import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
+import { atom, useAtom } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { HeroCard } from './HeroCard'
@@ -22,6 +23,8 @@ interface NewMintParams {
   image: string
 }
 
+export const userNftCollectionAtom = atom<(Metadata | Nft | Sft)[]>([])
+
 export default function HeroContentPage({ basePath }: HeroContentPageProps) {
   const wallet = useUserWallet()
   const metaplex = useMetaplex()
@@ -30,7 +33,7 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
   const [heroSelectOpen, setHeroSelectOpen] = useState(false)
   const [successOpen, setSuccessOpen] = useState(false)
   const [newMintParams, setNewMintParams] = useState<NewMintParams | null>(null)
-  const [collection, setCollection] = useState<(Metadata | Nft | Sft)[]>([])
+  const [collection, setCollection] = useAtom(userNftCollectionAtom)
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
 
@@ -84,11 +87,6 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
               >
                 Hire a Hero
               </button>
-              {/* <hr className='border-0 border-b border-white/5' />
-              <p className='text-stone-300'>
-                You can hire from a marketplace as well!
-              </p>
-              <Marketplaces /> */}
             </div>
           </div>
         </div>
@@ -226,57 +224,5 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
         )}
       </Dialog>
     </>
-  )
-}
-
-function Marketplaces({ forceCol }: { forceCol?: boolean }) {
-  return (
-    <div
-      className={classNames(
-        forceCol ? 'grid-cols-1' : 'grid-cols-3 portrait:grid-cols-1',
-        'grid gap-2',
-      )}
-    >
-      <a
-        href='https://magiceden.io/popular-collections'
-        target='_blank'
-        rel='noreferrer'
-        className={classNames(
-          'flex-auto p-2',
-          'flex items-center justify-center',
-          'bg-neutral-800 hover:bg-neutral-700 rounded',
-        )}
-      >
-        <img src='/magiceden.png' className='flex-none h-6 object-contain' />
-      </a>
-      <a
-        href='https://solsea.io/m/all'
-        target='_blank'
-        rel='noreferrer'
-        className={classNames(
-          'flex-auto p-2',
-          'flex items-center justify-center',
-          'bg-neutral-800 hover:bg-neutral-700 rounded',
-        )}
-      >
-        <img src='/solsea.svg' className='flex-none h-6 object-contain' />
-      </a>
-      <a
-        href='https://solanart.io/collections'
-        target='_blank'
-        rel='noreferrer'
-        className={classNames(
-          'flex-auto p-2',
-          'flex items-center justify-center',
-          'bg-neutral-800 hover:bg-neutral-700 rounded',
-        )}
-      >
-        <img
-          src='/solanart.svg'
-          className='flex-none h-6 aspect-square object-contain'
-        />
-        <span className='text-sm font-bold ml-1'>Solanart</span>
-      </a>
-    </div>
   )
 }

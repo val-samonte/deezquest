@@ -15,6 +15,7 @@ interface ListLayoutProps {
   basePath: string
   content: ReactNode
   children?: ReactNode
+  actionButton?: ReactNode
 }
 
 export default function ListLayout({
@@ -22,6 +23,7 @@ export default function ListLayout({
   basePath,
   content,
   children,
+  actionButton,
 }: ListLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -100,18 +102,7 @@ export default function ListLayout({
             <span className='ml-2 hidden md:block'>Close</span>
             <span className='ml-2 sm:hidden'>Back</span>
           </button>
-          {/* TODO: is this mine? */}
-          <button
-            type='button'
-            className={classNames(
-              'flex-auto px-3 py-2',
-              'flex items-center justify-center',
-              'bg-red-700 hover:bg-red-600 rounded',
-            )}
-          >
-            <img src='/BattleIcon.svg' className='w-6 h-6' />
-            <span className='ml-2 font-bold uppercase'>Battle</span>
-          </button>
+          {actionButton}
         </div>
       </div>
     </div>
