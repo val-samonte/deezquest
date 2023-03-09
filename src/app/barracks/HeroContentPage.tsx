@@ -5,6 +5,7 @@ import { useUserWallet } from '@/atoms/userWalletAtom'
 import { Dialog } from '@/components/Dialog'
 import WalletGuard from '@/components/WalletGuard'
 import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
+import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -25,12 +26,12 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
   const wallet = useUserWallet()
   const metaplex = useMetaplex()
   const router = useRouter()
-  const [listPreloaded, setListPreloaded] = useState(false)
+  const [listPreloaded, setListPreloaded] = useState<PublicKey | null>(null)
   const [heroSelectOpen, setHeroSelectOpen] = useState(false)
   const [successOpen, setSuccessOpen] = useState(false)
   const [newMintParams, setNewMintParams] = useState<NewMintParams | null>(null)
   const [collection, setCollection] = useState<(Metadata | Nft | Sft)[]>([])
-  const publicKey = wallet?.publicKey
+  const publicKey = wallet?.publicKey ?? null
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
@@ -43,9 +44,9 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
 
   useEffect(() => {
     setListPreloaded((listPreloaded) => {
-      if (!publicKey || listPreloaded) return true
+      if (publicKey === listPreloaded) return listPreloaded
       loadNfts()
-      return true
+      return publicKey
     })
   }, [publicKey, loadNfts, setListPreloaded])
 
