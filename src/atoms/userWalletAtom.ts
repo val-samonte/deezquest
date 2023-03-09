@@ -24,19 +24,4 @@ import { useMemo } from 'react'
 // )
 
 export const userWalletAtom = atom<WalletContextState | null>(null)
-
-export const useWallet = () => {
-  // useHydrateAtoms([[userWalletAtom, {}]] as any)
-
-  const { setVisible } = useWalletModal()
-  const wallet = useAtomValue(userWalletAtom)
-  return useMemo(
-    () => ({
-      ...wallet,
-      openModal: () => setVisible(true),
-    }),
-    [wallet, setVisible],
-  )
-}
-
 export const useUserWallet = () => useAtomValue(userWalletAtom)
