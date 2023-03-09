@@ -67,7 +67,7 @@ export default function ListLayout({
         className={classNames(
           detailsOpen ? 'w-screen sm:w-[35vw] xl:w-[25vw]' : 'w-0',
           'transition-all duration-500',
-          'flex-none flex flex-col bg-neutral-900/50',
+          'flex-none flex flex-col bg-neutral-900/80',
         )}
       >
         <div
@@ -97,6 +97,7 @@ export default function ListLayout({
             <span className='ml-2 hidden md:block'>Close</span>
             <span className='ml-2 sm:hidden'>Back</span>
           </button>
+          {/* TODO: is this mine? */}
           <button
             type='button'
             className={classNames(

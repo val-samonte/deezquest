@@ -53,7 +53,7 @@ export default function HeroDetailsPage({
 
   return (
     <div className='flex flex-col gap-8'>
-      <div className='relative w-full xl:max-w-xs mx-auto aspect-square rounded bg-neutral-900 overflow-hidden'>
+      <div className='relative w-full xl:max-w-xs mx-auto aspect-square rounded bg-black/50 overflow-hidden'>
         {metadata ? (
           <>
             <img

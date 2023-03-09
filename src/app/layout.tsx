@@ -2,6 +2,7 @@ import DependenciesContainer from './DependenciesContainer'
 import dynamic from 'next/dynamic'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
+import Backgrounds from './Backgrounds'
 
 const MainMenu = dynamic(() => import('./MainMenu'), { ssr: false })
 
@@ -18,18 +19,19 @@ export default function RootLayout({
       */}
       <head />
       <body className='bg-black text-neutral-200'>
-        <div className='fixed inset-0'>
-          <div className='w-full h-full overflow-y-auto'>
-            <DependenciesContainer>
+        <DependenciesContainer>
+          <Backgrounds />
+          <div className='fixed inset-0'>
+            <div className='w-full h-full overflow-y-auto relative'>
               <div className='w-full h-full flex flex-col'>
                 <div className='flex flex-auto relative overflow-hidden'>
                   {children}
                 </div>
                 <MainMenu />
               </div>
-            </DependenciesContainer>
+            </div>
           </div>
-        </div>
+        </DependenciesContainer>
       </body>
     </html>
   )

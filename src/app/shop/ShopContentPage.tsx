@@ -1,27 +1,10 @@
-import { Keypair } from '@solana/web3.js'
-import { usePathname, useRouter } from 'next/navigation'
-import { useMemo } from 'react'
-import { ShopCard } from './ShopCard'
-
 export default function ShopContentPage() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const sub = useMemo(
-    () => `${pathname}/${Keypair.generate().publicKey.toBase58()}`,
-    [pathname],
-  )
-
   return (
-    <div className='w-screen sm:w-auto flex-auto overflow-y-auto overflow-x-hidden p-3 xl:p-5'>
-      <div className='flex flex-wrap justify-center gap-3 xl:gap-5'>
-        <ShopCard onClick={() => router.push(sub)} />
-        <ShopCard onClick={() => router.push(sub)} />
-        <ShopCard onClick={() => router.push(sub)} />
-        <ShopCard onClick={() => router.push(sub)} />
-        <ShopCard onClick={() => router.push(sub)} />
-        <ShopCard onClick={() => router.push(sub)} />
-        <ShopCard onClick={() => router.push(sub)} />
-        <ShopCard onClick={() => router.push(sub)} />
+    <div className='absolute inset-0 flex flex-col items-center justify-center'>
+      <div className='relative flex flex-col items-center justify-center gap-5 p-5'>
+        <p className='text-center sm:text-lg xl:text-xl'>
+          The shop is currently closed right now
+        </p>
       </div>
     </div>
   )

@@ -73,22 +73,22 @@ export function HeroCard({ uri, basePath, address }: HeroCardProps) {
             <SpinnerIcon />
           </div>
         )}
-        <div className='absolute inset-x-0 bottom-0 grid grid-cols-4 gap-1 p-1 text-xs sm:gap-2 sm:p-2 sm:text-sm font-bold'>
-          <div className='flex items-center justify-center bg-neutral-900 rounded p-1 sm:px-2'>
-            <img src='/stat_int.svg' className='w-4 h-4 flex-none' />
-            <span className='ml-auto'>{stats.int}</span>
+        <div className='absolute inset-x-0 bottom-0 grid grid-cols-4 text-base font-bold'>
+          <div className='flex items-center justify-center bg-neutral-900/80 py-1 sm:py-2 border-r border-r-white/5'>
+            <img src='/stat_int.svg' className='w-4 h-4 flex-none opacity-50' />
+            <span className='ml-1'>{stats.int}</span>
           </div>
-          <div className='flex items-center justify-center bg-neutral-900 rounded p-1 sm:px-2'>
-            <img src='/stat_spd.svg' className='w-4 h-4 flex-none' />
-            <span className='ml-auto'>{stats.spd}</span>
+          <div className='flex items-center justify-center bg-neutral-900/80 py-1 sm:py-2 border-r border-r-white/5'>
+            <img src='/stat_spd.svg' className='w-4 h-4 flex-none opacity-50' />
+            <span className='ml-1'>{stats.spd}</span>
           </div>
-          <div className='flex items-center justify-center bg-neutral-900 rounded p-1 sm:px-2'>
-            <img src='/stat_vit.svg' className='w-4 h-4 flex-none' />
-            <span className='ml-auto'>{stats.vit}</span>
+          <div className='flex items-center justify-center bg-neutral-900/80 py-1 sm:py-2 border-r border-r-white/5'>
+            <img src='/stat_vit.svg' className='w-4 h-4 flex-none opacity-50' />
+            <span className='ml-1'>{stats.vit}</span>
           </div>
-          <div className='flex items-center justify-center bg-neutral-900 rounded p-1 sm:px-2'>
-            <img src='/stat_str.svg' className='w-4 h-4 flex-none' />
-            <span className='ml-auto'>{stats.str}</span>
+          <div className='flex items-center justify-center bg-neutral-900/80 py-1 sm:py-2'>
+            <img src='/stat_str.svg' className='w-4 h-4 flex-none opacity-50' />
+            <span className='ml-1'>{stats.str}</span>
           </div>
         </div>
       </div>
