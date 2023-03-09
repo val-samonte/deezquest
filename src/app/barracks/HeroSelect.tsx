@@ -1,12 +1,9 @@
-'use client'
-
 import { SkillTypes } from '@/enums/SkillTypes'
 import { clusterApiUrl, Connection, Keypair, PublicKey } from '@solana/web3.js'
 import SkillView from '@/components/SkillView'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getHeroAttributes, skills } from '@/utils/gameFunctions'
-import { metaplexAtom } from '@/atoms/metaplexAtom'
-import { useAtomValue } from 'jotai'
+import { useMetaplex } from '@/atoms/metaplexAtom'
 import { nftCollections } from './nft_collections'
 import { JsonMetadata, Metaplex } from '@metaplex-foundation/js'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
@@ -19,7 +16,7 @@ interface HeroSelectProps {
 
 export default function HeroSelect({ onMint }: HeroSelectProps) {
   const [mintKeypair, setMintKeypair] = useState(Keypair.generate())
-  const metaplex = useAtomValue(metaplexAtom)
+  const metaplex = useMetaplex()
   const [uri, setUri] = useState<string | null>(null)
   const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
   const [busy, setBusy] = useState(false)

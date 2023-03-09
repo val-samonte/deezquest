@@ -1,3 +1,5 @@
+'use client'
+
 import dynamic from 'next/dynamic'
 import { ReactNode, Suspense } from 'react'
 import ListLayout from '../ListLayout'
@@ -12,11 +14,7 @@ export default function BarracksLayout({ children }: { children: ReactNode }) {
     <ListLayout
       title='Barracks'
       basePath={basePath}
-      content={
-        <>
-          <HeroContentPage basePath={basePath} />
-        </>
-      }
+      content={<HeroContentPage basePath={basePath} />}
     >
       <Suspense fallback={'Loading'}>{children}</Suspense>
     </ListLayout>

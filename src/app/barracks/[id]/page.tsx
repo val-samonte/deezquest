@@ -1,33 +1,26 @@
 'use client'
 
-import { metaplexAtom } from '@/atoms/metaplexAtom'
+import { useMetaplex } from '@/atoms/metaplexAtom'
 import SkillView from '@/components/SkillView'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { getHeroAttributes, skills } from '@/utils/gameFunctions'
 import { JsonMetadata } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
-import { useAtomValue } from 'jotai'
-import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
-export default function HeroDetailsPage() {
-  // https://beta.nextjs.org/docs/routing/defining-routes#typescript
-  const pathname = usePathname()
-  const metaplex = useAtomValue(metaplexAtom)
+export default function HeroDetailsPage({
+  params,
+}: {
+  params: { id: string }
+}) {
+  const metaplex = useMetaplex()
   const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
-  const address = useMemo(
-    () =>
-      pathname?.includes('/barracks/')
-        ? pathname?.replace(`/barracks/`, '')
-        : null,
-    [pathname],
-  )
 
   const stats = useMemo(() => {
-    if (!address) return null
+    if (!params.id) return null
 
-    const pubkey = new PublicKey(address)
+    const pubkey = new PublicKey(params.id)
     const attribs = getHeroAttributes(pubkey)
     const bytes = pubkey.toBytes()
     const availableSkills = {
@@ -45,18 +38,18 @@ export default function HeroDetailsPage() {
       },
       skills: availableSkills,
     }
-  }, [address])
+  }, [params.id])
 
   useEffect(() => {
-    if (!address || !metaplex) return
+    if (!params.id || !metaplex) return
 
     metaplex
       .nfts()
-      .findByMint({ mintAddress: new PublicKey(address) })
+      .findByMint({ mintAddress: new PublicKey(params.id) })
       .then((nft) => {
         setMetadata(nft.json)
       })
-  }, [address, metaplex])
+  }, [params.id, metaplex])
 
   return (
     <div className='flex flex-col gap-8'>
@@ -159,5 +152,3 @@ export default function HeroDetailsPage() {
     </div>
   )
 }
-
-export const dynamic = 'force-dynamic'

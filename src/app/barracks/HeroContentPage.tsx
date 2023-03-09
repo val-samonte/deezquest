@@ -1,12 +1,11 @@
 'use client'
 
-import { metaplexAtom } from '@/atoms/metaplexAtom'
-import { userWalletAtom } from '@/atoms/userWalletAtom'
+import { useMetaplex } from '@/atoms/metaplexAtom'
+import { useUserWallet } from '@/atoms/userWalletAtom'
 import { Dialog } from '@/components/Dialog'
 import WalletGuard from '@/components/WalletGuard'
 import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import classNames from 'classnames'
-import { useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { HeroCard } from './HeroCard'
@@ -23,14 +22,15 @@ interface NewMintParams {
 }
 
 export default function HeroContentPage({ basePath }: HeroContentPageProps) {
-  const { connected, publicKey } = useAtomValue(userWalletAtom)
+  const wallet = useUserWallet()
+  const metaplex = useMetaplex()
   const router = useRouter()
-  const metaplex = useAtomValue(metaplexAtom)
   const [listPreloaded, setListPreloaded] = useState(false)
   const [heroSelectOpen, setHeroSelectOpen] = useState(false)
   const [successOpen, setSuccessOpen] = useState(false)
   const [newMintParams, setNewMintParams] = useState<NewMintParams | null>(null)
   const [collection, setCollection] = useState<(Metadata | Nft | Sft)[]>([])
+  const publicKey = wallet?.publicKey
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
@@ -49,7 +49,7 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
     })
   }, [publicKey, loadNfts, setListPreloaded])
 
-  if (!connected) {
+  if (!wallet?.connected) {
     return <WalletGuard />
   }
 
@@ -131,7 +131,6 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
                 </svg>
                 New Hero
               </button>
-              {/* <Marketplaces forceCol /> */}
             </div>
           </div>
         )
