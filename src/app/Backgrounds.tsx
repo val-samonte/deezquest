@@ -56,6 +56,14 @@ export default function Backgrounds() {
           'object-bottom brightness-50',
         )}
       />
+      <img
+        src='/bg_ruins.png'
+        className={classNames(
+          commonClasses,
+          pathname?.includes('/tutorial') ? 'opacity-100' : 'opacity-0',
+          'brightness-50',
+        )}
+      />
     </div>
   )
 }

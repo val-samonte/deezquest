@@ -8,7 +8,7 @@ import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { HeroCard } from './HeroCard'
 import HeroSelect from './HeroSelect'
 
@@ -26,29 +26,37 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
   const wallet = useUserWallet()
   const metaplex = useMetaplex()
   const router = useRouter()
-  const [listPreloaded, setListPreloaded] = useState<PublicKey | null>(null)
+  const [listPreloaded, setListPreloaded] = useState(false)
   const [heroSelectOpen, setHeroSelectOpen] = useState(false)
   const [successOpen, setSuccessOpen] = useState(false)
   const [newMintParams, setNewMintParams] = useState<NewMintParams | null>(null)
   const [collection, setCollection] = useState<(Metadata | Nft | Sft)[]>([])
   const publicKey = wallet?.publicKey ?? null
+  const controller = useRef(new AbortController())
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
     if (!publicKey || !metaplex) return
+
+    if (controller.current) {
+      controller.current.abort()
+      controller.current = new AbortController()
+    }
+
     const nfts = await metaplex
       .nfts()
-      .findAllByOwner({ owner: publicKey }, { commitment: 'processed' })
+      .findAllByOwner(
+        { owner: publicKey },
+        { commitment: 'processed', signal: controller.current.signal },
+      )
     setCollection(nfts)
   }, [publicKey, metaplex, setCollection])
 
   useEffect(() => {
-    setListPreloaded((listPreloaded) => {
-      if (publicKey === listPreloaded) return listPreloaded
-      loadNfts()
-      return publicKey
-    })
-  }, [publicKey, loadNfts, setListPreloaded])
+    setCollection([])
+    setListPreloaded(false)
+    loadNfts().then(() => setListPreloaded(true))
+  }, [publicKey, loadNfts, setListPreloaded, setCollection])
 
   if (!wallet?.connected) {
     return <WalletGuard />
@@ -76,11 +84,11 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
               >
                 Hire a Hero
               </button>
-              <hr className='border-0 border-b border-white/5' />
+              {/* <hr className='border-0 border-b border-white/5' />
               <p className='text-stone-300'>
                 You can hire from a marketplace as well!
               </p>
-              <Marketplaces />
+              <Marketplaces /> */}
             </div>
           </div>
         </div>
