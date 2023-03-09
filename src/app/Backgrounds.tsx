@@ -31,7 +31,7 @@ export default function Backgrounds() {
         className={classNames(
           commonClasses,
           pathname === '/' ? 'opacity-100' : 'opacity-0',
-          'object-bottom brightness-75',
+          'object-bottom brightness-50',
         )}
       />
       {/* <img

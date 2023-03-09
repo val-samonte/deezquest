@@ -5,6 +5,7 @@ import CloseIcon from '@/components/CloseIcon'
 import MenuIcon from '@/components/MenuIcon'
 import classNames from 'classnames'
 import { useSetAtom } from 'jotai'
+import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { ReactNode, Suspense } from 'react'
 import { showMenuAtom } from './MainMenu'
@@ -47,10 +48,12 @@ export default function ListLayout({
           )}
         >
           <div className='h-full flex items-center whitespace-nowrap'>
-            <img
-              src='/logo.png'
-              className='h-full aspect-square mr-3 xl:mr-5'
-            />
+            <Link href='/' className='h-full'>
+              <img
+                src='/logo.png'
+                className='h-full aspect-square mr-3 xl:mr-5'
+              />
+            </Link>
             <h1 className='text-lg xl:text-2xl'>{title}</h1>
           </div>
           <button

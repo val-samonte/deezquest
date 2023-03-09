@@ -142,7 +142,7 @@ export default function HeroSelect({ onMint }: HeroSelectProps) {
               </div>
             )}
           </div>
-          <div className='flex gap-5 text-2xl'>
+          <div className='flex gap-5 text-2xl items-center justify-center'>
             <span>
               HP:{' '}
               <span className='font-bold'>{80 + stats.attributes.vit * 2}</span>
