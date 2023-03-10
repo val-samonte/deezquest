@@ -63,7 +63,7 @@ export default function SkillView({
         )}
       >
         {!hideDesc ? (
-          <h3 className='text-sm xl:text-lg 2xl:text-xl font-bold flex-auto'>
+          <h3 className='text-base xl:text-lg 2xl:text-xl font-bold flex-auto'>
             {skill.name}
           </h3>
         ) : (
@@ -86,7 +86,7 @@ export default function SkillView({
               <div className='min-w-[200px] flex flex-col'>
                 <span>{skill.desc}</span>
                 {skill.type === SkillTypes.SPECIAL && (
-                  <span className='mt-2 pt-2 border-t border-t-white/5 italic'>
+                  <span className='mt-2 pt-2 italic opacity-50'>
                     A Special Skill needs 4 or more amulet matches to be used.
                   </span>
                 )}
@@ -158,7 +158,7 @@ export default function SkillView({
         <p className='text-sm text-neutral-300 flex flex-col'>
           <span>{skill.desc}</span>
           {skill.type === SkillTypes.SPECIAL && (
-            <span className='mt-2 pt-2 border-t border-t-white/5 italic'>
+            <span className='mt-2 pt-2 italic opacity-50'>
               A Special Skill needs 4 or more amulet matches to be used.
             </span>
           )}

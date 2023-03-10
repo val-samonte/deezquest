@@ -16,7 +16,7 @@ export default function Home() {
         className='text-2xl underline animate-pulse'
         onClick={() => showMenu(true)}
       >
-        Game Start
+        START GAME
       </button>
     </main>
   )
