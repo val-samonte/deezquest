@@ -1,8 +1,9 @@
 import DependenciesContainer from './DependenciesContainer'
 import dynamic from 'next/dynamic'
+import Backgrounds from './Backgrounds'
+import BurnerAccountManager from './BurnerAccountManager'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
-import Backgrounds from './Backgrounds'
 
 const MainMenu = dynamic(() => import('./MainMenu'), { ssr: false })
 
@@ -31,6 +32,7 @@ export default function RootLayout({
               </div>
             </div>
           </div>
+          <BurnerAccountManager />
         </DependenciesContainer>
       </body>
     </html>

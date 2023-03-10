@@ -6,12 +6,13 @@ import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import { usePathname } from 'next/navigation'
 import { Fragment, useMemo, useState } from 'react'
+import FriendlyMatch from './FriendlyMatch'
 import { userNftCollectionAtom } from './HeroContentPage'
 
 export default function HeroActionButtons() {
   const pathname = usePathname()
   const collection = useAtomValue(userNftCollectionAtom)
-
+  const [showMatchOptions, setShowMatchOptions] = useState(false)
   const isNftOwner = useMemo(() => {
     if (!pathname) return false
     return !!collection.find((nft) => {
@@ -25,7 +26,9 @@ export default function HeroActionButtons() {
     })
   }, [pathname, collection])
 
-  const [showMatchOptions, setShowMatchOptions] = useState(false)
+  const [showRankedDialog, setShowRankedDialog] = useState(false)
+  const [showFriendlyDialog, setShowFriendlyDialog] = useState(false)
+  const [showBotDialog, setShowBotDialog] = useState(false)
 
   return (
     <>
@@ -44,6 +47,7 @@ export default function HeroActionButtons() {
           <span className='ml-2 font-bold uppercase'>Battle</span>
         </button>
       )}
+      {/* TODO: Possibly move these as routes */}
       <Transition show={showMatchOptions} as={Fragment}>
         <Dialog
           onClose={() => setShowMatchOptions(false)}
@@ -79,7 +83,7 @@ export default function HeroActionButtons() {
                     className={'flex items-center justify-center mb-5'}
                   >
                     <img src='/BattleIcon.svg' className='w-8 h-8' />
-                    <h2 className='ml-2 text-2xl font-bold'>Battle</h2>
+                    <span className='ml-2 text-2xl font-bold'>Battle</span>
                   </Dialog.Title>
                   <ul className='grid grid-cols-1 landscape:grid-cols-3 gap-5'>
                     <li>
@@ -161,27 +165,18 @@ export default function HeroActionButtons() {
                     </button>
                   </div>
                 </Dialog.Panel>
-                {/* <Dialog.Panel
-                className={classNames(
-                  'w-full mx-auto overflow-hidden shadow-md drop-shadow-xl rounded',
-                  
-                )}
-              >
-                <Dialog.Title className='bg-neutral-800 border-b border-b-black/50 flex justify-between items-center px-5 py-4'>
-                  <div className='text-lg gradient-1'>{title}</div>
-                  <button type='button' onClick={onClose}>
-                    <CloseIcon />
-                  </button>
-                </Dialog.Title>
-                <div className='bg-neutral-900 h-full min-h-[280px] text-stone-300 w-full py-5 flex flex-col overflow-auto'>
-                  {children}
-                </div>
-              </Dialog.Panel> */}
               </div>
             </div>
           </Transition.Child>
         </Dialog>
       </Transition>
+
+      <FriendlyMatch
+        show={showFriendlyDialog}
+        onClose={() => {
+          setShowFriendlyDialog(false)
+        }}
+      />
     </>
   )
 }

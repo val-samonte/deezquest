@@ -7,7 +7,7 @@ import CloseIcon from './CloseIcon'
 
 interface DialogProps {
   show: boolean
-  title: ReactNode | string
+  title?: ReactNode | string
   children: ReactNode
   className?: string
   onClose?: () => void
@@ -54,12 +54,14 @@ export function Dialog({
                   className,
                 )}
               >
-                <UiDialog.Title className='bg-neutral-800 border-b border-b-black/50 flex justify-between items-center px-5 py-4'>
-                  <div className='text-lg gradient-1'>{title}</div>
-                  <button type='button' onClick={onClose}>
-                    <CloseIcon />
-                  </button>
-                </UiDialog.Title>
+                {title && (
+                  <UiDialog.Title className='bg-neutral-800 border-b border-b-black/50 flex justify-between items-center px-5 py-4'>
+                    <div className='text-lg gradient-1'>{title}</div>
+                    <button type='button' onClick={onClose}>
+                      <CloseIcon />
+                    </button>
+                  </UiDialog.Title>
+                )}
                 <div className='bg-neutral-900 h-full min-h-[280px] text-stone-300 w-full py-5 flex flex-col overflow-auto'>
                   {children}
                 </div>

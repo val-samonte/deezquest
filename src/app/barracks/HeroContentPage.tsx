@@ -160,7 +160,7 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
       <Dialog
         title={'Hired a New Hero!'}
         show={successOpen && !!newMintParams}
-        className='max-w-xs'
+        className='max-w-sm'
         onClose={() => setSuccessOpen(false)}
       >
         {newMintParams && (
