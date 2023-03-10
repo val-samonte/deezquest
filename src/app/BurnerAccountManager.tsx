@@ -12,7 +12,7 @@ import { getNextHash } from '@/utils/getNextHash'
 
 // Backend (Dapp) Seed:
 // to strengthen the security, an extra seed is given by the backend so that no other dapps
-// can derive the burner account. this will be stored in localstorage.
+// can derive the burner account.
 
 interface DappSeed {
   publicKey: string
@@ -21,12 +21,12 @@ interface DappSeed {
 export const dappSeedAtom = atomWithStorage<DappSeed | null>(
   'dapp_seed',
   null,
-  createJSONStorage<DappSeed | null>(() => window.localStorage),
+  createJSONStorage<DappSeed | null>(() => window.sessionStorage),
 )
 
 // Burner Account:
-// to create a burner account as player proxy for seamless tasks.
-// when the need for on-chain interaction is necessary (eg. funding the burner account)
+// acts as player proxy needed for seamless interaction.
+// when the need for on-chain transaction is necessary (eg. funding the burner account)
 // we have to save the nonce on-chain so that we can still derive the burner account.
 
 export const burnerNonceAtom = atomWithStorage<string | null>(
@@ -35,25 +35,6 @@ export const burnerNonceAtom = atomWithStorage<string | null>(
   createJSONStorage<string | null>(() => window.localStorage),
 )
 export const burnerKeypairAtom = atom<Keypair | null>(null)
-
-// Peer Connection:
-// NOTE: STORING THE NONCE IS NOT REQUIRED DURING FRIENDLY MATCHES
-// for p2p, we need another nonce as well, which is colocated in the same PDA with
-// the burner nonce. eg.
-//
-// export const peerIdAtom = atom((get) => {
-//   const kp = get(burnerKeypairAtom)
-//   return kp ? getNextHash([kp.publicKey.toBytes(), Buffer.from('[ON_CHAIN_P2P_NONCE]')]) : null
-// })
-//
-// opponent simply needs to listen to the PDA account for any p2p_nonce changes OR
-// the player can submit another ping message to the opponent, making the opponent dismiss the old peer connection.
-// as long as the player can sign the message using the burner account, opponent can always verify
-// the authencity of the message.
-
-// Accepting Match:
-// if both parties agreed to start the match (in p2p), both will exchange the code solution
-// to solve each respective code challenge stored in the "MatchAccountPDA"
 
 export default function BurnerAccountManager() {
   const wallet = useUserWallet()
@@ -76,11 +57,16 @@ export default function BurnerAccountManager() {
     setBurnerNonce(newNonce)
   }, [publicKey, burnerNonce, setBurnerNonce])
 
+  // Invalidate credentials, except burnerNonce
   useEffect(() => {
     if (!publicKey) {
       setBurner(null)
+    } else {
+      if (dappSeed?.publicKey !== publicKey.toBase58()) {
+        setDappSeed(null)
+      }
     }
-  }, [setBurner])
+  }, [publicKey, dappSeed, setBurner, setDappSeed])
 
   const [busy, setBusy] = useState(false)
   const sign = useCallback(async () => {
@@ -159,10 +145,6 @@ export default function BurnerAccountManager() {
     }
     let ctr = 0
 
-    if (dappSeed?.publicKey !== publicKey.toBase58()) {
-      setDappSeed(null)
-    }
-
     if (!dappSeed) ctr++
 
     if (!burner) ctr++
@@ -172,7 +154,7 @@ export default function BurnerAccountManager() {
     }
 
     return ctr
-  }, [publicKey, burner, dappSeed, setDappSeed])
+  }, [publicKey, burner, dappSeed])
 
   return (
     <Dialog show={requiredSignatures > 0 && !!signMessage} className='max-w-sm'>
@@ -210,8 +192,12 @@ export default function BurnerAccountManager() {
           onClick={() => sign()}
         >
           <>
-            Sign {totalRequiredSigs.current - requiredSignatures + 1} of{' '}
-            {totalRequiredSigs.current}
+            Sign{' '}
+            {Math.min(
+              totalRequiredSigs.current - requiredSignatures + 1,
+              totalRequiredSigs.current,
+            )}{' '}
+            of {totalRequiredSigs.current}
           </>
         </button>
       </div>
