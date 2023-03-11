@@ -7,6 +7,7 @@ import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useAtomValue } from 'jotai'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import { peerIdAtom } from '@/atoms/peerConnectionAtom'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 interface FriendlyMatchProps {
   show: boolean
@@ -136,20 +137,28 @@ function AsJoiner() {
     <>
       <div className='px-5 mb-5'>
         {permissionState === 'granted' ? (
-          <QrReader
-            className='w-full aspect-square bg-black/20 overflow-hidden rounded'
-            constraints={{ facingMode: 'environment' }}
-            onResult={(result, error) => {
-              if (!!result) {
-                setCode(result?.getText())
-              }
+          <ErrorBoundary
+            fallback={({ error }) => (
+              <div className='w-full aspect-square bg-black/20 overflow-hidden rounded flex items-center justify-center text-center'>
+                Unable to open the camera {JSON.stringify(error)}
+              </div>
+            )}
+          >
+            <QrReader
+              className='w-full aspect-square bg-black/20 overflow-hidden rounded'
+              constraints={{ facingMode: 'environment' }}
+              onResult={(result, error) => {
+                if (!!result) {
+                  setCode(result?.getText())
+                }
 
-              if (!!error) {
-                console.info(error)
-                setErrorMsg(error + '')
-              }
-            }}
-          />
+                if (!!error) {
+                  console.info(error)
+                  setErrorMsg(error + '')
+                }
+              }}
+            />
+          </ErrorBoundary>
         ) : (
           <button
             type='button'

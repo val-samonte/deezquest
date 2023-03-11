@@ -2,16 +2,17 @@ import React from 'react'
 
 export class ErrorBoundary extends React.Component<{
   children: React.ReactNode
-  fallback?: React.ReactNode
+  onError?: (err: any) => void
+  fallback?: ({ error }: { error: any }) => React.ReactNode
 }> {
   constructor(props: any) {
     super(props)
-    this.state = { hasError: false }
+    this.state = { hasError: false, error: null }
   }
 
-  static getDerivedStateFromError(_error: any) {
+  static getDerivedStateFromError(error: any) {
     // Update state so the next render will show the fallback UI.
-    return { hasError: true }
+    return { hasError: true, error }
   }
 
   // componentDidCatch(error, errorInfo) {
@@ -23,7 +24,7 @@ export class ErrorBoundary extends React.Component<{
     if ((this.state as any).hasError) {
       // You can render any custom fallback UI
       if ((this.props as any).fallback) {
-        return (this.props as any).fallback
+        return (this.props as any).fallback(this.state)
       } else {
         return <h1>Something went wrong.</h1>
       }

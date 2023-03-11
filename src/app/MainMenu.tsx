@@ -64,7 +64,9 @@ export default function MainMenu() {
                   {wallet?.connected && (
                     <li className='flex items-center justify-between text-base py-5'>
                       <span className='flex items-center gap-2'>
-                        Connected as:
+                        <span className='hidden sm:inline-block'>
+                          Connected as:
+                        </span>
                         <span className='font-bold'>
                           {trimAddress(wallet.publicKey?.toBase58() ?? '')}
                         </span>
