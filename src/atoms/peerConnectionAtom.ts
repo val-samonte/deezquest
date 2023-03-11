@@ -15,7 +15,7 @@ export const peerIdAtom = atom((get) => {
   const kp = get(burnerKeypairAtom)
   const nonce = get(peerNonceAtom)
   return kp && nonce
-    ? bs58.encode(getNextHash([kp.publicKey.toBytes(), Buffer.from(nonce)]))
+    ? bs58.encode(getNextHash([kp.publicKey.toBytes(), bs58.decode(nonce)]))
     : null
 })
 
@@ -23,3 +23,11 @@ export const renewEnabledAtom = atom(false)
 
 // TODO: lots of things to refactor here
 export const peerAtom = atom<PeerInstance | null>(null)
+
+export interface PeerMessage {
+  from: string // base58 encoded
+  data: any
+  signature: string // base58 encoded
+}
+
+export const messagesAtom = atom<PeerMessage[]>([])

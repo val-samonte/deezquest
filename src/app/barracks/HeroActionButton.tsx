@@ -131,7 +131,7 @@ export default function HeroActionButtons() {
                         </div>
                       </button>
                     </li>
-                    <li>
+                    <li className='brightness-50 grayscale'>
                       <button
                         type='button'
                         className={classNames(
@@ -148,7 +148,7 @@ export default function HeroActionButtons() {
                         <div className='flex flex-col landscape:gap-2'>
                           <h3 className='text-lg font-bold'>Practice</h3>
                           <p className='text-sm text-neutral-300'>
-                            Play against a bot off-chain
+                            Play against a bot off-chain (coming soon!)
                           </p>
                         </div>
                       </button>

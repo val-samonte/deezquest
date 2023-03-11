@@ -3,20 +3,120 @@ import { Tab } from '@headlessui/react'
 import classNames from 'classnames'
 import { QRCodeCanvas } from 'qrcode.react'
 import { QrReader } from 'react-qr-reader'
-import { Fragment, useCallback, useEffect, useState } from 'react'
-import { useAtomValue } from 'jotai'
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { useAtomValue, useSetAtom } from 'jotai'
 import SpinnerIcon from '@/components/SpinnerIcon'
-import { peerIdAtom } from '@/atoms/peerConnectionAtom'
-import { ErrorBoundary } from '@/components/ErrorBoundary'
+import {
+  peerAtom,
+  PeerMessage,
+  peerNonceAtom,
+} from '@/atoms/peerConnectionAtom'
+import { burnerKeypairAtom } from '../BurnerAccountManager'
+import { usePathname, useRouter } from 'next/navigation'
+import { Keypair, PublicKey } from '@solana/web3.js'
+import bs58 from 'bs58'
+import { getNextHash } from '@/utils/getNextHash'
+import { PeerMessages } from '@/enums/PeerMessages'
+import { matchAtom } from '@/atoms/matchAtom'
+import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
 
 interface FriendlyMatchProps {
   show: boolean
   onClose?: () => void
 }
 
+interface Parts {
+  nftAddress: string | null
+  burner: Keypair | null
+  peerNonce: string | null
+}
+
 export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
-  // const searchParams = useSearchParams()
-  // const opponent = searchParams?.get('opponent') ?? null
+  const router = useRouter()
+  const pathname = usePathname()
+  const nftAddress = useMemo(() => {
+    if (!pathname) return null
+    const parts = pathname.split('/')
+    return parts[parts.length - 1]
+  }, [pathname])
+  const burner = useAtomValue(burnerKeypairAtom)
+  const peerNonce = useAtomValue(peerNonceAtom)
+  const peerInstance = useAtomValue(peerAtom)
+  const messages = peerInstance?.messages
+  const setMatch = useSetAtom(matchAtom)
+
+  const lastMessage = useRef<PeerMessage | null>(null)
+  useEffect(() => {
+    if (!messages) return
+    if (!peerInstance) return
+    if (!burner || !peerNonce || !nftAddress) return
+
+    if (messages[messages.length - 1] !== lastMessage.current) {
+      const message = messages[messages.length - 1]
+      lastMessage.current = message
+
+      if (!message) return
+
+      if (message.data.matchType === 'friendly') {
+        switch (message.data.type) {
+          case PeerMessages.INVITATION:
+            if (message.from !== message.data.publicKey) break
+
+            const gameHash = combinePublicKeysAsHash(
+              burner.publicKey.toBase58(),
+              message.data.publicKey,
+              true,
+            ) as string
+
+            const opponentPeerId = bs58.encode(
+              getNextHash([
+                new PublicKey(message.data.publicKey).toBytes(),
+                Buffer.from(bs58.decode(message.data.peerNonce)),
+              ]),
+            )
+
+            peerInstance
+              .sendMessage(opponentPeerId, {
+                type: PeerMessages.ACCEPT_INVITATION,
+                matchType: 'friendly',
+              })
+              .then(() => {
+                setMatch({
+                  matchType: 'friendly',
+                  gameHash,
+                  ongoing: true,
+                  opponent: {
+                    publicKey: message.data.publicKey,
+                    peerNonce: message.data.peerNonce,
+                    nft: message.data.nftAddress,
+                  },
+                })
+                router.push('/battle')
+              })
+            break
+          case PeerMessages.ACCEPT_INVITATION:
+            setMatch((match) => {
+              if (!match) return null
+              if (message.from !== match.opponent.publicKey) return match
+
+              return {
+                ...match,
+                ongoing: true,
+              }
+            })
+            router.push('/battle')
+            break
+        }
+      }
+    }
+  }, [router, messages, peerInstance, burner, peerNonce, nftAddress])
 
   return (
     <Dialog
@@ -58,10 +158,18 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
         </Tab.List>
         <Tab.Panels>
           <Tab.Panel className='flex flex-col'>
-            <AsHost />
+            <AsHost
+              burner={burner}
+              nftAddress={nftAddress}
+              peerNonce={peerNonce}
+            />
           </Tab.Panel>
           <Tab.Panel className='flex flex-col'>
-            <AsJoiner />
+            <AsJoiner
+              burner={burner}
+              nftAddress={nftAddress}
+              peerNonce={peerNonce}
+            />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
@@ -69,11 +177,14 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
   )
 }
 
-function AsHost() {
+function AsHost({ burner, nftAddress, peerNonce }: Parts) {
   const [matchCodeCopied, setMatchCodeCopied] = useState(false)
-  const peerId = useAtomValue(peerIdAtom)
+  const code = useMemo(() => {
+    if (!nftAddress || !burner?.publicKey || !peerNonce) return null
+    return [burner?.publicKey.toBase58(), peerNonce, nftAddress].join('.')
+  }, [nftAddress, burner, peerNonce])
 
-  if (!peerId) {
+  if (!code) {
     return (
       <div className='mx-auto h-80 flex items-center justify-center'>
         <SpinnerIcon />
@@ -84,7 +195,7 @@ function AsHost() {
   return (
     <>
       <div className='mx-auto mb-5 overflow-hidden rounded'>
-        <QRCodeCanvas size={200} includeMargin value={peerId} />
+        <QRCodeCanvas size={325} includeMargin value={code} />
       </div>
       <p className='mx-5 mb-5 text-center'>
         Share the code or let the other player scan the QR code. The game will
@@ -94,7 +205,7 @@ function AsHost() {
         type='button'
         className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
         onClick={() => {
-          navigator.clipboard.writeText(peerId)
+          navigator.clipboard.writeText(code)
           setMatchCodeCopied(true)
         }}
         onMouseOut={() => {
@@ -107,10 +218,13 @@ function AsHost() {
   )
 }
 
-function AsJoiner() {
+function AsJoiner(props: Parts) {
   const [code, setCode] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
   const [permissionState, setPermissionState] = useState('granted') // useState('')
+  const [busy, setBusy] = useState(false)
+  const peerInstance = useAtomValue(peerAtom)
+  const setMatch = useSetAtom(matchAtom)
 
   // TODO: fix this. phantom is complaining,
   // even tho the scanner is working fine :/
@@ -136,6 +250,64 @@ function AsJoiner() {
   //     })
   // }, [])
 
+  const verifyCode = useCallback(async () => {
+    if (!peerInstance) return
+    if (!props.burner || !props.nftAddress || !props.peerNonce) return
+
+    setErrorMsg('')
+    setBusy(true)
+    try {
+      // code should be in 3 parts
+      const parts = code.split('.')
+      if (parts.length !== 3) {
+        throw new Error('Invalid code')
+      }
+
+      // 1st part should be a valid PublicKey
+      const opponentPubkey = new PublicKey(parts[0])
+
+      // 3rd part should be a valid PublicKey (NFT)
+      const nftAddress = new PublicKey(parts[2])
+
+      // derive peer id using opponentPubkey and peerNonce
+      const opponentPeerId = bs58.encode(
+        getNextHash([
+          opponentPubkey.toBytes(),
+          Buffer.from(bs58.decode(parts[1])),
+        ]),
+      )
+
+      const playerPublicKey = props.burner.publicKey.toBase58()
+
+      await peerInstance.sendMessage(opponentPeerId, {
+        type: PeerMessages.INVITATION,
+        matchType: 'friendly',
+        publicKey: playerPublicKey,
+        peerNonce: props.peerNonce,
+        nftAddress: props.nftAddress,
+      })
+
+      // preset values to localstorage
+      setMatch({
+        matchType: 'friendly',
+        gameHash: combinePublicKeysAsHash(
+          props.burner.publicKey.toBase58(),
+          parts[0],
+          true,
+        ) as string,
+        ongoing: false,
+        opponent: {
+          publicKey: parts[0],
+          peerNonce: parts[1],
+          nft: parts[2],
+        },
+      })
+    } catch (e) {
+      setErrorMsg('Code is invalid, please try again.')
+    }
+    setBusy(false)
+  }, [code, peerInstance, props, setBusy, setErrorMsg])
+
   return (
     <>
       <div className='px-5 mb-5'>
@@ -148,6 +320,7 @@ function AsJoiner() {
             onResult={(result, error) => {
               if (!!result) {
                 setCode(result?.getText())
+                verifyCode()
               }
 
               if (error?.message) {
@@ -176,17 +349,32 @@ function AsJoiner() {
       </p>
       <input
         type='text'
-        className='mx-5 mb-5 px-3 py-2 rounded bg-black/20'
+        disabled={busy}
+        className={classNames(
+          busy && 'opacity-20',
+          'mx-5 mb-5 px-3 py-2 rounded bg-black/20',
+        )}
         placeholder='Enter match code'
         value={code}
         onChange={(e) => setCode(e.target.value)}
       />
       <button
         type='button'
-        className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-        onClick={() => {}}
+        disabled={busy}
+        className={classNames(
+          busy && 'opacity-20',
+          'mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded',
+        )}
+        onClick={() => verifyCode()}
       >
-        Submit
+        {busy ? (
+          <div className='flex items-center justify-center'>
+            <SpinnerIcon />
+            <span className='ml-2'>Please Wait</span>
+          </div>
+        ) : (
+          'Submit'
+        )}
       </button>
     </>
   )

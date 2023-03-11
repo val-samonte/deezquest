@@ -8,6 +8,7 @@ import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 import { atomFamily } from 'jotai/utils'
 import classNames from 'classnames'
+import { messagesAtom, PeerMessage } from './peerConnectionAtom'
 
 // reexporting this as nextjs complains
 export enum PeerErrorType {
@@ -31,12 +32,6 @@ export interface PeerProps {
   onError?: (err: { type: PeerErrorType }) => void
 }
 
-export interface PeerMessage {
-  from: string // base58 encoded
-  data: any
-  signature: string // base58 encoded
-}
-
 export interface PeerInstance {
   peer: Peer | null
   isOpen: boolean
@@ -49,7 +44,6 @@ export interface PeerInstance {
 const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
 export const peerOpenAtom = atom(false)
 const connectionListAtom = atom<DataConnection[]>([])
-const messagesAtom = atom<PeerMessage[]>([])
 
 // always end up overengineering this ¯\_(ツ)_/¯
 export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
