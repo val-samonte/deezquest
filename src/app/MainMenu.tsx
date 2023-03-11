@@ -5,12 +5,17 @@ import BackIcon from '@/components/BackIcon'
 import { trimAddress } from '@/utils/trimAddress'
 import { Dialog, Transition } from '@headlessui/react'
 import classNames from 'classnames'
-import { atom, useAtom } from 'jotai'
+import { atom, useAtom, useAtomValue } from 'jotai'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Fragment } from 'react'
+// import { peerOpenAtom } from '@/atoms/peerAtom'
+import dynamic from 'next/dynamic'
 
 export const showMenuAtom = atom(false)
+const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
+  ssr: false,
+})
 
 export default function MainMenu() {
   const wallet = useUserWallet()
@@ -64,6 +69,7 @@ export default function MainMenu() {
                         <span className='font-bold'>
                           {trimAddress(wallet.publicKey?.toBase58() ?? '')}
                         </span>
+                        <PeerConnectionIndicator className='ml-2' />
                       </span>
                       <button
                         type='button'

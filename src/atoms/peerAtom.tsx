@@ -1,12 +1,19 @@
 'use client'
 
-import Peer, { DataConnection } from 'peerjs'
-import { atom, useAtom, useSetAtom } from 'jotai'
+import Peer, { DataConnection, PeerErrorType } from 'peerjs'
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
-import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
+import { atomFamily } from 'jotai/utils'
+import classNames from 'classnames'
+
+export interface PeerProps {
+  peerId: string | null
+  keypair: Keypair | null
+  onError?: (err: { type: PeerErrorType }) => void
+}
 
 export interface PeerMessage {
   from: string // base58 encoded
@@ -14,17 +21,14 @@ export interface PeerMessage {
   signature: string // base58 encoded
 }
 
-const peerBaseAtom = atom<Peer | null>(null)
-
-// const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
-const peerOpenAtom = atom(false)
+const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
+export const peerOpenAtom = atom(false)
 const connectionListAtom = atom<DataConnection[]>([])
 const messagesAtom = atom<PeerMessage[]>([])
 
 // always end up overengineering this ¯\_(ツ)_/¯
-export function usePeer(keypair: Keypair) {
-  const peerId = useMemo(() => keypair?.publicKey.toBase58(), [keypair])
-  const [peer, setPeer] = useAtom(peerBaseAtom)
+export function usePeer({ peerId, keypair, onError }: PeerProps) {
+  const [peer, setPeer] = useAtom(peerListAtom(peerId ?? ''))
   const [isOpen, setOpen] = useAtom(peerOpenAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
   const [messages, setMessages] = useAtom(messagesAtom)
@@ -97,14 +101,12 @@ export function usePeer(keypair: Keypair) {
 
           newPeer.on('error', (err: any) => {
             console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
-            if (err.type === 'unavailable-id') {
-              // TODO: hard refresh browser for now
-              window.location.reload()
-            }
+            onError?.(err)
           })
 
           newPeer.on('close', () => {
             console.log(`Peer closed ${peerId}`)
+            // TODO: investigate net disconnection (setTimeout?)
             setPeer(null)
             setOpen(false)
           })
@@ -125,11 +127,11 @@ export function usePeer(keypair: Keypair) {
         setPeer(null)
       }
     }
-  }, [peer, peerId, setPeer, setOpen, setConnections])
+  }, [peer, keypair, peerId, onError, setPeer, setOpen, setConnections])
 
   const sendMessage = useCallback(
     async (receiverId: string, message: any) => {
-      if (!peer) return
+      if (!peer || !keypair) return
 
       const payload: PeerMessage = {
         from: keypair.publicKey.toBase58(),
@@ -197,4 +199,21 @@ export function usePeer(keypair: Keypair) {
   )
 
   return { peer, isOpen, messages, connections, sendMessage, clearMessages }
+}
+
+export default function PeerConnectionIndicator({
+  className,
+}: {
+  className: string
+}) {
+  const peerConnected = useAtomValue(peerOpenAtom)
+  return (
+    <span
+      className={classNames(
+        peerConnected ? 'bg-green-600' : 'bg-red-600',
+        'w-4 h-4 rounded-full flex-none inline-block',
+        className,
+      )}
+    />
+  )
 }

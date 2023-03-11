@@ -4,8 +4,12 @@ import Backgrounds from './Backgrounds'
 import BurnerAccountManager from './BurnerAccountManager'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
+// import PeerConnectionManager from './PeerConnectionManager'
 
 const MainMenu = dynamic(() => import('./MainMenu'), { ssr: false })
+const PeerConnectionManager = dynamic(() => import('./PeerConnectionManager'), {
+  ssr: false,
+})
 
 export default function RootLayout({
   children,
@@ -32,6 +36,7 @@ export default function RootLayout({
               </div>
             </div>
           </div>
+          <PeerConnectionManager />
           <BurnerAccountManager />
         </DependenciesContainer>
       </body>

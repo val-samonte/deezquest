@@ -21,7 +21,15 @@ export default function PeerConnectionManager() {
   const router = useRouter()
   const playerKp = useAtomValue(playerKpAtom)
   const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
-  const { isOpen, connections, messages, sendMessage } = usePeer(playerKp!)
+  const { isOpen, connections, messages, sendMessage } = usePeer({
+    peerId: playerKp?.publicKey.toBase58() ?? '',
+    keypair: playerKp!,
+    onError: (err) => {
+      if (err.type === 'unavailable-id') {
+        window.location.reload()
+      }
+    },
+  })
   const gameFn = useSetAtom(gameFunctions)
   const [gameState, setGameState] = useAtom(gameStateAtom)
   const setGameResult = useSetAtom(gameResultAtom)

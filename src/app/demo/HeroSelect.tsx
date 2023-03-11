@@ -20,7 +20,10 @@ export default function HeroSelect() {
       Keypair.fromSecretKey(bs58.decode(localStorage.getItem('demo_kp')!))) ||
       Keypair.generate(),
   )
-  const { messages, sendMessage, clearMessages } = usePeer(kp)
+  const { messages, sendMessage, clearMessages } = usePeer({
+    keypair: kp,
+    peerId: kp.publicKey.toBase58(),
+  })
   const [messageCursor, setMessageCursor] = useState(0)
   const [startMatch, setStartMatch] = useState(false)
   const [matchLinkCopied, setMatchLinkCopied] = useState(false)
@@ -219,7 +222,7 @@ export default function HeroSelect() {
               type='button'
               className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
               onClick={() => {
-                navigator.clipboard.writeText(
+                window.navigator.clipboard.writeText(
                   `${
                     window.location.origin
                   }/demo?opponent=${kp.publicKey.toBase58()}`,
