@@ -1,10 +1,8 @@
 'use client'
 
-import { Keypair } from '@solana/web3.js'
-import bs58 from 'bs58'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { PeerMessage, usePeer } from '@/atoms/peerAtom'
+import { useEffect, useRef, useState } from 'react'
+import { usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { sleep } from '@/utils/sleep'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
@@ -16,6 +14,7 @@ import {
   playerKpAtom,
 } from '@/atoms/gameStateAtom'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
+import { PeerMessage } from '@/atoms/peerConnectionAtom'
 
 export default function PeerConnectionManager() {
   const router = useRouter()
