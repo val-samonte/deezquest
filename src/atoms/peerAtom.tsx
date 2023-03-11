@@ -62,11 +62,18 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
 
         console.log(`Recieving data from ${from}: `, data)
 
-        const valid = sign.detached.verify(
-          Buffer.from(JSON.stringify(data)),
-          bs58.decode(signature),
-          bs58.decode(from),
-        )
+        let valid = false
+        try {
+          valid = sign.detached.verify(
+            Buffer.from(JSON.stringify(data)),
+            bs58.decode(signature),
+            bs58.decode(from),
+          )
+        } catch (e) {
+          console.error(e)
+        }
+
+        console.log('========', valid)
 
         if (valid && from === conn.peer) {
           setMessages((m) => [...m, { data, from, signature }])
@@ -74,6 +81,7 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
       })
 
       conn.on('close', () => {
+        console.log(`Connection closed ${conn.peer}`, conn)
         setConnections((c) => c.filter((i) => i.peer !== conn.peer))
       })
 
@@ -82,7 +90,10 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
           return connections
         }
 
-        console.log(`Connection established ${conn.peer}`)
+        console.log(
+          `Connection established ${conn.peer}`,
+          conn.peerConnection.connectionState,
+        )
 
         return [...connections, conn]
       })
@@ -140,9 +151,8 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
       }, 50)
     }
     return () => {
-      if (peer !== null) {
-        // this will ensure creation of a fresh peer client
-        peer.disconnected && peer.destroy()
+      if (peer !== null && peer.disconnected) {
+        peer.destroy()
         setPeer(null)
       }
     }
@@ -179,7 +189,10 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
             reliable: true,
           })
 
-          if (!newConnection) {
+          if (
+            !newConnection ||
+            newConnection.peerConnection.connectionState === 'failed'
+          ) {
             peer.off('error', peerErr)
             reject('Remote peer is possibly destroyed / disconnected.')
             return
@@ -197,7 +210,7 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
           })
         })
 
-        setupConnection(connection)
+        // setupConnection(connection)
       }
 
       setupConnection(connection)

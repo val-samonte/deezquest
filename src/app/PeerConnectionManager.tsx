@@ -60,12 +60,11 @@ export default function PeerConnectionManager() {
 
   useEffect(() => {
     // TODO: listen to PDA p2p nonce, update peerNonce accdgly
-    if (nonce) return
-    const newNonce = bs58.encode(
-      window.crypto.getRandomValues(new Uint8Array(16)),
-    )
-    setNonce(newNonce)
-  }, [nonce, setNonce])
+    setNonce((nonce) => {
+      if (nonce) return nonce
+      return bs58.encode(window.crypto.getRandomValues(new Uint8Array(16)))
+    })
+  }, [setNonce])
 
   return (
     <Dialog show={showReloadModal && !!burner} className='max-w-sm'>

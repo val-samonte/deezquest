@@ -57,6 +57,7 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
     if (!messages) return
     if (!peerInstance) return
     if (!burner || !peerNonce || !nftAddress) return
+    console.log(messages)
 
     if (messages[messages.length - 1] !== lastMessage.current) {
       const message = messages[messages.length - 1]
@@ -279,6 +280,7 @@ function AsJoiner(props: Parts) {
 
       const playerPublicKey = props.burner.publicKey.toBase58()
 
+      console.log('>>>>')
       await peerInstance.sendMessage(opponentPeerId, {
         type: PeerMessages.INVITATION,
         matchType: 'friendly',
@@ -286,6 +288,7 @@ function AsJoiner(props: Parts) {
         peerNonce: props.peerNonce,
         nftAddress: props.nftAddress,
       })
+      console.log('<<<<')
 
       // preset values to localstorage
       setMatch({
