@@ -112,26 +112,26 @@ function AsJoiner() {
   const [errorMsg, setErrorMsg] = useState('')
   const [permissionState, setPermissionState] = useState('')
 
-  useEffect(() => {
-    if (permissionState !== '') return
-    navigator.permissions
-      .query({ name: 'camera' as PermissionName })
-      .then((result) => {
-        console.log(result)
-        setPermissionState(result.state)
-      })
-  }, [permissionState])
+  // useEffect(() => {
+  //   if (permissionState !== '') return
+  //   navigator.permissions
+  //     .query({ name: 'camera' as PermissionName })
+  //     .then((result) => {
+  //       console.log(result)
+  //       setPermissionState(result.state)
+  //     })
+  // }, [permissionState])
 
-  const requestAccess = useCallback(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .catch((error) => {
-        console.error('Failed to get camera access:', error)
-      })
-      .finally(() => {
-        setPermissionState('')
-      })
-  }, [])
+  // const requestAccess = useCallback(() => {
+  //   navigator.mediaDevices
+  //     .getUserMedia({ video: true })
+  //     .catch((error) => {
+  //       console.error('Failed to get camera access:', error)
+  //     })
+  //     .finally(() => {
+  //       setPermissionState('')
+  //     })
+  // }, [])
 
   return (
     <>
@@ -166,7 +166,7 @@ function AsJoiner() {
           <button
             type='button'
             className='w-full aspect-square bg-black/20 overflow-hidden rounded flex items-center justify-center text-center'
-            onClick={() => requestAccess()}
+            // onClick={() => requestAccess()}
           >
             Tap to enable camera
           </button>
