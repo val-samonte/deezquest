@@ -150,9 +150,8 @@ function AsJoiner() {
                 setCode(result?.getText())
               }
 
-              if (!!error) {
-                console.info(error)
-                setErrorMsg(JSON.stringify(error))
+              if (error?.message) {
+                setErrorMsg(error.message)
               }
             }}
           />
