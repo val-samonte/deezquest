@@ -10,7 +10,7 @@ import { FederatedPointerEvent, Texture } from 'pixi.js'
 import { useCallback, useState } from 'react'
 import { Sprite } from 'react-pixi-fiber/index.js'
 import { PeerMessages } from '@/enums/PeerMessages'
-import { peerAtom } from '../PeerConnectionManager'
+import { peerAtom } from '@/atoms/peerConnectionAtom'
 
 const cursorIcon = Texture.from(`/cursor.png`)
 

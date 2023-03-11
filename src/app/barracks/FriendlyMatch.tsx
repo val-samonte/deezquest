@@ -1,7 +1,12 @@
 import { Dialog } from '@/components/Dialog'
-import { useSearchParams } from 'next/navigation'
+import { Tab } from '@headlessui/react'
+import classNames from 'classnames'
 import { QRCodeCanvas } from 'qrcode.react'
-import { useState } from 'react'
+import { QrReader } from 'react-qr-reader'
+import { Fragment, useState } from 'react'
+import { useAtomValue } from 'jotai'
+import SpinnerIcon from '@/components/SpinnerIcon'
+import { peerIdAtom } from '@/atoms/peerConnectionAtom'
 
 interface FriendlyMatchProps {
   show: boolean
@@ -9,8 +14,8 @@ interface FriendlyMatchProps {
 }
 
 export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
-  const searchParams = useSearchParams()
-  const opponent = searchParams?.get('opponent') ?? null
+  // const searchParams = useSearchParams()
+  // const opponent = searchParams?.get('opponent') ?? null
 
   return (
     <Dialog
@@ -19,135 +24,131 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
       onClose={onClose}
       className='max-w-sm'
     >
-      <>a</>
+      <Tab.Group>
+        <Tab.List className='px-2 grid grid-cols-2 gap-2 -mt-3 mb-5'>
+          <Tab as={Fragment}>
+            {({ selected }) => (
+              <button
+                className={classNames(
+                  !selected
+                    ? 'bg-neutral-800 hover:bg-neutral-700 text-neutral-600 hover:text-neutral-500'
+                    : 'bg-neutral-700 hover:bg-neutral-600',
+                  'px-3 py-2 rounded flex items-center justify-center',
+                )}
+              >
+                Host
+              </button>
+            )}
+          </Tab>
+          <Tab as={Fragment}>
+            {({ selected }) => (
+              <button
+                className={classNames(
+                  !selected
+                    ? 'bg-neutral-800 hover:bg-neutral-700 text-neutral-600 hover:text-neutral-500'
+                    : 'bg-neutral-700 hover:bg-neutral-600',
+                  'px-3 py-2 rounded flex items-center justify-center',
+                )}
+              >
+                Join
+              </button>
+            )}
+          </Tab>
+        </Tab.List>
+        <Tab.Panels>
+          <Tab.Panel className='flex flex-col'>
+            <AsHost />
+          </Tab.Panel>
+          <Tab.Panel className='flex flex-col'>
+            <AsJoiner />
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
     </Dialog>
   )
 }
 
 function AsHost() {
-  const [matchLinkCopied, setMatchLinkCopied] = useState(false)
+  const [matchCodeCopied, setMatchCodeCopied] = useState(false)
+  const peerId = useAtomValue(peerIdAtom)
+
+  if (!peerId) {
+    return (
+      <div className='mx-auto h-300 flex items-center justify-center'>
+        <SpinnerIcon />
+      </div>
+    )
+  }
+
   return (
     <>
-      <p className='mx-5 mb-5'>
-        Click <span className='font-bold'>Copy Match Link</span> and share it
-        with someone you would like to play with, or let&apos;em scan this QR
-        code.
+      <div className='mx-auto mb-5 overflow-hidden rounded'>
+        <QRCodeCanvas size={200} includeMargin value={peerId} />
+      </div>
+      <p className='mx-5 mb-5 text-center'>
+        Share the code or let the other player scan the QR code. The game will
+        start automatically once the other player is ready.
       </p>
-      {/* <QRCodeCanvas
-              className='mx-auto mb-5'
-              size={200}
-              includeMargin
-              value={`${
-                window.location.origin
-              }/demo?opponent=${kp.publicKey.toBase58()}`}
-            /> */}
-      <p className='mx-5 mb-5'>
-        If the link has already been shared, please standby and wait for the
-        other player to set up. The game will commence automatically.
-      </p>
-      <div className='flex-auto'></div>
       <button
         type='button'
         className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-        // onClick={() => {
-        //   navigator.clipboard.writeText(
-        //     `${
-        //       window.location.origin
-        //     }/demo?opponent=${kp.publicKey.toBase58()}`,
-        //   )
-        //   setMatchLinkCopied(true)
-        // }}
+        onClick={() => {
+          navigator.clipboard.writeText(peerId)
+          setMatchCodeCopied(true)
+        }}
+        onMouseOut={() => {
+          setMatchCodeCopied(false)
+        }}
       >
-        {/* {matchLinkCopied ? 'Copied to Clipboard!' : 'Copy Match Link'} */}
+        {matchCodeCopied ? 'Copied to Clipboard!' : 'Copy Match Code'}
       </button>
     </>
   )
 }
 
-// <Dialog
-//         show={startMatch}
-//         title='DEMO Match'
-//         className='max-w-sm'
-//         onClose={() => setStartMatch(false)}
-//       >
-//         {!opponent ? (
-//           <>
-//             <p className='mx-5 mb-5'>
-//               Click <span className='font-bold'>Copy Match Link</span> and share
-//               it with someone you would like to play with, or let&apos;em scan
-//               this QR code.
-//             </p>
-//             <QRCodeCanvas
-//               className='mx-auto mb-5'
-//               size={200}
-//               includeMargin
-//               value={`${
-//                 window.location.origin
-//               }/demo?opponent=${kp.publicKey.toBase58()}`}
-//             />
-//             <p className='mx-5 mb-5'>
-//               If the link has already been shared, please standby and wait for
-//               the other player to set up. The game will commence automatically.
-//             </p>
+function AsJoiner() {
+  const [code, setCode] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
 
-//             <div className='flex-auto'></div>
-//             <button
-//               type='button'
-//               className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-//               onClick={() => {
-//                 navigator.clipboard.writeText(
-//                   `${
-//                     window.location.origin
-//                   }/demo?opponent=${kp.publicKey.toBase58()}`,
-//                 )
-//                 setMatchLinkCopied(true)
-//               }}
-//             >
-//               {matchLinkCopied ? 'Copied to Clipboard!' : 'Copy Match Link'}
-//             </button>
-//           </>
-//         ) : (
-//           <>
-//             <p className='mx-5 mb-5'>
-//               You are about to start your match with{' '}
-//               <span className='font-bold'>{trimAddress(opponent)}</span>.
-//             </p>
-//             <p className='mx-5 mb-5'>
-//               If you would like to play with different opponent,{' '}
-//               <button
-//                 type='button'
-//                 className='underline'
-//                 onClick={() => {
-//                   clearMessages(opponent)
-//                   setMessageCursor(0)
-//                   localStorage.removeItem('demo_opponent')
-//                   setOpponent('')
-//                 }}
-//               >
-//                 click here
-//               </button>
-//               .
-//             </p>
-//             {errorMsg && (
-//               <p className='mx-5 mb-5 text-red-400 bg-red-800/10 p-5 text-sm rounded'>
-//                 {errorMsg}
-//               </p>
-//             )}
-//             <div className='flex-auto'></div>
-//             <button
-//               type='button'
-//               className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-//               onClick={() => {
-//                 sendMessage(opponent, { type: PeerMessages.INVITATION }).catch(
-//                   () =>
-//                     setErrorMsg(
-//                       'Opponent is not available. Ask for the match link again.',
-//                     ),
-//                 )
-//               }}
-//             >
-//               Start Match
-//             </button>
-//           </>
-//         )}
-//       </Dialog>
+  return (
+    <>
+      <QrReader
+        className='w-full aspect-square bg-black/20 overflow-hidden rounded'
+        constraints={{ facingMode: 'environment' }}
+        onResult={(result, error) => {
+          if (!!result) {
+            setCode(result?.getText())
+          }
+
+          if (!!error) {
+            console.info(error)
+            setErrorMsg(error + '')
+          }
+        }}
+      />
+      <p className='mx-5 mb-5 text-center'>
+        Scan the QR code or paste the code in the input box below, the match
+        will begin automatically.
+      </p>
+      {errorMsg && (
+        <p className='mx-5 mb-5 text-red-400 bg-red-800/10 p-5 text-sm rounded'>
+          {errorMsg}
+        </p>
+      )}
+      <input
+        type='text'
+        className='mx-5 mb-5 px-3 py-2 rounded bg-black/20'
+        placeholder='Enter match code'
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+      />
+      <button
+        type='button'
+        className='mx-5 px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+        onClick={() => {}}
+      >
+        Submit
+      </button>
+    </>
+  )
+}

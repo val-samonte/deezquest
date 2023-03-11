@@ -117,6 +117,7 @@ export default function HeroActionButtons() {
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
                           'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded',
                         )}
+                        onClick={() => setShowFriendlyDialog(true)}
                       >
                         <img
                           src='/match_practice.svg'

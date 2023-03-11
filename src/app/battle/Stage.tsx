@@ -29,7 +29,7 @@ import { sleep } from '@/utils/sleep'
 import { usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { useRouter } from 'next/navigation'
-import { peerAtom } from '../PeerConnectionManager'
+import { peerAtom } from '@/atoms/peerConnectionAtom'
 
 export default function Stage() {
   const router = useRouter()

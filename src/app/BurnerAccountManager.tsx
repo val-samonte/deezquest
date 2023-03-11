@@ -59,6 +59,7 @@ export default function BurnerAccountManager() {
 
   // Invalidate credentials, except burnerNonce
   useEffect(() => {
+    setErrorMsg('')
     if (!publicKey) {
       setBurner(null)
     } else {
@@ -66,7 +67,7 @@ export default function BurnerAccountManager() {
         setDappSeed(null)
       }
     }
-  }, [publicKey, dappSeed, setBurner, setDappSeed])
+  }, [publicKey, dappSeed, setBurner, setDappSeed, setErrorMsg])
 
   const [busy, setBusy] = useState(false)
   const sign = useCallback(async () => {
@@ -74,7 +75,9 @@ export default function BurnerAccountManager() {
     if (!signMessage) return
     if (!burnerNonce) return
 
+    setErrorMsg('')
     setBusy(true)
+
     try {
       // extract dappSeed
       let appSeed = dappSeed?.nonce ? bs58.decode(dappSeed.nonce) : null
@@ -163,7 +166,7 @@ export default function BurnerAccountManager() {
         (you <span className='font-bold'>WILL NOT</span> pay anything)
       </p>
       <p className='text-center px-5 mb-5'>
-        Click here to{' '}
+        Or click here to{' '}
         <button
           tabIndex={2}
           type='button'

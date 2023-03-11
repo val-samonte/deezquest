@@ -9,30 +9,19 @@ import bs58 from 'bs58'
 import { useEffect, useState } from 'react'
 import { Dialog } from '@/components/Dialog'
 import classNames from 'classnames'
+import {
+  peerAtom,
+  peerIdAtom,
+  peerNonceAtom,
+  renewEnabledAtom,
+} from '@/atoms/peerConnectionAtom'
 
 // Peer Connection:
 // NOTE: STORING THE NONCE IS NOT REQUIRED DURING FRIENDLY MATCHES
 // for p2p, we need another nonce as well, which is colocated in the same PDA with
 // the burner nonce. eg.
 
-export const peerNonceAtom = atomWithStorage<string | null>(
-  'peer_nonce',
-  null,
-  createJSONStorage<string | null>(() => window.localStorage),
-)
-
-export const peerIdAtom = atom((get) => {
-  const kp = get(burnerKeypairAtom)
-  const nonce = get(peerNonceAtom)
-  return kp && nonce
-    ? bs58.encode(getNextHash([kp.publicKey.toBytes(), Buffer.from(nonce)]))
-    : null
-})
-
-export const renewEnabledAtom = atom(false)
-
-// TODO: lots of things to refactor here
-export const peerAtom = atom<PeerInstance | null>(null)
+// See: peerConnectionAtom
 
 // opponent simply needs to listen to the PDA account for any p2p_nonce changes OR
 // the player can submit another ping message to the opponent, making the opponent dismiss the old peer connection.
@@ -70,14 +59,13 @@ export default function PeerConnectionManager() {
   }, [peerInstance.isOpen, setShowReloadModal, setInstance])
 
   useEffect(() => {
+    // TODO: listen to PDA p2p nonce, update peerNonce accdgly
     if (nonce) return
     const newNonce = bs58.encode(
       window.crypto.getRandomValues(new Uint8Array(16)),
     )
     setNonce(newNonce)
   }, [nonce, setNonce])
-
-  // TODO: listen to PDA p2p nonce, update peerNonce accdgly
 
   return (
     <Dialog show={showReloadModal && !!burner} className='max-w-sm'>
