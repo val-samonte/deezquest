@@ -73,15 +73,13 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
           console.error(e)
         }
 
-        console.log('========', valid)
-
-        if (valid && from === conn.peer) {
+        if (valid) {
           setMessages((m) => [...m, { data, from, signature }])
         }
       })
 
       conn.on('close', () => {
-        console.log(`Connection closed ${conn.peer}`, conn)
+        console.log(`Connection closed ${conn.peer}`)
         setConnections((c) => c.filter((i) => i.peer !== conn.peer))
       })
 

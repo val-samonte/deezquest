@@ -14,6 +14,7 @@ import {
 import { useAtomValue, useSetAtom } from 'jotai'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import {
+  messagesAtom,
   peerAtom,
   PeerMessage,
   peerNonceAtom,
@@ -49,7 +50,7 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
   const burner = useAtomValue(burnerKeypairAtom)
   const peerNonce = useAtomValue(peerNonceAtom)
   const peerInstance = useAtomValue(peerAtom)
-  const messages = peerInstance?.messages
+  const messages = useAtomValue(messagesAtom)
   const setMatch = useSetAtom(matchAtom)
 
   const lastMessage = useRef<PeerMessage | null>(null)
@@ -57,7 +58,6 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
     if (!messages) return
     if (!peerInstance) return
     if (!burner || !peerNonce || !nftAddress) return
-    console.log(messages)
 
     if (messages[messages.length - 1] !== lastMessage.current) {
       const message = messages[messages.length - 1]
@@ -280,7 +280,6 @@ function AsJoiner(props: Parts) {
 
       const playerPublicKey = props.burner.publicKey.toBase58()
 
-      console.log('>>>>')
       await peerInstance.sendMessage(opponentPeerId, {
         type: PeerMessages.INVITATION,
         matchType: 'friendly',
@@ -288,7 +287,6 @@ function AsJoiner(props: Parts) {
         peerNonce: props.peerNonce,
         nftAddress: props.nftAddress,
       })
-      console.log('<<<<')
 
       // preset values to localstorage
       setMatch({
