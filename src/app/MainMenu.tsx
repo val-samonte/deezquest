@@ -9,7 +9,6 @@ import { atom, useAtom, useAtomValue } from 'jotai'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Fragment } from 'react'
-// import { peerOpenAtom } from '@/atoms/peerAtom'
 import dynamic from 'next/dynamic'
 
 export const showMenuAtom = atom(false)
@@ -64,12 +63,12 @@ export default function MainMenu() {
                 >
                   {wallet?.connected && (
                     <li className='flex items-center justify-between text-base py-5'>
-                      <span>
-                        Connected as:{' '}
+                      <span className='flex items-center gap-2'>
+                        Connected as:
                         <span className='font-bold'>
                           {trimAddress(wallet.publicKey?.toBase58() ?? '')}
                         </span>
-                        <PeerConnectionIndicator className='ml-2' />
+                        <PeerConnectionIndicator />
                       </span>
                       <button
                         type='button'

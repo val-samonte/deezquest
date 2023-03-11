@@ -1,6 +1,6 @@
 'use client'
 
-import Peer, { DataConnection, PeerErrorType } from 'peerjs'
+import Peer, { DataConnection } from 'peerjs'
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Keypair } from '@solana/web3.js'
@@ -8,6 +8,22 @@ import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 import { atomFamily } from 'jotai/utils'
 import classNames from 'classnames'
+
+// reexporting this as nextjs complains
+export enum PeerErrorType {
+  BrowserIncompatible = 'browser-incompatible',
+  Disconnected = 'disconnected',
+  InvalidID = 'invalid-id',
+  InvalidKey = 'invalid-key',
+  Network = 'network',
+  PeerUnavailable = 'peer-unavailable',
+  SslUnavailable = 'ssl-unavailable',
+  ServerError = 'server-error',
+  SocketError = 'socket-error',
+  SocketClosed = 'socket-closed',
+  UnavailableID = 'unavailable-id',
+  WebRTC = 'webrtc',
+}
 
 export interface PeerProps {
   peerId: string | null
@@ -21,13 +37,22 @@ export interface PeerMessage {
   signature: string // base58 encoded
 }
 
+export interface PeerInstance {
+  peer: Peer | null
+  isOpen: boolean
+  messages: PeerMessage[]
+  connections: DataConnection[]
+  sendMessage: (receiverId: string, message: any) => Promise<void>
+  clearMessages: (from: string) => void
+}
+
 const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
 export const peerOpenAtom = atom(false)
 const connectionListAtom = atom<DataConnection[]>([])
 const messagesAtom = atom<PeerMessage[]>([])
 
 // always end up overengineering this ¯\_(ツ)_/¯
-export function usePeer({ peerId, keypair, onError }: PeerProps) {
+export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
   const [peer, setPeer] = useAtom(peerListAtom(peerId ?? ''))
   const [isOpen, setOpen] = useAtom(peerOpenAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
@@ -204,14 +229,14 @@ export function usePeer({ peerId, keypair, onError }: PeerProps) {
 export default function PeerConnectionIndicator({
   className,
 }: {
-  className: string
+  className?: string
 }) {
   const peerConnected = useAtomValue(peerOpenAtom)
   return (
     <span
       className={classNames(
         peerConnected ? 'bg-green-600' : 'bg-red-600',
-        'w-4 h-4 rounded-full flex-none inline-block',
+        'w-2 h-2 rounded-full flex-none inline-block',
         className,
       )}
     />

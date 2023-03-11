@@ -29,6 +29,7 @@ import { sleep } from '@/utils/sleep'
 import { usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { useRouter } from 'next/navigation'
+import { peerAtom } from '../PeerConnectionManager'
 
 export default function Stage() {
   const router = useRouter()
@@ -52,7 +53,7 @@ export default function Stage() {
     [playerKp],
   )
   const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
-  const { sendMessage } = usePeer(playerKp!)
+  const peerInstance = useAtomValue(peerAtom) //usePeer(playerKp!)
 
   const currentTransition = useRef<any>(null)
   useEffect(() => {
@@ -208,7 +209,7 @@ export default function Stage() {
                 })
                 setGameResult('')
                 opponent &&
-                  sendMessage(opponent, {
+                  peerInstance?.sendMessage(opponent, {
                     type: PeerMessages.REMATCH,
                   })
               }}

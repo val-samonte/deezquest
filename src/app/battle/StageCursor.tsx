@@ -3,7 +3,6 @@ import {
   gameStateAtom,
   playerKpAtom,
 } from '@/atoms/gameStateAtom'
-import { usePeer } from '@/atoms/peerAtom'
 import { stageDimensionAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { useAtomValue, useSetAtom } from 'jotai'
@@ -11,12 +10,14 @@ import { FederatedPointerEvent, Texture } from 'pixi.js'
 import { useCallback, useState } from 'react'
 import { Sprite } from 'react-pixi-fiber/index.js'
 import { PeerMessages } from '@/enums/PeerMessages'
+import { peerAtom } from '../PeerConnectionManager'
 
 const cursorIcon = Texture.from(`/cursor.png`)
 
 export default function StageCursor() {
   const playerKp = useAtomValue(playerKpAtom)
-  const { sendMessage } = usePeer(playerKp!)
+  // const { sendMessage } = usePeer(playerKp!)
+  const peerInstance = useAtomValue(peerAtom)
   const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
   const gameFn = useSetAtom(gameFunctions)
   const tileSize = useAtomValue(tileSizeAtom)
@@ -55,7 +56,7 @@ export default function StageCursor() {
                 },
               }
               opponent &&
-                sendMessage(opponent, {
+                peerInstance?.sendMessage(opponent, {
                   latestHash: gameState.hashes[gameState.hashes.length - 1],
                   type: PeerMessages.GAME_TURN,
                   data: payload,
@@ -76,7 +77,7 @@ export default function StageCursor() {
         return null
       })
     },
-    [tileSize, opponent, playerKp, gameState, sendMessage],
+    [tileSize, opponent, playerKp, gameState, peerInstance],
   )
 
   return (

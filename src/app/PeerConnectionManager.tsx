@@ -1,15 +1,14 @@
 'use client'
 
-import { usePeer } from '@/atoms/peerAtom'
+import { PeerErrorType, PeerInstance, usePeer } from '@/atoms/peerAtom'
 import { getNextHash } from '@/utils/getNextHash'
-import { atom, useAtomValue } from 'jotai'
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 import { burnerKeypairAtom } from './BurnerAccountManager'
 import bs58 from 'bs58'
 import { useEffect, useState } from 'react'
 import { Dialog } from '@/components/Dialog'
 import classNames from 'classnames'
-import { PeerErrorType } from 'peerjs'
 
 // Peer Connection:
 // NOTE: STORING THE NONCE IS NOT REQUIRED DURING FRIENDLY MATCHES
@@ -32,6 +31,9 @@ export const peerIdAtom = atom((get) => {
 
 export const renewEnabledAtom = atom(false)
 
+// TODO: lots of things to refactor here
+export const peerAtom = atom<PeerInstance | null>(null)
+
 // opponent simply needs to listen to the PDA account for any p2p_nonce changes OR
 // the player can submit another ping message to the opponent, making the opponent dismiss the old peer connection.
 // as long as the player can sign the message using the burner account, opponent can always verify
@@ -46,7 +48,9 @@ export default function PeerConnectionManager() {
   const renewEnabled = useAtomValue(renewEnabledAtom)
   const burner = useAtomValue(burnerKeypairAtom)
   const peerId = useAtomValue(peerIdAtom)
-  const { peer, isOpen } = usePeer({
+  const [nonce, setNonce] = useAtom(peerNonceAtom)
+  const setInstance = useSetAtom(peerAtom)
+  const peerInstance = usePeer({
     peerId,
     keypair: burner,
     onError: (err) => {
@@ -57,15 +61,28 @@ export default function PeerConnectionManager() {
   })
 
   useEffect(() => {
-    setShowReloadModal(false)
-  }, [isOpen, setShowReloadModal])
+    if (peerInstance.isOpen) {
+      setShowReloadModal(false)
+      setInstance(peerInstance)
+    } else {
+      setInstance(null)
+    }
+  }, [peerInstance.isOpen, setShowReloadModal, setInstance])
+
+  useEffect(() => {
+    if (nonce) return
+    const newNonce = bs58.encode(
+      window.crypto.getRandomValues(new Uint8Array(16)),
+    )
+    setNonce(newNonce)
+  }, [nonce, setNonce])
 
   // TODO: listen to PDA p2p nonce, update peerNonce accdgly
 
   return (
     <Dialog show={showReloadModal && !!burner} className='max-w-sm'>
       <p className='text-center px-5 mb-5'>
-        There is an issue with your peer connection. If you're playing from
+        There is an issue with your peer connection. If you are playing from
         another device, please close the game from that device first then press{' '}
         <span className='font-bold'>Reload</span>.{' '}
         {renewEnabled && (
