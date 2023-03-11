@@ -110,7 +110,7 @@ function AsHost() {
 function AsJoiner() {
   const [code, setCode] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
-  const [permissionState, setPermissionState] = useState('')
+  const [permissionState, setPermissionState] = useState('granted')
 
   // useEffect(() => {
   //   if (permissionState !== '') return
@@ -137,38 +137,28 @@ function AsJoiner() {
     <>
       <div className='px-5 mb-5'>
         {permissionState === 'granted' ? (
-          <ErrorBoundary
-            fallback={({ error }) => (
-              <div className='w-full aspect-square bg-black/20 overflow-hidden rounded flex items-center justify-center text-center'>
-                Unable to open the camera {JSON.stringify(error)}
-              </div>
-            )}
-          >
-            <div className='w-full aspect-square bg-black/20 overflow-hidden rounded flex items-center justify-center text-center'>
-              QR Scanner coming soon. Please use the input box instead.
-            </div>
-            {/* <QrReader
-              className='w-full aspect-square bg-black/20 overflow-hidden rounded'
-              constraints={{ facingMode: 'environment' }}
-              onResult={(result, error) => {
-                if (!!result) {
-                  setCode(result?.getText())
-                }
+          <QrReader
+            className='w-full aspect-square bg-black/20 overflow-hidden rounded'
+            constraints={{ facingMode: 'environment' }}
+            onResult={(result, error) => {
+              if (!!result) {
+                setCode(result?.getText())
+              }
 
-                if (!!error) {
-                  console.info(error)
-                  setErrorMsg(error + '')
-                }
-              }}
-            /> */}
-          </ErrorBoundary>
+              if (!!error) {
+                console.info(error)
+                setErrorMsg(error + '')
+              }
+            }}
+          />
         ) : (
           <button
             type='button'
             className='w-full aspect-square bg-black/20 overflow-hidden rounded flex items-center justify-center text-center'
             // onClick={() => requestAccess()}
           >
-            Tap to enable camera
+            {/* Tap to enable camera */}
+            QR Scanner coming soon. Please use the input box instead.
           </button>
         )}
       </div>
