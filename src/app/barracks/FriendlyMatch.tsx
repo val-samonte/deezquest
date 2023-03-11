@@ -110,7 +110,10 @@ function AsHost() {
 function AsJoiner() {
   const [code, setCode] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
-  const [permissionState, setPermissionState] = useState('granted')
+  const [permissionState, setPermissionState] = useState('granted') // useState('')
+
+  // TODO: fix this. phantom is complaining,
+  // even tho the scanner is working fine :/
 
   // useEffect(() => {
   //   if (permissionState !== '') return
@@ -138,6 +141,8 @@ function AsJoiner() {
       <div className='px-5 mb-5'>
         {permissionState === 'granted' ? (
           <QrReader
+            videoContainerStyle={{ width: '100%' }}
+            videoStyle={{ width: '100%' }}
             className='w-full aspect-square bg-black/20 overflow-hidden rounded'
             constraints={{ facingMode: 'environment' }}
             onResult={(result, error) => {
@@ -147,7 +152,7 @@ function AsJoiner() {
 
               if (!!error) {
                 console.info(error)
-                setErrorMsg(error + '')
+                setErrorMsg(JSON.stringify(error))
               }
             }}
           />
@@ -157,8 +162,7 @@ function AsJoiner() {
             className='w-full aspect-square bg-black/20 overflow-hidden rounded flex items-center justify-center text-center'
             // onClick={() => requestAccess()}
           >
-            {/* Tap to enable camera */}
-            QR Scanner coming soon. Please use the input box instead.
+            Tap to enable camera
           </button>
         )}
       </div>
