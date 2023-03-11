@@ -144,7 +144,10 @@ function AsJoiner() {
               </div>
             )}
           >
-            <QrReader
+            <div className='w-full aspect-square bg-black/20 overflow-hidden rounded flex items-center justify-center text-center'>
+              QR Scanner coming soon. Please use the input box instead.
+            </div>
+            {/* <QrReader
               className='w-full aspect-square bg-black/20 overflow-hidden rounded'
               constraints={{ facingMode: 'environment' }}
               onResult={(result, error) => {
@@ -157,7 +160,7 @@ function AsJoiner() {
                   setErrorMsg(error + '')
                 }
               }}
-            />
+            /> */}
           </ErrorBoundary>
         ) : (
           <button
