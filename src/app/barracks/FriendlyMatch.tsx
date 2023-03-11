@@ -3,7 +3,7 @@ import { Tab } from '@headlessui/react'
 import classNames from 'classnames'
 import { QRCodeCanvas } from 'qrcode.react'
 import { QrReader } from 'react-qr-reader'
-import { Fragment, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useAtomValue } from 'jotai'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import { peerIdAtom } from '@/atoms/peerConnectionAtom'
@@ -74,7 +74,7 @@ function AsHost() {
 
   if (!peerId) {
     return (
-      <div className='mx-auto h-300 flex items-center justify-center'>
+      <div className='mx-auto h-80 flex items-center justify-center'>
         <SpinnerIcon />
       </div>
     )
@@ -109,32 +109,66 @@ function AsHost() {
 function AsJoiner() {
   const [code, setCode] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+  const [permissionState, setPermissionState] = useState('')
+
+  useEffect(() => {
+    if (permissionState !== '') return
+    navigator.permissions
+      .query({ name: 'camera' as PermissionName })
+      .then((result) => {
+        console.log(result)
+        setPermissionState(result.state)
+      })
+  }, [permissionState])
+
+  const requestAccess = useCallback(() => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .catch((error) => {
+        console.error('Failed to get camera access:', error)
+      })
+      .finally(() => {
+        setPermissionState('')
+      })
+  }, [])
 
   return (
     <>
-      <QrReader
-        className='w-full aspect-square bg-black/20 overflow-hidden rounded'
-        constraints={{ facingMode: 'environment' }}
-        onResult={(result, error) => {
-          if (!!result) {
-            setCode(result?.getText())
-          }
+      <div className='px-5 mb-5'>
+        {permissionState === 'granted' ? (
+          <QrReader
+            className='w-full aspect-square bg-black/20 overflow-hidden rounded'
+            constraints={{ facingMode: 'environment' }}
+            onResult={(result, error) => {
+              if (!!result) {
+                setCode(result?.getText())
+              }
 
-          if (!!error) {
-            console.info(error)
-            setErrorMsg(error + '')
-          }
-        }}
-      />
-      <p className='mx-5 mb-5 text-center'>
-        Scan the QR code or paste the code in the input box below, the match
-        will begin automatically.
-      </p>
+              if (!!error) {
+                console.info(error)
+                setErrorMsg(error + '')
+              }
+            }}
+          />
+        ) : (
+          <button
+            type='button'
+            className='w-full aspect-square bg-black/20 overflow-hidden rounded flex items-center justify-center text-center'
+            onClick={() => requestAccess()}
+          >
+            Tap to enable camera
+          </button>
+        )}
+      </div>
       {errorMsg && (
         <p className='mx-5 mb-5 text-red-400 bg-red-800/10 p-5 text-sm rounded'>
           {errorMsg}
         </p>
       )}
+      <p className='mx-5 mb-5 text-center'>
+        Scan the QR code or paste the code in the input box below, the match
+        will begin automatically.
+      </p>
       <input
         type='text'
         className='mx-5 mb-5 px-3 py-2 rounded bg-black/20'
