@@ -34,12 +34,6 @@ export default function Backgrounds() {
           'object-bottom brightness-50',
         )}
       />
-      {/* <img
-        src='/bg_arena.png'
-        className={classNames(commonClasses, 
-          pathname?.includes('/battle') ? 'opacity-100' : 'opacity-0',
-          'object-bottom brightness-50')}
-      /> */}
       <img
         src='/bg_shop.png'
         className={classNames(

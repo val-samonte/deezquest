@@ -3,7 +3,18 @@
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        antispin: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(-360deg)' },
+        },
+      },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+        'anti-spin': 'antispin 1s linear infinite',
+      },
+    },
     screens: {
       xs: '390px',
       sm: '640px',

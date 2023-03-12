@@ -70,8 +70,10 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
           case PeerMessages.INVITATION:
             if (message.from !== message.data.publicKey) break
 
+            const playerPublicKey = burner.publicKey.toBase58()
+
             const gameHash = combinePublicKeysAsHash(
-              burner.publicKey.toBase58(),
+              playerPublicKey,
               message.data.publicKey,
               true,
             ) as string
@@ -97,6 +99,11 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
                     publicKey: message.data.publicKey,
                     peerNonce: message.data.peerNonce,
                     nft: message.data.nftAddress,
+                  },
+                  player: {
+                    publicKey: playerPublicKey,
+                    peerNonce,
+                    nft: nftAddress,
                   },
                 })
                 router.push('/battle')
@@ -301,6 +308,11 @@ function AsJoiner(props: Parts) {
           publicKey: parts[0],
           peerNonce: parts[1],
           nft: parts[2],
+        },
+        player: {
+          publicKey: playerPublicKey,
+          peerNonce: props.peerNonce,
+          nft: props.nftAddress,
         },
       })
     } catch (e) {
