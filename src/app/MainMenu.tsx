@@ -114,7 +114,7 @@ export default function MainMenu() {
                     {match && pathname?.includes('/battle') && (
                       <li
                         className={classNames(
-                          'shadow-sm',
+                          'shadow-sm rounded',
                           'bg-gradient-to-r from-neutral-900 to-red-600 hover:bg-red-600 transition-colors',
                         )}
                       >
