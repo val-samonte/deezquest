@@ -278,7 +278,9 @@ function AsJoiner(props: Parts) {
       // code should be in 3 parts
       const parts = code.split('.')
       if (parts.length !== 3) {
-        throw new Error('Code is invalid, please try again.')
+        throw new Error(
+          'Code is invalid, please try again. ' + JSON.stringify(parts),
+        )
       }
 
       // 1st part should be a valid PublicKey
