@@ -98,7 +98,7 @@ export default function MainMenu() {
                       <li
                         className={classNames(
                           ' rounded shadow-sm p-3 px-5',
-                          'bg-gradient-to-r from-neutral-900 hover:from-red-600 to-red-600 transition-colors',
+                          'bg-gradient-to-r from-neutral-900 to-red-600 hover:bg-red-600 transition-colors',
                         )}
                       >
                         <Link
@@ -114,13 +114,13 @@ export default function MainMenu() {
                     {match && pathname?.includes('/battle') && (
                       <li
                         className={classNames(
-                          ' rounded shadow-sm p-3 px-5',
-                          'bg-gradient-to-r from-neutral-900 hover:from-red-600 to-red-600 transition-colors',
+                          'shadow-sm',
+                          'bg-gradient-to-r from-neutral-900 to-red-600 hover:bg-red-600 transition-colors',
                         )}
                       >
                         <button
                           type='button'
-                          className='flex items-center gap-3 outline-none'
+                          className='flex items-center gap-3 outline-none w-full p-3 px-5 rounded'
                           onClick={() => {
                             setOpen(false)
                             setQuitMatchConfirm(true)
