@@ -1,9 +1,10 @@
 import { burnerKeypairAtom } from '@/app/BurnerAccountManager'
 import { getNextHash } from '@/utils/getNextHash'
 import { atom } from 'jotai'
-import { atomWithStorage, createJSONStorage } from 'jotai/utils'
+import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
 import bs58 from 'bs58'
 import { PeerInstance } from './peerAtom'
+import Peer, { DataConnection } from 'peerjs'
 
 export const peerNonceAtom = atomWithStorage<string | null>(
   'peer_nonce',
@@ -31,3 +32,7 @@ export interface PeerMessage {
 }
 
 export const messagesAtom = atom<PeerMessage[]>([])
+
+export const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
+export const peerOpenAtom = atom(false)
+export const connectionListAtom = atom<DataConnection[]>([])

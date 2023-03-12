@@ -10,14 +10,15 @@ import { useEffect, useState } from 'react'
 import { Dialog } from '@/components/Dialog'
 import classNames from 'classnames'
 import {
+  connectionListAtom,
   peerAtom,
   peerIdAtom,
   peerNonceAtom,
+  peerOpenAtom,
   renewEnabledAtom,
 } from '@/atoms/peerConnectionAtom'
 
 // Peer Connection:
-// NOTE: STORING THE NONCE IS NOT REQUIRED DURING FRIENDLY MATCHES
 // for p2p, we need another nonce as well, which is colocated in the same PDA with
 // the burner nonce. eg.
 
@@ -37,7 +38,9 @@ export default function PeerConnectionManager() {
   const renewEnabled = useAtomValue(renewEnabledAtom)
   const burner = useAtomValue(burnerKeypairAtom)
   const peerId = useAtomValue(peerIdAtom)
-  const [nonce, setNonce] = useAtom(peerNonceAtom)
+  const isOpen = useAtomValue(peerOpenAtom)
+  const connections = useAtomValue(connectionListAtom)
+  const setNonce = useSetAtom(peerNonceAtom)
   const setInstance = useSetAtom(peerAtom)
   const peerInstance = usePeer({
     peerId,
@@ -50,13 +53,13 @@ export default function PeerConnectionManager() {
   })
 
   useEffect(() => {
-    if (peerInstance.isOpen) {
+    if (isOpen) {
       setShowReloadModal(false)
       setInstance(peerInstance)
     } else {
       setInstance(null)
     }
-  }, [peerInstance.isOpen, setShowReloadModal, setInstance])
+  }, [isOpen, peerInstance, setShowReloadModal, setInstance])
 
   useEffect(() => {
     // TODO: listen to PDA p2p nonce, update peerNonce accdgly
@@ -66,7 +69,6 @@ export default function PeerConnectionManager() {
     })
   }, [setNonce])
 
-  const connections = peerInstance?.connections
   useEffect(() => {
     if (!connections) return
     console.log('Connections length', connections.length)

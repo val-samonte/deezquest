@@ -7,7 +7,12 @@ import {
   gameStateAtom,
 } from '@/atoms/gameStateAtom'
 import { matchAtom } from '@/atoms/matchAtom'
-import { messagesAtom, peerAtom, PeerMessage } from '@/atoms/peerConnectionAtom'
+import {
+  connectionListAtom,
+  messagesAtom,
+  peerAtom,
+  PeerMessage,
+} from '@/atoms/peerConnectionAtom'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { PeerMessages } from '@/enums/PeerMessages'
@@ -38,6 +43,7 @@ function FriendlyMatchManager() {
   const router = useRouter()
   const peerInstance = useAtomValue(peerAtom)
   const messages = useAtomValue(messagesAtom)
+  const connections = useAtomValue(connectionListAtom)
   const match = useAtomValue(matchAtom)
   const [gameState, setGameState] = useAtom(gameStateAtom)
   const gameFn = useSetAtom(gameFunctions)
@@ -48,11 +54,24 @@ function FriendlyMatchManager() {
   const lastMessage = useRef<PeerMessage | null>(null)
   useEffect(() => {
     if (!peerInstance || !match) return
-    if (
-      messages.length > 0 &&
-      lastMessage.current !== messages[messages.length - 1]
-    ) {
-      lastMessage.current = messages[messages.length - 1]
+
+    const opponentMessages = messages.filter(
+      (m) => m.from === match.opponent.publicKey,
+    )
+    if (opponentMessages.length === 0) return
+
+    const lastOpponentMessage = opponentMessages[opponentMessages.length - 1]
+    if (lastMessage.current === lastOpponentMessage) {
+      peerInstance.clearMessages(match.opponent.peerId ?? '')
+      return
+    }
+
+    if (lastMessage.current !== lastOpponentMessage) {
+      const message = lastOpponentMessage
+      lastMessage.current = message
+
+      if (!message) return
+
       const latestHash = gameState?.hashes[gameState.hashes.length - 1] ?? null
 
       switch (lastMessage.current.data.type) {
@@ -128,7 +147,7 @@ function FriendlyMatchManager() {
   useEffect(() => {
     if (!peerInstance || !match?.opponent.peerId || !gameState) return
 
-    const opponentActive = peerInstance.connections.find(
+    const opponentActive = connections.find(
       (conn) => conn.peer === match.opponent.peerId,
     )
 
@@ -156,7 +175,7 @@ function FriendlyMatchManager() {
       }
       !retrying.current && ping()
     }
-  }, [peerInstance, match, gameState])
+  }, [peerInstance, match, connections, gameState])
 
   // Checks opponent status
 

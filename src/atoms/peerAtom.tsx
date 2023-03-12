@@ -6,9 +6,15 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
-import { atomFamily } from 'jotai/utils'
 import classNames from 'classnames'
-import { messagesAtom, PeerMessage } from './peerConnectionAtom'
+import {
+  connectionListAtom,
+  messagesAtom,
+  peerListAtom,
+  PeerMessage,
+  peerOpenAtom,
+} from './peerConnectionAtom'
+import { PeerMessages } from '@/enums/PeerMessages'
 
 // reexporting this as nextjs complains
 export enum PeerErrorType {
@@ -34,23 +40,16 @@ export interface PeerProps {
 
 export interface PeerInstance {
   peer: Peer | null
-  isOpen: boolean
-  messages: PeerMessage[]
-  connections: DataConnection[]
   sendMessage: (receiverId: string, message: any) => Promise<void>
   clearMessages: (from: string) => void
 }
 
-const peerListAtom = atomFamily((id: string) => atom<Peer | null>(null))
-export const peerOpenAtom = atom(false)
-const connectionListAtom = atom<DataConnection[]>([])
-
 // always end up overengineering this ¯\_(ツ)_/¯
 export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
   const [peer, setPeer] = useAtom(peerListAtom(peerId ?? ''))
-  const [isOpen, setOpen] = useAtom(peerOpenAtom)
   const [connections, setConnections] = useAtom(connectionListAtom)
   const [messages, setMessages] = useAtom(messagesAtom)
+  const setOpen = useSetAtom(peerOpenAtom)
 
   const setupConnection = useCallback(
     (conn: DataConnection) => {
@@ -60,7 +59,10 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
       conn.on('data', (payload) => {
         const { data, from, signature } = payload as PeerMessage
 
-        console.log(`Recieving data from ${from}: `, data)
+        // console.log(`Recieving data from ${from}: `, data)
+        if (data.type === PeerMessages.GAME_TURN) {
+          console.log('Receive', data)
+        }
 
         let valid = false
         try {
@@ -79,7 +81,7 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
       })
 
       conn.on('close', () => {
-        console.log(`Connection closed ${conn.peer}`)
+        // // console.log(`Connection closed ${conn.peer}`)
         setConnections((c) => c.filter((i) => i.peer !== conn.peer))
       })
 
@@ -88,10 +90,10 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
           return connections
         }
 
-        console.log(
-          `Connection established ${conn.peer}`,
-          conn.peerConnection.connectionState,
-        )
+        // console.log(
+        //   `Connection established ${conn.peer}`,
+        //   conn.peerConnection.connectionState,
+        // )
 
         return [...connections, conn]
       })
@@ -123,17 +125,17 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
           newPeer.on('connection', setupConnection)
 
           newPeer.on('open', () => {
-            console.log(`Peer opened ${peerId}`)
+            // console.log(`Peer opened ${peerId}`)
             setOpen(true)
           })
 
           newPeer.on('error', (err: any) => {
-            console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
+            // console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
             onError?.(err)
           })
 
           newPeer.on('close', () => {
-            console.log(`Peer closed ${peerId}`)
+            // console.log(`Peer closed ${peerId}`)
             // TODO: investigate net disconnection (setTimeout?)
             setPeer(null)
             setOpen(false)
@@ -212,7 +214,10 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
       }
 
       setupConnection(connection)
-      console.log(`Sending message to ${receiverId}: `, message)
+      // console.log(`Sending message to ${receiverId}: `, message)
+      if (message.type === PeerMessages.GAME_TURN) {
+        console.log('Sending', message)
+      }
 
       connection.send(payload, false)
     },
@@ -221,14 +226,17 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
 
   const clearMessages = useCallback(
     (from: string) => {
-      setMessages((messages) => {
-        return messages.filter((m) => m.from !== from)
-      })
+      const hasMessage = !!messages.find((m) => m.from === from)
+      if (hasMessage) {
+        setMessages((messages) => {
+          return messages.filter((m) => m.from !== from)
+        })
+      }
     },
-    [setMessages],
+    [messages, setMessages],
   )
 
-  return { peer, isOpen, messages, connections, sendMessage, clearMessages }
+  return { peer, sendMessage, clearMessages }
 }
 
 export default function PeerConnectionIndicator({
