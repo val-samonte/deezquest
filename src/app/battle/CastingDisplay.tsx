@@ -69,12 +69,12 @@ export default function CastingDisplay({
       <animated.div
         key={`cast_text_${skill.name}`}
         style={textProps}
-        className='relative text-3xl xs:text-4xl font-bold flex items-center gap-3 md:gap-5'
+        className='relative text-base sm:text-3xl xs:text-4xl font-bold flex items-center gap-3 md:gap-5'
       >
         <div className='flex items-center justify-center gap-3 md:gap-5'>
           <img
             src={`/cmd_${skill.type}.svg`}
-            className='w-10 h-10 md:w-12 md:h-12'
+            className='w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12'
           />
           <span className='font-serif'>
             {skill.name} {['', 'II', 'III'][skill.lvl - 1]}
