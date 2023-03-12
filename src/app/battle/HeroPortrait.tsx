@@ -43,6 +43,8 @@ export default function HeroPortrait({
   })
 
   useEffect(() => {
+    // TODO: just check HP difference instead of damage
+
     if (!publicKey) return
     if (publicKey !== damage?.hero) return
     setDamage(null)

@@ -13,10 +13,13 @@ import {
   peerAtom,
   PeerMessage,
 } from '@/atoms/peerConnectionAtom'
+import { useUserWallet } from '@/atoms/userWalletAtom'
+import WalletGuard from '@/components/WalletGuard'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { sleep } from '@/utils/sleep'
+import classNames from 'classnames'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
@@ -29,12 +32,54 @@ export default function BattleStagePage({
 }: {
   params: { id: string }
 }) {
+  const wallet = useUserWallet()
+  const router = useRouter()
   const match = useAtomValue(matchAtom)
+  const gameState = useAtomValue(gameStateAtom)
+
+  useEffect(() => {
+    let id: number
+    if (!match) {
+      id = window.setTimeout(() => {
+        router.push('/battle')
+      }, 1000)
+    }
+    return () => {
+      if (id) {
+        window.clearTimeout(id)
+      }
+    }
+  }, [match])
+
+  const turnsLeft = 100 - (gameState?.hashes.length ?? 0)
+
+  if (!wallet?.connected) {
+    return <WalletGuard />
+  }
 
   return (
     <div className='max-w-full max-h-full landscape:w-full landscape:aspect-[2/1] portrait:h-full portrait:aspect-[1/2] mx-auto'>
       {match?.matchType === MatchTypes.FRIENDLY && <FriendlyMatchManager />}
       <Stage />
+      {turnsLeft < 50 && (
+        <div
+          className={classNames(
+            'fixed bottom-0 inset-x-0 pointer-events-none py-3 z-20 flex items-center justify-center text-center',
+          )}
+        >
+          <div
+            className={classNames(
+              turnsLeft < 10 ? 'text-red-600' : 'text-white',
+              'flex flex-col items-center justify-center bg-black/50 rounded px-3',
+            )}
+          >
+            <span className='font-bold text-4xl'>{turnsLeft}</span>
+            <span className='text-xs opacity-50 font-bold uppercase'>
+              turns left
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

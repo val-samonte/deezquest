@@ -149,18 +149,34 @@ export const gameFunctions = atom(
 
         const isMe = player.nft === gameState?.currentTurn
 
-        if (playerHero.hp > 0 && opponentHero.hp <= 0) {
-          queue.push({
-            type: isMe ? GameTransitions.WIN : GameTransitions.LOSE,
-          })
-        } else if (playerHero.hp <= 0 && opponentHero.hp > 0) {
-          queue.push({
-            type: isMe ? GameTransitions.LOSE : GameTransitions.WIN,
-          })
-        } else if (playerHero.hp <= 0 && opponentHero.hp <= 0) {
-          queue.push({
-            type: GameTransitions.DRAW,
-          })
+        if (gameState.hashes.length >= 0) {
+          if (playerHero.hp > 0 && opponentHero.hp <= 0) {
+            queue.push({
+              type: isMe ? GameTransitions.WIN : GameTransitions.LOSE,
+            })
+          } else if (playerHero.hp <= 0 && opponentHero.hp > 0) {
+            queue.push({
+              type: isMe ? GameTransitions.LOSE : GameTransitions.WIN,
+            })
+          } else if (playerHero.hp <= 0 && opponentHero.hp <= 0) {
+            queue.push({
+              type: GameTransitions.DRAW,
+            })
+          }
+        } else {
+          if (playerHero.hp === opponentHero.hp) {
+            queue.push({
+              type: GameTransitions.DRAW,
+            })
+          } else if (playerHero.hp > opponentHero.hp) {
+            queue.push({
+              type: isMe ? GameTransitions.WIN : GameTransitions.LOSE,
+            })
+          } else if (playerHero.hp < opponentHero.hp) {
+            queue.push({
+              type: isMe ? GameTransitions.LOSE : GameTransitions.WIN,
+            })
+          }
         }
 
         set(gameTransitionQueueAtom, [...queue])
@@ -449,29 +465,45 @@ export const gameFunctions = atom(
           })
         }
 
-        // TODO
-        // checkWinner(playerHero, opponentHero)
-        const isMe = player.nft === gameState?.currentTurn
-
-        if (playerHero.hp > 0 && opponentHero.hp <= 0) {
-          queue.push({
-            type: isMe ? GameTransitions.WIN : GameTransitions.LOSE,
-          })
-        } else if (playerHero.hp <= 0 && opponentHero.hp > 0) {
-          queue.push({
-            type: isMe ? GameTransitions.LOSE : GameTransitions.WIN,
-          })
-        } else if (playerHero.hp <= 0 && opponentHero.hp <= 0) {
-          queue.push({
-            type: GameTransitions.DRAW,
-          })
-        }
-
         gameState.tiles = [...newTiles] as number[]
         gameState.hashes = [...gameState.hashes, bs58.encode(hash)]
         gameState.players = {
           [gameState.currentTurn]: playerHero,
           [opponentPubkey]: opponentHero,
+        }
+
+        // TODO
+        // checkWinner(playerHero, opponentHero)
+        const isMe = player.nft === gameState?.currentTurn
+
+        if (gameState.hashes.length >= 0) {
+          if (playerHero.hp > 0 && opponentHero.hp <= 0) {
+            queue.push({
+              type: isMe ? GameTransitions.WIN : GameTransitions.LOSE,
+            })
+          } else if (playerHero.hp <= 0 && opponentHero.hp > 0) {
+            queue.push({
+              type: isMe ? GameTransitions.LOSE : GameTransitions.WIN,
+            })
+          } else if (playerHero.hp <= 0 && opponentHero.hp <= 0) {
+            queue.push({
+              type: GameTransitions.DRAW,
+            })
+          }
+        } else {
+          if (playerHero.hp === opponentHero.hp) {
+            queue.push({
+              type: GameTransitions.DRAW,
+            })
+          } else if (playerHero.hp > opponentHero.hp) {
+            queue.push({
+              type: isMe ? GameTransitions.WIN : GameTransitions.LOSE,
+            })
+          } else if (playerHero.hp < opponentHero.hp) {
+            queue.push({
+              type: isMe ? GameTransitions.LOSE : GameTransitions.WIN,
+            })
+          }
         }
 
         queue.push({

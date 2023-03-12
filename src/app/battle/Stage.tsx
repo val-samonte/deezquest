@@ -178,7 +178,7 @@ export default function Stage() {
           enter='transition-opacity duration-500'
           enterFrom='opacity-0'
           enterTo='opacity-100'
-          className='absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-5'
+          className='fixed inset-x-0 top-0 bottom-14 xl:bottom-16 bg-black/80 flex flex-col items-center justify-center gap-5'
         >
           <img
             src={

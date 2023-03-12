@@ -40,7 +40,9 @@ export default function BattleLayout({ children }: { children: ReactNode }) {
           </Link>
           {!match && <h1 className='text-lg xl:text-2xl'>Battle</h1>}
           {match?.matchType === MatchTypes.FRIENDLY && (
-            <h1 className='text-lg xl:text-2xl'>Friendly Match</h1>
+            <h1 className='text-lg xl:text-2xl'>
+              Friendly <span className='hidden sm:inline'>Match</span>
+            </h1>
           )}
         </div>
         <button

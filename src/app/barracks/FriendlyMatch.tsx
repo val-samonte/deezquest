@@ -46,7 +46,14 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
   const nftAddress = useMemo(() => {
     if (!pathname) return null
     const parts = pathname.split('/')
-    return parts[parts.length - 1]
+    const address = parts[parts.length - 1]
+    try {
+      new PublicKey(address)
+    } catch (e) {
+      return null
+    }
+
+    return address
   }, [pathname])
   const burner = useAtomValue(burnerKeypairAtom)
   const peerNonce = useAtomValue(peerNonceAtom)
