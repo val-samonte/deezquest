@@ -5,7 +5,6 @@ import {
   gameFunctions,
   gameTransitionQueueAtom,
   isGameTransitioningAtom,
-  playerKpAtom,
   gameResultAtom,
 } from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
@@ -26,34 +25,28 @@ import { SkillTypes } from '@/enums/SkillTypes'
 import { GameTransitions } from '@/enums/GameTransitions'
 import { heroDamagedAtom } from './HeroPortrait'
 import { sleep } from '@/utils/sleep'
-import { usePeer } from '@/atoms/peerAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { useRouter } from 'next/navigation'
 import { peerAtom } from '@/atoms/peerConnectionAtom'
+import { matchAtom } from '@/atoms/matchAtom'
 
 export default function Stage() {
   const router = useRouter()
   const gameFn = useSetAtom(gameFunctions)
+  const setGameState = useSetAtom(gameStateAtom)
   const updateHeroes = useSetAtom(updateHeroesAtom)
   const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
-  const [transitionQueue, setTransitionQueue] = useAtom(gameTransitionQueueAtom)
   const setDamage = useSetAtom(heroDamagedAtom)
+  const [transitionQueue, setTransitionQueue] = useAtom(gameTransitionQueueAtom)
   const [tiles, setTiles] = useState<any[]>([])
   const [skill, setSkill] = useState<{
     name: string
     lvl: number
     type: SkillTypes
   }>()
-  const setGameState = useSetAtom(gameStateAtom)
+  const [match, setMatch] = useAtom(matchAtom)
   const [gameResult, setGameResult] = useAtom(gameResultAtom)
-
-  const playerKp = useAtomValue(playerKpAtom)
-  const player = useMemo(
-    () => playerKp?.publicKey.toBase58() ?? null,
-    [playerKp],
-  )
-  const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
-  const peerInstance = useAtomValue(peerAtom) //usePeer(playerKp!)
+  const peerInstance = useAtomValue(peerAtom)
 
   const currentTransition = useRef<any>(null)
   useEffect(() => {
@@ -76,7 +69,7 @@ export default function Stage() {
               const transition: any = {
                 id: next.type,
                 type: next.nodes[i].type,
-                asOpponent: next.turn !== player,
+                asOpponent: next.turn !== match?.player.nft,
                 variation: next.nodes[i].variation,
                 duration: next.duration,
                 delay: next.nodes[i].delay,
@@ -122,6 +115,7 @@ export default function Stage() {
       setTransitionQueue(queue)
     })()
   }, [
+    match,
     transitionQueue,
     setTransitionQueue,
     updateHeroes,
@@ -147,9 +141,9 @@ export default function Stage() {
   return (
     <div className='relative w-full h-full flex portrait:flex-col-reverse'>
       <div className='relative p-2 w-full h-full'>
-        {player && <PlayerCard publicKey={player} />}
+        {match?.player && <PlayerCard player={match.player} />}
       </div>
-      <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5 backdrop-blur-sm '>
+      <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5 backdrop-grayscale rounded'>
         <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden '>
           <PixiStage options={{ backgroundAlpha: 0 }}>
             <AppContext.Consumer>
@@ -173,7 +167,7 @@ export default function Stage() {
         <CastingDisplay skill={skill} />
       </div>
       <div className='relative p-2 w-full h-full'>
-        {opponent && <PlayerCard asOpponent publicKey={opponent} />}
+        {match?.opponent && <PlayerCard asOpponent player={match.opponent} />}
       </div>
       {gameResult && (
         <div className='absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-5'>
@@ -185,19 +179,6 @@ export default function Stage() {
             }
             className='m-10 mb-5 max-h-32 lg:max-h-none'
           />
-          <p className='max-w-xs w-full mx-10 text-center lg:text-xl'>
-            Thanks for playing the demo! <br />
-            Please message us on{' '}
-            <a
-              href='https://twitter.com/deezquest'
-              target='_blank'
-              rel='noreferrer'
-              className='underline'
-            >
-              twitter
-            </a>{' '}
-            for your feedback!
-          </p>
           <div className='flex gap-5 mx-5'>
             <button
               className='px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded'
@@ -208,8 +189,8 @@ export default function Stage() {
                   type: GameStateFunctions.INIT,
                 })
                 setGameResult('')
-                opponent &&
-                  peerInstance?.sendMessage(opponent, {
+                match?.opponent?.peerId &&
+                  peerInstance?.sendMessage(match.opponent.peerId, {
                     type: PeerMessages.REMATCH,
                   })
               }}
@@ -220,13 +201,13 @@ export default function Stage() {
               className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
               onClick={() => {
                 window.sessionStorage.clear()
-                window.localStorage.removeItem('demo_opponent')
                 setGameState(null)
+                setMatch(null)
                 setGameResult('')
-                router.push('/demo')
+                router.push('/barracks')
               }}
             >
-              Return to Hero Select
+              Return to Barracks
             </button>
           </div>
         </div>

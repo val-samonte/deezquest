@@ -2,13 +2,12 @@ import { atom } from 'jotai'
 import bs58 from 'bs58'
 import { GameTransitions } from '@/enums/GameTransitions'
 import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
-import { Keypair, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
 import {
   absorbMana,
   applyDamage,
   applyGravity,
-  checkWinner,
   executableCommands,
   fill,
   getMatches,
@@ -23,6 +22,7 @@ import { TargetHero } from '@/enums/TargetHero'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { getNextHash } from '@/utils/getNextHash'
+import { matchAtom } from './matchAtom'
 
 export interface GameState {
   hashes: string[]
@@ -35,29 +35,21 @@ export interface GameState {
 
 export const gamesStateAtom = atomFamily((matchId: string) =>
   atomWithStorage<GameState | null>(
-    `demo_games_${matchId}`,
+    `games_${matchId}`,
     null,
     createJSONStorage<GameState | null>(() => sessionStorage),
   ),
 )
 
-export const playerKpAtom = atom(() => {
-  const playerDemoKp = localStorage.getItem('demo_kp')
-  if (!playerDemoKp) return null
-  return Keypair.fromSecretKey(bs58.decode(playerDemoKp))
-})
-
 export const matchIdAtom = atom((get) => {
-  const playerKp = get(playerKpAtom)
-  if (!playerKp) return null
+  const match = get(matchAtom)
+  if (!match) return null
 
-  const opponentPubkey = window.localStorage.getItem('demo_opponent')
-  if (!opponentPubkey) return null
+  if (match.matchType === 'friendly') {
+    return match.gameHash
+  }
 
-  return combinePublicKeysAsHash(
-    playerKp.publicKey.toBase58(),
-    opponentPubkey,
-  ) as string
+  return null
 })
 
 export const gameStateAtom = atom(
@@ -82,29 +74,25 @@ export const gameResultAtom = atom('')
 export const gameFunctions = atom(
   null,
   (get, set, action: { type: string; data?: any }) => {
+    let match = get(matchAtom)
     let gameState = get(gameStateAtom)
-    const playerKp = get(playerKpAtom)
+
+    if (!match) return
+    const player = match.player
+    const opponent = match.opponent
 
     if (!gameState) {
-      const opponentPubkey = window.localStorage.getItem('demo_opponent')
+      if (!player || !opponent) throw Error('Missing player / opponent')
 
-      if (!playerKp || !opponentPubkey)
-        throw Error('Missing player / opponent public keys')
-
-      const playerPubkey = playerKp.publicKey.toBase58()
-      let playerHero = heroFromPublicKey(playerKp.publicKey)
-      let opponentHero = heroFromPublicKey(opponentPubkey)
-      let hash = combinePublicKeysAsHash(
-        playerPubkey,
-        opponentPubkey,
-        false,
-      ) as Uint8Array
+      let playerHero = heroFromPublicKey(player.nft)
+      let opponentHero = heroFromPublicKey(opponent.nft)
+      let hash = bs58.decode(match.gameHash)
 
       const heroInTurn = getNextTurn(
         playerHero,
         opponentHero,
-        playerKp.publicKey.toBytes(),
-        new PublicKey(opponentPubkey).toBytes(),
+        new PublicKey(player.nft).toBytes(),
+        new PublicKey(opponent.nft).toBytes(),
         hash,
       )
 
@@ -124,8 +112,8 @@ export const gameFunctions = atom(
         currentTurn,
         tiles,
         players: {
-          [playerPubkey]: playerHero,
-          [opponentPubkey]: opponentHero,
+          [player.nft]: playerHero,
+          [opponent.nft]: opponentHero,
         },
       }
 
@@ -446,7 +434,7 @@ export const gameFunctions = atom(
 
         // TODO
         // checkWinner(playerHero, opponentHero)
-        const isMe = playerKp?.publicKey.toBase58() === gameState?.currentTurn
+        const isMe = player.nft === gameState?.currentTurn
 
         if (playerHero.hp > 0 && opponentHero.hp <= 0) {
           queue.push({

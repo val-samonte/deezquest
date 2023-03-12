@@ -1,8 +1,4 @@
-import {
-  gameFunctions,
-  gameStateAtom,
-  playerKpAtom,
-} from '@/atoms/gameStateAtom'
+import { gameFunctions, gameStateAtom } from '@/atoms/gameStateAtom'
 import { stageDimensionAtom, tileSizeAtom } from '@/atoms/stageDimensionAtom'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { useAtomValue, useSetAtom } from 'jotai'
@@ -11,14 +7,13 @@ import { useCallback, useState } from 'react'
 import { Sprite } from 'react-pixi-fiber/index.js'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { peerAtom } from '@/atoms/peerConnectionAtom'
+import { matchAtom } from '@/atoms/matchAtom'
 
 const cursorIcon = Texture.from(`/cursor.png`)
 
 export default function StageCursor() {
-  const playerKp = useAtomValue(playerKpAtom)
-  // const { sendMessage } = usePeer(playerKp!)
+  const match = useAtomValue(matchAtom)
   const peerInstance = useAtomValue(peerAtom)
-  const [opponent] = useState(localStorage.getItem('demo_opponent') || null)
   const gameFn = useSetAtom(gameFunctions)
   const tileSize = useAtomValue(tileSizeAtom)
   const { width, height } = useAtomValue(stageDimensionAtom)
@@ -29,8 +24,8 @@ export default function StageCursor() {
 
   const onPointerUp = useCallback(
     (e: FederatedPointerEvent) => {
-      if (!gameState) return
-      if (gameState.currentTurn !== playerKp?.publicKey.toBase58()) return
+      if (!gameState || !match) return
+      if (gameState.currentTurn !== match.player.nft) return
 
       const x = Math.floor(e.global.x / tileSize)
       const y = Math.floor(e.global.y / tileSize)
@@ -49,14 +44,14 @@ export default function StageCursor() {
               const payload = {
                 type: GameStateFunctions.SWAP_NODE,
                 data: {
-                  publicKey: playerKp?.publicKey.toBase58(),
+                  publicKey: match.player.nft,
                   origin: dir + origin,
                   node1: { x: curr.x, y: curr.y },
                   node2: { x, y },
                 },
               }
-              opponent &&
-                peerInstance?.sendMessage(opponent, {
+              match.opponent.peerId &&
+                peerInstance?.sendMessage(match.opponent.peerId, {
                   latestHash: gameState.hashes[gameState.hashes.length - 1],
                   type: PeerMessages.GAME_TURN,
                   data: payload,
@@ -77,7 +72,7 @@ export default function StageCursor() {
         return null
       })
     },
-    [tileSize, opponent, playerKp, gameState, peerInstance],
+    [tileSize, match, gameState, peerInstance],
   )
 
   return (

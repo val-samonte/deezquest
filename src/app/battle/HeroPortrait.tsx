@@ -1,6 +1,9 @@
 'use client'
 
+import { useMetaplex } from '@/atoms/metaplexAtom'
+import { JsonMetadata } from '@metaplex-foundation/js'
 import { useSpring, animated } from '@react-spring/web'
+import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import { atom, useAtom } from 'jotai'
 import { useEffect, useState } from 'react'
@@ -21,9 +24,11 @@ export default function HeroPortrait({
   spotlight,
 }: HeroPortraitProps) {
   const [damage, setDamage] = useAtom(heroDamagedAtom)
-
   const [isWobbling, setIsWobbling] = useState(false)
   const [inSpotlight, setInSpotlight] = useState(false)
+
+  const metaplex = useMetaplex()
+  const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
 
   const wobbleAnimation = useSpring({
     transform: isWobbling
@@ -55,6 +60,17 @@ export default function HeroPortrait({
     }, 600)
   }, [publicKey, damage, setDamage, setIsWobbling, setInSpotlight])
 
+  useEffect(() => {
+    if (!publicKey || !metaplex) return
+
+    metaplex
+      .nfts()
+      .findByMint({ mintAddress: new PublicKey(publicKey) })
+      .then((nft) => {
+        setMetadata(nft.json)
+      })
+  }, [publicKey, metaplex])
+
   return (
     <>
       <animated.div
@@ -64,7 +80,7 @@ export default function HeroPortrait({
         )}
         style={{
           ...wobbleAnimation,
-          backgroundImage: `url("https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png")`,
+          backgroundImage: `url("${metadata?.image ?? ''}")`,
         }}
       />
     </>

@@ -1,13 +1,13 @@
 'use client'
 
 import { gameStateAtom, isGameTransitioningAtom } from '@/atoms/gameStateAtom'
+import { Player } from '@/atoms/matchAtom'
 import AnimatedCounter from '@/components/AnimatedCounter'
 import SkillView from '@/components/SkillView'
 import StatCounter from '@/components/StatCounter'
 import {
   Hero,
   heroFromPublicKey,
-  isExecutable,
   skillCountPerMana,
   skills,
 } from '@/utils/gameFunctions'
@@ -34,13 +34,13 @@ export const updateHeroesAtom = atom(
 )
 
 export default function PlayerCard({
-  publicKey,
+  player,
   asOpponent,
 }: {
-  publicKey: string
+  player: Player
   asOpponent?: boolean
 }) {
-  const hero = useAtomValue(heroDisplayAtom(publicKey))
+  const hero = useAtomValue(heroDisplayAtom(player.nft))
   const gameState = useAtomValue(gameStateAtom)
   const isTransitioning = useAtomValue(isGameTransitioningAtom)
 
@@ -123,12 +123,12 @@ export default function PlayerCard({
     hero.specialSkill,
   ])
 
-  const currentTurn = gameState?.currentTurn === publicKey && !isTransitioning
+  const currentTurn = gameState?.currentTurn === player.nft && !isTransitioning
 
   return (
     <div
       className={classNames(
-        'flex-auto w-full h-full bg-neutral-900 rounded',
+        'flex-auto w-full h-full bg-neutral-900 rounded shadow-md',
         'flex landscape:flex-col transition-all',
         asOpponent && 'portrait:flex-row-reverse',
         // !currentTurn && 'brightness-90',
@@ -136,7 +136,7 @@ export default function PlayerCard({
     >
       <div className='bg-black/20 flex-1 overflow-hidden flex items-center justify-center relative rounded-t'>
         <HeroPortrait
-          publicKey={publicKey}
+          publicKey={player.nft}
           flip={asOpponent}
           spotlight={currentTurn}
         />
@@ -157,7 +157,7 @@ export default function PlayerCard({
           >
             <AnimatedCounter
               className='text-3xl md:text-4xl xl:text-7xl xs:font-bold flex-none'
-              value={hero.hp}
+              value={Math.max(hero.hp, 0)}
             />
             <span className='xs:font-bold xl:hidden whitespace-nowrap'>
               / {hero.hpCap}

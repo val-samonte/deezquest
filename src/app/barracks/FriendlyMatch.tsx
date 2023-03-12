@@ -308,6 +308,7 @@ function AsJoiner(props: Parts) {
           publicKey: parts[0],
           peerNonce: parts[1],
           nft: parts[2],
+          peerId: opponentPeerId,
         },
         player: {
           publicKey: playerPublicKey,

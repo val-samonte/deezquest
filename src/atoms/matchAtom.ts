@@ -1,9 +1,10 @@
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 
-interface Player {
+export interface Player {
   publicKey: string
   nft: string
   peerNonce: string
+  peerId?: string
 }
 
 interface Match {
