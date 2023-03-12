@@ -59,10 +59,7 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
       conn.on('data', (payload) => {
         const { data, from, signature } = payload as PeerMessage
 
-        // console.log(`Recieving data from ${from}: `, data)
-        if (data.type === PeerMessages.GAME_TURN) {
-          console.log('Receive', data)
-        }
+        console.log(`Recieving data from ${from}: `, data)
 
         let valid = false
         try {
@@ -81,7 +78,7 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
       })
 
       conn.on('close', () => {
-        // // console.log(`Connection closed ${conn.peer}`)
+        // console.log(`Connection closed ${conn.peer}`)
         setConnections((c) => c.filter((i) => i.peer !== conn.peer))
       })
 
@@ -90,10 +87,10 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
           return connections
         }
 
-        // console.log(
-        //   `Connection established ${conn.peer}`,
-        //   conn.peerConnection.connectionState,
-        // )
+        console.log(
+          `Connection established ${conn.peer}`,
+          conn.peerConnection.connectionState,
+        )
 
         return [...connections, conn]
       })
@@ -125,17 +122,17 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
           newPeer.on('connection', setupConnection)
 
           newPeer.on('open', () => {
-            // console.log(`Peer opened ${peerId}`)
+            console.log(`Peer opened ${peerId}`)
             setOpen(true)
           })
 
           newPeer.on('error', (err: any) => {
-            // console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
+            console.log(`Peer error ${peerId}: ${JSON.stringify(err)}`)
             onError?.(err)
           })
 
           newPeer.on('close', () => {
-            // console.log(`Peer closed ${peerId}`)
+            console.log(`Peer closed ${peerId}`)
             // TODO: investigate net disconnection (setTimeout?)
             setPeer(null)
             setOpen(false)
@@ -214,7 +211,7 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
       }
 
       setupConnection(connection)
-      // console.log(`Sending message to ${receiverId}: `, message)
+      console.log(`Sending message to ${receiverId}: `, message)
       if (message.type === PeerMessages.GAME_TURN) {
         console.log('Sending', message)
       }

@@ -147,6 +147,22 @@ export const gameFunctions = atom(
           heroes: gameState.players,
         })
 
+        const isMe = player.nft === gameState?.currentTurn
+
+        if (playerHero.hp > 0 && opponentHero.hp <= 0) {
+          queue.push({
+            type: isMe ? GameTransitions.WIN : GameTransitions.LOSE,
+          })
+        } else if (playerHero.hp <= 0 && opponentHero.hp > 0) {
+          queue.push({
+            type: isMe ? GameTransitions.LOSE : GameTransitions.WIN,
+          })
+        } else if (playerHero.hp <= 0 && opponentHero.hp <= 0) {
+          queue.push({
+            type: GameTransitions.DRAW,
+          })
+        }
+
         set(gameTransitionQueueAtom, [...queue])
         break
       }

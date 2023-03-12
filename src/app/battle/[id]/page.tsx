@@ -44,16 +44,17 @@ function FriendlyMatchManager() {
   const peerInstance = useAtomValue(peerAtom)
   const messages = useAtomValue(messagesAtom)
   const connections = useAtomValue(connectionListAtom)
-  const match = useAtomValue(matchAtom)
+  const [match, setMatch] = useAtom(matchAtom)
   const [gameState, setGameState] = useAtom(gameStateAtom)
   const gameFn = useSetAtom(gameFunctions)
   const setGameResult = useSetAtom(gameResultAtom)
+  const sendMessage = peerInstance?.sendMessage
 
   // Capture and process peer messages
 
   const lastMessage = useRef<PeerMessage | null>(null)
   useEffect(() => {
-    if (!peerInstance || !match) return
+    if (!peerInstance || !match || !sendMessage) return
 
     const opponentMessages = messages.filter(
       (m) => m.from === match.opponent.publicKey,
@@ -74,26 +75,23 @@ function FriendlyMatchManager() {
 
       const latestHash = gameState?.hashes[gameState.hashes.length - 1] ?? null
 
-      switch (lastMessage.current.data.type) {
+      switch (message.data.type) {
         case PeerMessages.GAME_TURN: {
-          if (latestHash === lastMessage.current.data.latestHash) {
-            gameFn(lastMessage.current.data.data)
+          if (latestHash === message.data.latestHash) {
+            gameFn(message.data.data)
             break
           }
           // NOTE OF THE LACK OF BREAK
         }
         case PeerMessages.PING: {
-          if (latestHash === lastMessage.current.data.latestHash) {
+          if (latestHash === message.data.latestHash) {
             break
           }
           // NOTE OF THE LACK OF BREAK
         }
         case PeerMessages.REQUEST_GAME_STATE: {
-          if (
-            match.opponent.peerId &&
-            latestHash !== lastMessage.current.data.latestHash
-          ) {
-            peerInstance.sendMessage(match.opponent.peerId, {
+          if (match.opponent.peerId && latestHash !== message.data.latestHash) {
+            sendMessage(match.opponent.peerId, {
               type: PeerMessages.RESPONSE_GAME_STATE,
               data: gameState,
             })
@@ -101,8 +99,7 @@ function FriendlyMatchManager() {
           break
         }
         case PeerMessages.RESPONSE_GAME_STATE: {
-          const opponentGameState = lastMessage.current.data.data as GameState
-          console.log('Parsing response game state', opponentGameState)
+          const opponentGameState = message.data.data as GameState
           if (
             !gameState?.hashes ||
             gameState.hashes.length < opponentGameState.hashes.length
@@ -120,16 +117,26 @@ function FriendlyMatchManager() {
             type: GameStateFunctions.INIT,
           })
         }
+        case PeerMessages.QUIT: {
+          window.sessionStorage.clear()
+          setGameState(null)
+          setMatch(null)
+          setGameResult('')
+          router.push('/barracks')
+        }
       }
     }
   }, [
+    router,
     peerInstance,
     messages,
     gameState,
     match,
     gameFn,
+    sendMessage,
     setGameState,
     setGameResult,
+    setMatch,
   ])
 
   // Kick out of the arena when there's no pending match

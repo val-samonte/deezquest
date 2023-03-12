@@ -29,6 +29,8 @@ import { PeerMessages } from '@/enums/PeerMessages'
 import { useRouter } from 'next/navigation'
 import { peerAtom } from '@/atoms/peerConnectionAtom'
 import { matchAtom } from '@/atoms/matchAtom'
+import { Transition } from '@headlessui/react'
+import { MatchTypes } from '@/enums/MatchTypes'
 
 export default function Stage() {
   const router = useRouter()
@@ -170,7 +172,14 @@ export default function Stage() {
         {match?.opponent && <PlayerCard asOpponent player={match.opponent} />}
       </div>
       {gameResult && (
-        <div className='absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-5'>
+        <Transition
+          show={true}
+          appear={true}
+          enter='transition-opacity duration-500'
+          enterFrom='opacity-0'
+          enterTo='opacity-100'
+          className='absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-5'
+        >
           <img
             src={
               { win: '/you_win.png', lose: '/you_lose.png', draw: '/draw.png' }[
@@ -200,6 +209,14 @@ export default function Stage() {
             <button
               className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
               onClick={() => {
+                if (
+                  match?.matchType === MatchTypes.FRIENDLY &&
+                  match?.opponent.peerId
+                ) {
+                  peerInstance?.sendMessage(match?.opponent.peerId, {
+                    type: PeerMessages.QUIT,
+                  })
+                }
                 window.sessionStorage.clear()
                 setGameState(null)
                 setMatch(null)
@@ -210,7 +227,7 @@ export default function Stage() {
               Return to Barracks
             </button>
           </div>
-        </div>
+        </Transition>
       )}
     </div>
   )
