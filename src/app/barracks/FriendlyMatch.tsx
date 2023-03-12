@@ -28,6 +28,7 @@ import { PeerMessages } from '@/enums/PeerMessages'
 import { matchAtom } from '@/atoms/matchAtom'
 import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
 import { MatchTypes } from '@/enums/MatchTypes'
+import { sleep } from '@/utils/sleep'
 
 interface FriendlyMatchProps {
   show: boolean
@@ -277,7 +278,7 @@ function AsJoiner(props: Parts) {
       // code should be in 3 parts
       const parts = code.split('.')
       if (parts.length !== 3) {
-        throw new Error('Invalid code')
+        throw new Error('Code is invalid, please try again.')
       }
 
       // 1st part should be a valid PublicKey
@@ -326,7 +327,7 @@ function AsJoiner(props: Parts) {
         },
       })
     } catch (e) {
-      setErrorMsg('Code is invalid, please try again.')
+      setErrorMsg(e)
       setBusy(false)
     }
   }, [code, peerInstance, props, setBusy, setErrorMsg])
@@ -341,9 +342,11 @@ function AsJoiner(props: Parts) {
             containerStyle={{ width: '100%' }}
             className='w-full aspect-square bg-black/20 overflow-hidden rounded'
             constraints={{ facingMode: 'environment' }}
-            onResult={(result, error) => {
+            onResult={async (result, error) => {
               if (!!result) {
                 setCode(result?.getText())
+                setBusy(true)
+                await sleep(100)
                 verifyCode()
               }
 
