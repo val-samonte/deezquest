@@ -326,8 +326,8 @@ function AsJoiner(props: Parts) {
           nft: props.nftAddress,
         },
       })
-    } catch (e) {
-      setErrorMsg(e)
+    } catch (e: any) {
+      setErrorMsg(e.message ?? e + '')
       setBusy(false)
     }
   }, [code, peerInstance, props, setBusy, setErrorMsg])

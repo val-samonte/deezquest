@@ -251,7 +251,9 @@ export default function MainMenu() {
         className='max-w-sm'
         onClose={() => setQuitMatchConfirm(false)}
       >
-        <p className='px-5 mb-5'>Are you sure you want to quit this match?</p>
+        <p className='px-5 mb-5 text-center'>
+          Are you sure you want to quit this match?
+        </p>
         <div className='flex-auto' />
         <div className='flex gap-3 px-5'>
           <button
