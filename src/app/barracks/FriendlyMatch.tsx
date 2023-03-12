@@ -27,6 +27,7 @@ import { getNextHash } from '@/utils/getNextHash'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { matchAtom } from '@/atoms/matchAtom'
 import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
+import { MatchTypes } from '@/enums/MatchTypes'
 
 interface FriendlyMatchProps {
   show: boolean
@@ -65,7 +66,7 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
 
       if (!message) return
 
-      if (message.data.matchType === 'friendly') {
+      if (message.data.matchType === MatchTypes.FRIENDLY) {
         switch (message.data.type) {
           case PeerMessages.INVITATION:
             if (message.from !== message.data.publicKey) break
@@ -88,11 +89,11 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
             peerInstance
               .sendMessage(opponentPeerId, {
                 type: PeerMessages.ACCEPT_INVITATION,
-                matchType: 'friendly',
+                matchType: MatchTypes.FRIENDLY,
               })
               .then(() => {
                 setMatch({
-                  matchType: 'friendly',
+                  matchType: MatchTypes.FRIENDLY,
                   gameHash,
                   ongoing: true,
                   opponent: {
@@ -289,7 +290,7 @@ function AsJoiner(props: Parts) {
 
       await peerInstance.sendMessage(opponentPeerId, {
         type: PeerMessages.INVITATION,
-        matchType: 'friendly',
+        matchType: MatchTypes.FRIENDLY,
         publicKey: playerPublicKey,
         peerNonce: props.peerNonce,
         nftAddress: props.nftAddress,
@@ -297,7 +298,7 @@ function AsJoiner(props: Parts) {
 
       // preset values to localstorage
       setMatch({
-        matchType: 'friendly',
+        matchType: MatchTypes.FRIENDLY,
         gameHash: combinePublicKeysAsHash(
           props.burner.publicKey.toBase58(),
           parts[0],

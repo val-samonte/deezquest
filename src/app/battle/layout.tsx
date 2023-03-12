@@ -1,15 +1,18 @@
 'use client'
 
+import { matchAtom } from '@/atoms/matchAtom'
 import MenuIcon from '@/components/MenuIcon'
 import PreloaderAnimation from '@/components/PreloaderAnimation'
+import { MatchTypes } from '@/enums/MatchTypes'
 import classNames from 'classnames'
-import { useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import Link from 'next/link'
 import { ReactNode, Suspense } from 'react'
 import { showMenuAtom } from '../MainMenu'
 
 export default function BattleLayout({ children }: { children: ReactNode }) {
   const showMenu = useSetAtom(showMenuAtom)
+  const match = useAtomValue(matchAtom)
   return (
     <main className='flex flex-col landscape:justify-center w-full h-full bg-cover bg-no-repeat bg-center absolute inset-0'>
       <div
@@ -35,7 +38,10 @@ export default function BattleLayout({ children }: { children: ReactNode }) {
               className='h-full aspect-square mr-3 xl:mr-5'
             />
           </Link>
-          <h1 className='text-lg xl:text-2xl'>Battle</h1>
+          {!match && <h1 className='text-lg xl:text-2xl'>Battle</h1>}
+          {match?.matchType === MatchTypes.FRIENDLY && (
+            <h1 className='text-lg xl:text-2xl'>Friendly Match</h1>
+          )}
         </div>
         <button
           type='button'

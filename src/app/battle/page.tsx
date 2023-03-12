@@ -4,7 +4,7 @@ import { matchAtom } from '@/atoms/matchAtom'
 import { useUserWallet } from '@/atoms/userWalletAtom'
 import PreloaderAnimation from '@/components/PreloaderAnimation'
 import WalletGuard from '@/components/WalletGuard'
-import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import { MatchTypes } from '@/enums/MatchTypes'
 import { useAtomValue } from 'jotai'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -25,7 +25,7 @@ export default function Battle() {
       return
     }
     // TODO: preload here? what about Suspense fallback?
-    if (match.matchType === 'friendly' && match.gameHash) {
+    if (match.matchType === MatchTypes.FRIENDLY && match.gameHash) {
       router.push(`/battle/${match.gameHash}`)
     }
   }, [match, router, setShowDialog])

@@ -23,6 +23,7 @@ import { SkillTypes } from '@/enums/SkillTypes'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { getNextHash } from '@/utils/getNextHash'
 import { matchAtom } from './matchAtom'
+import { MatchTypes } from '@/enums/MatchTypes'
 
 export interface GameState {
   hashes: string[]
@@ -45,7 +46,7 @@ export const matchIdAtom = atom((get) => {
   const match = get(matchAtom)
   if (!match) return null
 
-  if (match.matchType === 'friendly') {
+  if (match.matchType === MatchTypes.FRIENDLY) {
     return match.gameHash
   }
 
