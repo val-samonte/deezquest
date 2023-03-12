@@ -268,71 +268,76 @@ function AsJoiner(props: Parts) {
   //     })
   // }, [])
 
-  const verifyCode = useCallback(async () => {
-    if (!peerInstance) return
-    if (!props.burner || !props.nftAddress || !props.peerNonce) return
+  const verifyCode = useCallback(
+    async (paramCode?: string) => {
+      if (!peerInstance) return
+      if (!props.burner || !props.nftAddress || !props.peerNonce) return
 
-    setErrorMsg('')
-    setBusy(true)
-    try {
-      // code should be in 3 parts
-      const parts = code.split('.')
-      if (parts.length !== 3) {
-        throw new Error(
-          'Code is invalid, please try again. ' + JSON.stringify(parts),
+      const subjectCode = paramCode || code
+
+      setErrorMsg('')
+      setBusy(true)
+      try {
+        // code should be in 3 parts
+        const parts = subjectCode.split('.')
+        if (parts.length !== 3) {
+          throw new Error(
+            'Code is invalid, please try again. ' + JSON.stringify(subjectCode),
+          )
+        }
+
+        // 1st part should be a valid PublicKey
+        const opponentPubkey = new PublicKey(parts[0])
+
+        // 3rd part should be a valid PublicKey (NFT)
+        const nftAddress = new PublicKey(parts[2])
+
+        // derive peer id using opponentPubkey and peerNonce
+        const opponentPeerId = bs58.encode(
+          getNextHash([
+            opponentPubkey.toBytes(),
+            Buffer.from(bs58.decode(parts[1])),
+          ]),
         )
-      }
 
-      // 1st part should be a valid PublicKey
-      const opponentPubkey = new PublicKey(parts[0])
+        const playerPublicKey = props.burner.publicKey.toBase58()
 
-      // 3rd part should be a valid PublicKey (NFT)
-      const nftAddress = new PublicKey(parts[2])
-
-      // derive peer id using opponentPubkey and peerNonce
-      const opponentPeerId = bs58.encode(
-        getNextHash([
-          opponentPubkey.toBytes(),
-          Buffer.from(bs58.decode(parts[1])),
-        ]),
-      )
-
-      const playerPublicKey = props.burner.publicKey.toBase58()
-
-      await peerInstance.sendMessage(opponentPeerId, {
-        type: PeerMessages.INVITATION,
-        matchType: MatchTypes.FRIENDLY,
-        publicKey: playerPublicKey,
-        peerNonce: props.peerNonce,
-        nftAddress: props.nftAddress,
-      })
-
-      // preset values to localstorage
-      setMatch({
-        matchType: MatchTypes.FRIENDLY,
-        gameHash: combinePublicKeysAsHash(
-          props.burner.publicKey.toBase58(),
-          parts[0],
-          true,
-        ) as string,
-        ongoing: false,
-        opponent: {
-          publicKey: parts[0],
-          peerNonce: parts[1],
-          nft: parts[2],
-          peerId: opponentPeerId,
-        },
-        player: {
+        await peerInstance.sendMessage(opponentPeerId, {
+          type: PeerMessages.INVITATION,
+          matchType: MatchTypes.FRIENDLY,
           publicKey: playerPublicKey,
           peerNonce: props.peerNonce,
-          nft: props.nftAddress,
-        },
-      })
-    } catch (e: any) {
-      setErrorMsg(e.message ?? e + '')
-      setBusy(false)
-    }
-  }, [code, peerInstance, props, setBusy, setErrorMsg])
+          nftAddress: props.nftAddress,
+        })
+
+        // preset values to localstorage
+        setMatch({
+          matchType: MatchTypes.FRIENDLY,
+          gameHash: combinePublicKeysAsHash(
+            props.burner.publicKey.toBase58(),
+            parts[0],
+            true,
+          ) as string,
+          ongoing: false,
+          opponent: {
+            publicKey: parts[0],
+            peerNonce: parts[1],
+            nft: parts[2],
+            peerId: opponentPeerId,
+          },
+          player: {
+            publicKey: playerPublicKey,
+            peerNonce: props.peerNonce,
+            nft: props.nftAddress,
+          },
+        })
+      } catch (e: any) {
+        setErrorMsg(e.message ?? e + '')
+        setBusy(false)
+      }
+    },
+    [code, peerInstance, props, setBusy, setErrorMsg],
+  )
 
   return (
     <>
@@ -346,10 +351,9 @@ function AsJoiner(props: Parts) {
             constraints={{ facingMode: 'environment' }}
             onResult={async (result, error) => {
               if (!!result) {
-                setCode(result?.getText())
-                setBusy(true)
-                await sleep(100)
-                verifyCode()
+                const code = result?.getText()
+                setCode(code)
+                verifyCode(code)
               }
 
               if (error?.message) {
