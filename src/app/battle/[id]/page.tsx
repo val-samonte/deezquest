@@ -161,6 +161,7 @@ function FriendlyMatchManager() {
           gameFn({
             type: GameStateFunctions.INIT,
           })
+          break
         }
         case PeerMessages.QUIT: {
           window.sessionStorage.clear()
@@ -168,6 +169,7 @@ function FriendlyMatchManager() {
           setMatch(null)
           setGameResult('')
           router.push('/barracks')
+          break
         }
       }
     }
