@@ -66,6 +66,12 @@ export default function PeerConnectionManager() {
     })
   }, [setNonce])
 
+  const connections = peerInstance?.connections
+  useEffect(() => {
+    if (!connections) return
+    console.log('Connections length', connections.length)
+  }, [connections])
+
   return (
     <Dialog show={showReloadModal && !!burner} className='max-w-sm'>
       <p className='text-center px-5 mb-5'>

@@ -134,7 +134,13 @@ export default function PlayerCard({
         // !currentTurn && 'brightness-90',
       )}
     >
-      <div className='bg-black/20 flex-1 overflow-hidden flex items-center justify-center relative rounded-t'>
+      <div
+        className={classNames(
+          'bg-black/20 flex-1 flex items-center justify-center relative landscape:rounded-t',
+          'overflow-hidden',
+          asOpponent ? 'portrait:rounded-r' : 'portrait:rounded-l',
+        )}
+      >
         <HeroPortrait
           publicKey={player.nft}
           flip={asOpponent}

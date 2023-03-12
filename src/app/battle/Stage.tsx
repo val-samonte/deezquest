@@ -144,7 +144,7 @@ export default function Stage() {
         {match?.player && <PlayerCard player={match.player} />}
       </div>
       <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5'>
-        <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden '>
+        <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden rounded'>
           <PixiStage options={{ backgroundAlpha: 0 }}>
             <AppContext.Consumer>
               {(app) => <PixiAppHandler app={app} />}

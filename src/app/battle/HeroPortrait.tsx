@@ -75,8 +75,8 @@ export default function HeroPortrait({
     <>
       <animated.div
         className={classNames(
-          'bg-no-repeat bg-cover bg-center portrait:h-full landscape:w-full aspect-square',
-          !(spotlight || inSpotlight) && 'brightness-50',
+          'bg-no-repeat bg-cover bg-center portrait:h-full landscape:w-full aspect-square transition-colors duration-500',
+          !(spotlight || inSpotlight) && 'grayscale',
         )}
         style={{
           ...wobbleAnimation,

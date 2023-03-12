@@ -100,6 +100,7 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
                     publicKey: message.data.publicKey,
                     peerNonce: message.data.peerNonce,
                     nft: message.data.nftAddress,
+                    peerId: opponentPeerId,
                   },
                   player: {
                     publicKey: playerPublicKey,
@@ -319,8 +320,8 @@ function AsJoiner(props: Parts) {
       })
     } catch (e) {
       setErrorMsg('Code is invalid, please try again.')
+      setBusy(false)
     }
-    setBusy(false)
   }, [code, peerInstance, props, setBusy, setErrorMsg])
 
   return (

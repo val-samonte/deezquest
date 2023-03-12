@@ -83,6 +83,7 @@ function FriendlyMatchManager() {
         }
         case PeerMessages.RESPONSE_GAME_STATE: {
           const opponentGameState = lastMessage.current.data.data as GameState
+          console.log('Parsing response game state', opponentGameState)
           if (
             !gameState?.hashes ||
             gameState.hashes.length < opponentGameState.hashes.length
@@ -102,7 +103,15 @@ function FriendlyMatchManager() {
         }
       }
     }
-  }, [peerInstance, gameState, match, gameFn, setGameState, setGameResult])
+  }, [
+    peerInstance,
+    messages,
+    gameState,
+    match,
+    gameFn,
+    setGameState,
+    setGameResult,
+  ])
 
   // Kick out of the arena when there's no pending match
 
