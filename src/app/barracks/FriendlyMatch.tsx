@@ -338,6 +338,7 @@ function AsJoiner(props: Parts) {
           <QrReader
             videoContainerStyle={{ width: '100%' }}
             videoStyle={{ width: '100%' }}
+            containerStyle={{ width: '100%' }}
             className='w-full aspect-square bg-black/20 overflow-hidden rounded'
             constraints={{ facingMode: 'environment' }}
             onResult={(result, error) => {
