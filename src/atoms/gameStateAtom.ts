@@ -3,7 +3,6 @@ import bs58 from 'bs58'
 import { GameTransitions } from '@/enums/GameTransitions'
 import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
 import { PublicKey } from '@solana/web3.js'
-import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
 import {
   absorbMana,
   applyDamage,
