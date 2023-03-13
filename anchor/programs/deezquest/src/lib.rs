@@ -14,4 +14,8 @@ pub mod deezquest {
     pub fn init(ctx: Context<Init>, params: InitParams) -> Result<()> {
         init_handler(ctx, params)
     }
+
+    pub fn create_season(ctx: Context<CreateSeason>, params: CreateSeasonParams) -> Result<()> {
+        create_season_handler(ctx, params)
+    }
 }

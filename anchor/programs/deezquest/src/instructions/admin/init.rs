@@ -17,9 +17,7 @@ pub struct Init<'info> {
     #[account(
         init,
         payer = upgrade_authority,
-        seeds = [
-            "main".as_bytes(),
-        ],
+        seeds = [b"main"],
         bump,
         space = Main::len(),
     )]
@@ -73,6 +71,7 @@ pub fn init_handler(ctx: Context<Init>, params: InitParams) -> Result<()> {
     main.treasury = params.treasury.key();
     main.maintenance_authority = params.maintenance_authority.key();
     main.service_fee = params.service_fee;
+    main.season_count = 0;
 
     let mint_address = ctx.accounts.deez_coin.key();
     let metadata_seeds = &[
