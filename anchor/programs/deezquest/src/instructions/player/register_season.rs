@@ -64,11 +64,13 @@ pub fn register_season_handler(ctx: Context<RegisterSeason>) -> Result<()> {
 
     let season_entry = &mut ctx.accounts.season_entry;
     let token_program = &ctx.accounts.token_program;
-    let season = &ctx.accounts.season;
+    let season = &mut ctx.accounts.season;
     let season_rating_mint = &ctx.accounts.season_rating_mint;
     let season_rating_token = &ctx.accounts.season_rating_token;
-    let season_bump = &ctx.accounts.season.bump.to_le_bytes();
+    let season_bump = &season.bump.to_le_bytes();
     let season_id = season.id.to_le_bytes();
+
+    season.registered_players += 1;
 
     season_entry.bump = *ctx.bumps.get("season_entry").unwrap();
     season_entry.owner = ctx.accounts.owner.key();

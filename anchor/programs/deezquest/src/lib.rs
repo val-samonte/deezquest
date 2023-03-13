@@ -22,4 +22,11 @@ pub mod deezquest {
     pub fn register_season(ctx: Context<RegisterSeason>) -> Result<()> {
         register_season_handler(ctx)
     }
+
+    pub fn create_match_entry(
+        ctx: Context<CreateMatchEntry>,
+        params: CreateMatchEntryParams,
+    ) -> Result<()> {
+        create_match_entry_handler(ctx, params)
+    }
 }
