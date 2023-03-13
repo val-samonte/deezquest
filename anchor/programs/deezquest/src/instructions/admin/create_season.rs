@@ -52,11 +52,15 @@ pub struct CreateSeason<'info> {
 
 pub fn create_season_handler(ctx: Context<CreateSeason>, params: CreateSeasonParams) -> Result<()> {
     let season = &mut ctx.accounts.season;
+    let main = &mut ctx.accounts.main;
 
     season.bump = *ctx.bumps.get("season").unwrap();
+    season.id = main.season_count;
     season.season_rating_mint_bump = *ctx.bumps.get("season_rating_mint").unwrap();
     season.registered_players = 0;
     season.uri = params.uri;
+
+    main.season_count += 1;
 
     Ok(())
 }

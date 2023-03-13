@@ -18,4 +18,8 @@ pub mod deezquest {
     pub fn create_season(ctx: Context<CreateSeason>, params: CreateSeasonParams) -> Result<()> {
         create_season_handler(ctx, params)
     }
+
+    pub fn register_season(ctx: Context<RegisterSeason>) -> Result<()> {
+        register_season_handler(ctx)
+    }
 }

@@ -5,6 +5,9 @@ pub struct Season {
     /// Bump nonce of the PDA. (1)
     pub bump: u8,
 
+    /// ID of this season, used for seed. (8)
+    pub id: u64,
+
     /// Bump nonce of rating token for this season. (1)
     pub season_rating_mint_bump: u8,
 
@@ -21,6 +24,6 @@ pub struct Season {
 
 impl Season {
     pub fn len(uri: String) -> usize {
-        8 + 1 + 1 + 8 + (4 + uri.len()) + 128
+        8 + 1 + 8 + 1 + 8 + (4 + uri.len()) + 128
     }
 }
