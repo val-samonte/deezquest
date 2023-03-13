@@ -4,19 +4,10 @@ use anchor_spl::{
     token::{FreezeAccount, Mint, MintTo, Token, TokenAccount},
 };
 
-use crate::states::{Main, Season, SeasonEntry};
+use crate::states::{Main, Season};
 
 #[derive(Accounts)]
 pub struct RegisterSeason<'info> {
-    #[account(
-        init,
-        payer = owner,
-        seeds = [b"season_entry", season.key().as_ref(), owner.key().as_ref()],
-        bump,
-        space = SeasonEntry::len()
-    )]
-    pub season_entry: Account<'info, SeasonEntry>,
-
     #[account(
         init,
         payer = owner,
@@ -32,6 +23,7 @@ pub struct RegisterSeason<'info> {
     )]
     pub season_rating_mint: Account<'info, Mint>,
 
+    #[account(mut)]
     pub season: Box<Account<'info, Season>>,
 
     #[account(mut)]
@@ -62,7 +54,6 @@ pub fn register_season_handler(ctx: Context<RegisterSeason>) -> Result<()> {
     );
     system_program::transfer(cpi_ctx, ctx.accounts.main.service_fee)?;
 
-    let season_entry = &mut ctx.accounts.season_entry;
     let token_program = &ctx.accounts.token_program;
     let season = &mut ctx.accounts.season;
     let season_rating_mint = &ctx.accounts.season_rating_mint;
@@ -71,12 +62,6 @@ pub fn register_season_handler(ctx: Context<RegisterSeason>) -> Result<()> {
     let season_id = season.id.to_le_bytes();
 
     season.registered_players += 1;
-
-    season_entry.bump = *ctx.bumps.get("season_entry").unwrap();
-    season_entry.owner = ctx.accounts.owner.key();
-    season_entry.season = season.key();
-    season_entry.is_banned = false;
-    season_entry.existing_match = None;
 
     let inner = vec![b"season".as_ref(), season_id.as_ref(), season_bump.as_ref()];
     let outer = vec![inner.as_slice()];
