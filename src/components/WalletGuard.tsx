@@ -7,7 +7,10 @@ export default function WalletGuard() {
     <div className='absolute inset-0 flex flex-col items-center justify-center'>
       <div className='relative flex flex-col items-center justify-center gap-5 p-5'>
         <p className='text-center sm:text-lg xl:text-xl'>
-          Please connect your wallet to continue
+          Please connect your wallet to continue <br />
+          <span className='sm:text-sm xl:text-base'>
+            (Please switch to DEVNET)
+          </span>
         </p>
         <button
           type='button'

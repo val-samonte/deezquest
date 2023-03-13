@@ -1,15 +1,17 @@
 use anchor_lang::prelude::*;
 
+mod instructions;
+mod states;
+
+use instructions::*;
+
 declare_id!("4eMRK1vkaB3qN7Hxxdvu48bjaTb4bAKsh4KDTeffcu9Z");
 
 #[program]
 pub mod deezquest {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        Ok(())
+    pub fn init(ctx: Context<Init>, params: InitParams) -> Result<()> {
+        init_handler(ctx, params)
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}
