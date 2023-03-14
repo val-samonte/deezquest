@@ -1,5 +1,7 @@
 use anchor_lang::{prelude::*, solana_program::hash::hashv};
 
+use crate::instructions::player;
+
 #[account]
 pub struct Game {
     /// Bump nonce of the PDA. (1)
@@ -643,10 +645,197 @@ pub fn skills(
     command_level: u8,
     player: &mut Hero,
     opponent: &mut Hero,
+    pre_command_player: Option<&Hero>,
     tiles: &Option<[Option<u8>; 64]>,
     game_hash: &Option<[u8; 32]>,
     depths: &Option<[u8; 8]>,
-) {
+) -> (Hero, Hero, Option<[Option<u8>; 64]>, Option<[u8; 32]>) {
+    match index {
+        // 'Burning Punch'
+        0 => {
+            let atk = (player.base_dmg + command_level) * 2;
+            let opponent_mp = opponent.fire_mp;
+            let player_mp = pre_command_player.unwrap().fire_mp;
+            let mag = if player_mp > opponent_mp {
+                player_mp - opponent_mp
+            } else {
+                opponent_mp - player_mp
+            };
+            let mag = mag * if command_level == 3 { 2 } else { 1 };
+            apply_damage(opponent, Some(atk), Some(mag), None, None);
+
+            return (*player, *opponent, None, None);
+        }
+        // 'Swift Strike'
+        1 => {
+            let mut mag = match command_level {
+                1 => 6,
+                2 => 8,
+                _ => 10,
+            };
+
+            if command_level == 3 {
+                mag += if player.attr_spd > opponent.attr_spd {
+                    player.attr_spd - opponent.attr_spd
+                } else {
+                    0
+                };
+                opponent.turn_time = if opponent.turn_time > 100 {
+                    opponent.turn_time - 100
+                } else {
+                    0
+                };
+            }
+            apply_damage(opponent, None, Some(mag), None, None);
+
+            return (*player, *opponent, None, None);
+        }
+        // 'Aquashot'
+        2 => {
+            let mut mag = match command_level {
+                1 => 4,
+                2 => 12,
+                _ => 16,
+            };
+
+            if command_level == 3 {
+                mag += if player.attr_vit > opponent.attr_vit {
+                    player.attr_vit - opponent.attr_vit
+                } else {
+                    0
+                };
+            }
+
+            apply_damage(opponent, None, Some(mag), None, Some(command_level == 3));
+
+            return (*player, *opponent, None, None);
+        }
+        // 'Crushing Blow'
+        3 => {
+            let pre_player = pre_command_player.unwrap();
+            let mag = pre_player.eart_mp * 2;
+            let mut atk = 0;
+            if command_level > 1 && pre_player.eart_mp >= 5 {
+                atk = player.attr_str;
+            }
+            apply_damage(opponent, Some(atk), Some(mag), None, None);
+            if command_level == 3 {
+                opponent.armor = 0;
+            }
+            return (*player, *opponent, None, None);
+        }
+        // 'Empower'
+        4 => {
+            player.base_dmg += command_level * 3;
+            return (*player, *opponent, None, None);
+        }
+        // 'Tailwind'
+        5 => {
+            player.attr_spd += command_level;
+            return (*player, *opponent, None, None);
+        }
+        // 'Healing'
+        6 => {
+            let mut heal = match command_level {
+                1 => 6,
+                2 => 8,
+                _ => 10,
+            };
+            if command_level == 3 {
+                heal += player.attr_vit * 2;
+            }
+            add_hp(player, heal);
+            return (*player, *opponent, None, None);
+        }
+        // 'Manawall'
+        7 => {
+            let pre_player = pre_command_player.unwrap();
+            player.shell += pre_player.eart_mp;
+            if command_level > 1 && pre_player.eart_mp >= 5 {
+                player.armor += player.attr_str;
+            }
+            return (*player, *opponent, None, None);
+        }
+        // 'Combustion'
+        8 => {
+            let mut count = 0;
+            let mut new_tiles = tiles.unwrap().clone();
+            let mut i = 0;
+            while i < 64 {
+                if new_tiles[i] == Some(5) {
+                    count += 1;
+                    new_tiles[i] = Some(3);
+                }
+                i += 1;
+            }
+            if count == 0 {
+                return (*player, *opponent, Some(new_tiles), None);
+            }
+
+            let mag = count * 2;
+            apply_damage(opponent, None, Some(mag), None, None);
+            return (*player, *opponent, Some(new_tiles), None);
+        }
+        // 'Tornado'
+        9 => {
+            let new_hash = hashv(&[b"SHUFFLE", &game_hash.unwrap()]);
+            let new_hash: &[u8; 32] = &new_hash.to_bytes()[..32].try_into().unwrap();
+            let tiles = tiles.unwrap();
+            let mut new_tiles = hash_to_tiles(new_hash);
+            let mut count = 0;
+            let mut i = 0;
+            while i < 64 {
+                if tiles[i].is_none() {
+                    new_tiles[i] = None;
+                } else if tiles[i] == Some(4) || tiles[i] == Some(6) {
+                    count += 1;
+                }
+                i += 1;
+            }
+            apply_damage(opponent, None, Some(count), None, None);
+            return (*player, *opponent, Some(new_tiles), Some(*new_hash));
+        }
+        // 'Extinguish'
+        10 => {
+            let mut count = 0;
+            let mut new_tiles = tiles.unwrap().clone();
+            let mut i = 0;
+            while i < 64 {
+                if new_tiles[i] == Some(3) {
+                    count += 1;
+                    new_tiles[i] = Some(5);
+                }
+                i += 1;
+            }
+            if count == 0 {
+                return (*player, *opponent, Some(new_tiles), None);
+            }
+
+            let mag = count * 2;
+            add_hp(player, mag);
+            return (*player, *opponent, Some(new_tiles), None);
+        }
+        // 'Quake'
+        11 => {
+            let player_dmg = if player.wind_mp < 30 {
+                30 - player.wind_mp
+            } else {
+                30
+            };
+            let opponent_dmg = if opponent.wind_mp < 30 {
+                30 - player.wind_mp
+            } else {
+                30
+            };
+
+            apply_damage(player, None, Some(player_dmg), None, None);
+            apply_damage(opponent, None, Some(opponent_dmg), None, None);
+
+            return (*player, *opponent, None, None);
+        }
+        // Fallback
+        _ => (*player, *opponent, None, None),
+    }
 }
 
 pub struct CommandQueue {
