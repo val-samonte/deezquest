@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program::hash::hashv};
 
 #[account(zero_copy)]
 pub struct Game {
@@ -71,7 +71,7 @@ pub struct Hero {
 
 // TODO: i don't know what i am doing :D
 impl Hero {
-    pub fn from(serialized: [u8; 22]) -> Hero {
+    pub fn from_bytes(serialized: [u8; 22]) -> Hero {
         Hero {
             hp: serialized[0],
             hp_cap: serialized[1],
@@ -124,187 +124,196 @@ impl Hero {
             self.special_skill,
         ]
     }
+
+    pub fn from_pubkey(&pubkey: Pubkey) -> Hero {
+        let [int, spd, vit, str] = get_hero_attributes(pubkey);
+        let mut bytes = pubkey.to_bytes().as_ref();
+
+        Hero {
+            hp: 80 + vit * 2,
+            hp_cap: 80 + vit * 2,
+            armor: 0,
+            shell: 0,
+            turn_time: 0,
+            base_dmg: str,
+            fire_mp: 0,
+            fire_mp_cap: 10 + int,
+            wind_mp: 0,
+            wind_mp_cap: 10 + int,
+            watr_mp: 0,
+            watr_mp_cap: 10 + int,
+            eart_mp: 0,
+            eart_mp_cap: 10 + int,
+            int,
+            spd,
+            vit,
+            str,
+            weight: 0,
+            offensive_skill: bytes[0] % 4,
+            supportive_skill: (bytes[1] % 4) + 4,
+            special_Skill: (bytes[2] % 4) + 8,
+        }
+    }
 }
 
-pub fn get_hero_attributes(pubkey: Pubkey) -> Hero {
-    Hero {}
+pub fn get_hero_attributes(&pubkey: Pubkey) -> Hero {
+    let mut attribs: [u8; 4] = [
+        1, // INT - Mana cap increase
+        1, // SPD - More likely to get a turn
+        1, // VIT - Flat HP increase
+        1, // STR - Able to carry heavier equipment, base damage
+    ];
+    let mut cursor = 0;
+    let mut remaining = 17;
+    let mut bytes = pubkey.to_bytes().as_ref();
+
+    let mut i = 0;
+    while i < u8::MAX && remaining > 0 {
+        if bytes[i % 32] % 2 == 0 || attribs[cursor] == 10 {
+            cursor = (cursor + 1) % 4;
+        } else {
+            attribs[cursor] += 1;
+            remaining -= 1;
+        }
+
+        i += 1;
+    }
+
+    if remaining != 0 {
+        attribs = [5, 5, 5, 5];
+        attribs[bytes[0] % 4] += 1;
+    }
+
+    attribs
 }
 
-// export const getHeroAttributes = (pubkey: PublicKey) => {
-//     let attribs = [
-//         1, // INT - Mana cap increase
-//         1, // SPD - More likely to get a turn
-//         1, // VIT - Flat HP increase
-//         1, // STR - Able to carry heavier equipment
-//     ]
-//     let cursor = 0
-//     let remaining = 17
-//     let bytes = pubkey.toBytes()
+pub fn apply_damage(
+    &mut hero: Hero,
+    physical: Option<u8>,
+    magical: Option<u8>,
+    ignore_armor: Option<bool>,
+    ignore_shell: Option<bool>,
+) -> Result<Ok> {
+    physical = physical.unwrap_or(0);
+    magical = magical.unwrap_or(0);
+    ignore_armor = ignore_armor.unwrap_or(false);
+    ignore_shell = ignore_shell.unwrap_or(false);
 
-//     for (let i = 0; i < 256 && remaining > 0; i++) {
-//         if (bytes[i % 32] % 2 === 0 || attribs[cursor] === 10) {
-//         cursor = (cursor + 1) % 4
-//         } else {
-//         attribs[cursor] += 1
-//         remaining -= 1
-//         }
-//     }
+    if !ignore_armor {
+        if hero.armor < physical {
+            physical -= hero.armor;
+            hero.armor = 0;
+        } else {
+            hero.armor -= physical;
+            physical = 0;
+        }
+    }
 
-//     // very unlikely to happen
-//     if (remaining !== 0) {
-//         attribs = [5, 5, 5, 5]
-//         attribs[bytes[0] % 4] += 1
-//     }
+    if !ignore_shell {
+        if hero.shell < magical {
+            magical -= hero.shell;
+            hero.shell = 0;
+        } else {
+            hero.shell -= magical;
+            magical = 0;
+        }
+    }
 
-//     return attribs
-//     }
+    hero.hp -= physical + magical;
 
-//     export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
-//     if (typeof publicKey === 'string') {
-//         publicKey = new PublicKey(publicKey)
-//     }
+    hero
+}
 
-//     const [int, spd, vit, str] = getHeroAttributes(publicKey)
-//     const bytes = publicKey.toBytes()
+// TODO: simplify this, create a pure function to cap value (Math.max?)
+pub fn add_hp(&mut hero: Hero, amount: u8) -> Hero {
+    hero.hp += amount;
+    if hero.hp > hero.hp_cap {
+        hero.hp = hero.hp_cap;
+    }
+    hero
+}
 
-//     return {
-//         hp: 80 + vit * 2,
-//         hpCap: 80 + vit * 2,
-//         armor: 0,
-//         shell: 0,
-//         turnTime: 0,
-//         baseDmg: str,
-//         fireMp: 0,
-//         fireMpCap: 10 + int,
-//         windMp: 0,
-//         windMpCap: 10 + int,
-//         watrMp: 0,
-//         watrMpCap: 10 + int,
-//         eartMp: 0,
-//         eartMpCap: 10 + int,
-//         int: int,
-//         spd: spd,
-//         vit: vit,
-//         str: str,
-//         weight: 0,
-//         offensiveSkill: bytes[0] % 4,
-//         supportiveSkill: (bytes[1] % 4) + 4,
-//         specialSkill: (bytes[2] % 4) + 8,
-//     }
-//     }
+pub fn absorb_mana(&mut hero: Hero, absorbed_mana: [u8; 4]) -> Hero {
+    hero.fire_mp += absorbed_mana[0];
+    hero.wind_mp += absorbed_mana[1];
+    hero.watr_mp += absorbed_mana[2];
+    hero.eart_mp += absorbed_mana[3];
 
-//     export const applyDamage = (
-//     hero: Hero,
-//     physical = 0,
-//     magical = 0,
-//     ignoreArmor = false,
-//     ignoreShell = false,
-//     ) => {
-//     if (!ignoreArmor) {
-//         if (hero.armor < physical) {
-//         physical -= hero.armor
-//         hero.armor = 0
-//         } else {
-//         hero.armor -= physical
-//         physical = 0
-//         }
-//     }
+    if hero.fire_mp > hero.fire_mp_cap {
+        hero.fire_mp = hero.fire_mpCap;
+    }
+    if hero.wind_mp > hero.wind_mp_cap {
+        hero.wind_mp = hero.wind_mpCap;
+    }
+    if hero.watr_mp > hero.watr_mp_cap {
+        hero.watr_mp = hero.watr_mpCap;
+    }
+    if hero.eart_mp > hero.eart_mp_cap {
+        hero.eart_mp = hero.eart_mpCap;
+    }
 
-//     if (!ignoreShell) {
-//         if (hero.shell < magical) {
-//         magical -= hero.shell
-//         hero.shell = 0
-//         } else {
-//         hero.shell -= magical
-//         magical = 0
-//         }
-//     }
+    hero
+}
 
-//     hero.hp -= physical + magical
+pub fn get_next_turn(
+    &mut hero1: Hero,
+    &mut hero2: Hero,
+    &pubkey1: [u8; 32],
+    &pubkey2: [u8; 32],
+    &game_hash: [u8; 32],
+) -> (Hero, [u8; 32]) {
+    while hero1.turn_time < 200 && hero2.turn_time < 200 {
+        hero1.turn_time += hero1.spd + 10;
+        hero2.turn_time += hero2.spd + 10;
+    }
 
-//     return hero
-//     }
+    if hero1.turn_time >= 200 && hero2.turn_time >= 200 {
+        let seq1 = [
+            hero1.turn_time,
+            hero1.spd,
+            hero1.vit,
+            hero1.str,
+            hero1.int,
+            hero1.hp,
+        ];
+        let seq2 = [
+            hero2.turn_time,
+            hero2.spd,
+            hero2.vit,
+            hero2.str,
+            hero2.int,
+            hero2.hp,
+        ];
 
-//     export const addHp = (hero: Hero, amount: number) => {
-//     hero.hp += amount
-//     if (hero.hp > hero.hpCap) hero.hp = hero.hpCap
-//     return hero
-//     }
+        let mut i = 0;
+        while i < 6 {
+            if seq1[i] > seq2[i] {
+                return (hero1, pubkey1);
+            } else if seq1[i] < seq2[i] {
+                return (hero2, pubkey2);
+            }
+        }
 
-//     export const absorbMana = (
-//     hero: Hero,
-//     absorbedMana: number[] /* [FIRE, WIND, WATR, EART] */,
-//     ) => {
-//     hero.fireMp += absorbedMana[0]
-//     hero.windMp += absorbedMana[1]
-//     hero.watrMp += absorbedMana[2]
-//     hero.eartMp += absorbedMana[3]
+        // random using game hash
+        let hash1 = hashv(&[&pubkey1, &game_hash]);
+        let seq1 = &hash.to_bytes()[..32];
 
-//     if (hero.fireMp > hero.fireMpCap) hero.fireMp = hero.fireMpCap
-//     if (hero.windMp > hero.windMpCap) hero.windMp = hero.windMpCap
-//     if (hero.watrMp > hero.watrMpCap) hero.watrMp = hero.watrMpCap
-//     if (hero.eartMp > hero.eartMpCap) hero.eartMp = hero.eartMpCap
+        let hash2 = hashv(&[&pubkey2, &game_hash]);
+        let seq2 = &hash.to_bytes()[..32];
 
-//     return hero
-//     }
+        let mut i = 0;
+        while i < 32 {
+            if seq1[i] > seq2[i] {
+                return (hero1, pubkey1);
+            } else if seq1[i] < seq2[i] {
+                return (hero2, pubkey2);
+            }
+        }
 
-//     export const getNextTurn = (
-//     hero1: Hero,
-//     hero2: Hero,
-//     pubkey1: Uint8Array,
-//     pubkey2: Uint8Array,
-//     gameHash: Uint8Array,
-//     ) => {
-//     while (hero1.turnTime < 200 && hero2.turnTime < 200) {
-//         hero1.turnTime += hero1.spd + 5
-//         hero2.turnTime += hero2.spd + 5
-//     }
+        panic!("Heroes are too identical, even having the same public key hash result.");
+    } else if hero1.turn_time >= 200 {
+        return (hero1, pubkey1);
+    }
 
-//     if (hero1.turnTime >= 200 && hero2.turnTime >= 200) {
-//         const seq1 = [
-//         hero1.turnTime,
-//         hero1.spd,
-//         hero1.vit,
-//         hero1.str,
-//         hero1.int,
-//         hero1.hp,
-//         ...Array.from(
-//             crypto
-//             .createHash('sha256')
-//             .update(Buffer.concat([pubkey1, gameHash]))
-//             .digest(),
-//         ),
-//         ]
-//         const seq2 = [
-//         hero2.turnTime,
-//         hero2.spd,
-//         hero2.vit,
-//         hero2.str,
-//         hero2.int,
-//         hero2.hp,
-//         ...Array.from(
-//             crypto
-//             .createHash('sha256')
-//             .update(Buffer.concat([pubkey2, gameHash]))
-//             .digest(),
-//         ),
-//         ]
-
-//         for (let i = 0; i < seq1.length; i++) {
-//         if (seq1[i] > seq2[i]) {
-//             return { hero: hero1, pubkey: pubkey1 }
-//         } else if (seq1[i] < seq2[i]) {
-//             return { hero: hero2, pubkey: pubkey2 }
-//         }
-//         }
-
-//         // shouldn't reach this point, unless both hero 1 and hero 2 are the same
-//         throw new Error(
-//         'Heroes are too identical, even having the same public key hash result.',
-//         )
-//     } else if (hero1.turnTime >= 200) {
-//         return { hero: hero1, pubkey: pubkey1 }
-//     }
-
-//     return { hero: hero2, pubkey: pubkey2 }
-//     }
+    (hero2, pubkey2)
+}
