@@ -44,6 +44,7 @@ impl Game {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Hero {
     hp: u8,
     hp_cap: u8,
@@ -151,7 +152,7 @@ impl Hero {
             weight: 0,
             offensive_skill: bytes[0] % 4,
             supportive_skill: (bytes[1] % 4) + 4,
-            special_Skill: (bytes[2] % 4) + 8,
+            special_skill: (bytes[2] % 4) + 8,
         }
     }
 }
@@ -518,110 +519,215 @@ pub fn fill(
     tiles
 }
 
-// export const skillCountPerMana = (mana: number[], cost: SkillCost) => {
-//     const costs = [cost.fire, cost.wind, cost.water, cost.earth]
+pub fn skill_count_per_mana(mana: [u8; 4], &costs: [Option<u8>; 4]) -> [Option<u8>; 4] {
+    let mut result: [Option<u8>; 4] = [None; 4];
+    let mut i = 0;
 
-//     return mana.map((mp, i) => {
-//       if (typeof costs[i] === 'undefined') return undefined
+    while i < 4 {
+        if costs[i].is_none() {
+            continue;
+        }
+        let cost = costs[i].unwrap();
 
-//       if (costs[i] === 0) {
-//         return mp >= 1 ? 1 : 0
-//       }
+        if (cost == 0) {
+            result[i] = if mana[i] >= 1 { Some(1) } else { Some(0) };
+            continue;
+        }
 
-//       return mp / costs[i]!
-//     })
-//   }
+        result[i] = mana[i] / cost;
 
-//   export const isExecutable = (hero: Hero, cost: SkillCost) => {
-//     const count = skillCountPerMana(
-//       [hero.fireMp, hero.windMp, hero.watrMp, hero.eartMp],
-//       cost,
-//     )
+        i += 1;
+    }
 
-//     return count.every((n) => {
-//       if (typeof n === 'undefined') return true
-//       if (n >= 1) return true
+    result
+}
 
-//       return false
-//     })
-//   }
+pub fn is_executable(&mut hero: Hero, &costs: [Option<u8>; 4]) -> bool {
+    let counts = skill_count_per_mana(
+        [hero.fire_mp, hero.wind_mp, hero.watr_mp, hero.eart_mp],
+        &costs,
+    );
 
-//   export const deductMana = (hero: Hero, cost: SkillCost) => {
-//     hero.fireMp -= cost.fire === 0 ? hero.fireMp : cost.fire ?? 0
-//     hero.windMp -= cost.wind === 0 ? hero.windMp : cost.wind ?? 0
-//     hero.watrMp -= cost.water === 0 ? hero.watrMp : cost.water ?? 0
-//     hero.eartMp -= cost.earth === 0 ? hero.eartMp : cost.earth ?? 0
+    let mut result = true;
+    let mut i = 0;
 
-//     return hero
-//   }
+    while i < 4 {
+        if counts[i].is_none() {
+            continue;
+        }
+        if counts[i].unwrap() >= 1 {
+            continue;
+        }
 
-//   export const executableCommands = (
-//     originalHero: Hero,
-//     absorbedCommands: number[] /* [ATK, SUP, SPE] */,
-//   ) => {
-//     let hero = { ...originalHero } as Hero
-//     const flags = [false, false, false]
-//     const offensiveSkill = skills[hero.offensiveSkill]
-//     const supportiveSkill = skills[hero.supportiveSkill]
-//     const specialSkill = skills[hero.specialSkill]
-//     const queue: {
-//       hero: Hero
-//       lvl?: number
-//       skill?: Skill
-//       attack?: number
-//       armor?: number
-//     }[] = []
+        result = false;
+        break;
 
-//     // priority: special skill > supportive skill > offensive skill
+        i += 1;
+    }
 
-//     // Special Skill requires to have 4 or more amulets to be executed
-//     if (absorbedCommands[2] > 3) {
-//       if (isExecutable(hero, specialSkill.cost)) {
-//         hero = deductMana(hero, specialSkill.cost)
-//         queue.push({
-//           hero: { ...hero },
-//           skill: specialSkill,
-//         })
-//         flags[2] = true
-//       }
-//     }
+    result
+}
 
-//     if (absorbedCommands[1] > 2) {
-//       if (isExecutable(hero, supportiveSkill.cost)) {
-//         hero = deductMana(hero, supportiveSkill.cost)
-//         queue.push({
-//           hero: { ...hero },
-//           lvl: absorbedCommands[1] > 4 ? 3 : absorbedCommands[1] === 4 ? 2 : 1,
-//           skill: supportiveSkill,
-//         })
-//         flags[1] = true
-//       } else {
-//         queue.push({
-//           armor: absorbedCommands[1],
-//           hero: { ...hero },
-//         })
-//       }
-//     }
+pub fn deduct_mana(&mut hero: Hero, &costs: [Option<u8>; 4]) -> Hero {
+    // NOTE: 0 cost means ALL mana. None means literally no cost.
+    let mut mana = [hero.fire_mp, hero.wind_mp, hero.watr_mp, hero.eart_mp];
+    let mut i = 0;
+    while i < 4 {
+        if costs[i].is_none() {
+            continue;
+        }
 
-//     if (absorbedCommands[0] > 2) {
-//       if (isExecutable(hero, offensiveSkill.cost)) {
-//         hero = deductMana(hero, offensiveSkill.cost)
-//         queue.push({
-//           hero: { ...hero },
-//           lvl: absorbedCommands[0] > 4 ? 3 : absorbedCommands[0] === 4 ? 2 : 1,
-//           skill: offensiveSkill,
-//         })
-//         flags[0] = true
-//       } else {
-//         queue.push({
-//           attack: absorbedCommands[0],
-//           hero: { ...hero },
-//         })
-//       }
-//     }
+        let cost = costs[i].unwrap();
 
-//     return {
-//       flags,
-//       queue,
-//     }
-//   }
+        if cost == 0 {
+            mana[i] = 0;
+        } else {
+            if mana[i] > cost {
+                mana[i] -= cost;
+            } else {
+                mana[i] = 0;
+            }
+        }
+
+        i += 1;
+    }
+
+    hero.fire_mp = mana[0];
+    hero.wind_mp = mana[1];
+    hero.watr_mp = mana[2];
+    hero.eart_mp = mana[3];
+
+    hero
+}
+
+pub fn skill_cost(index: u8) -> [Option<u8>; 4] {
+    // [fire, wind, water, earth]
+    match index {
+        // 'Burning Punch'
+        0 => [Some(5), None, None, None],
+        // 'Swift Strike'
+        1 => [None, Some(3), None, None],
+        // 'Aquashot'
+        2 => [None, None, Some(4), None],
+        // 'Crushing Blow'
+        3 => [None, None, None, Some(0)],
+        // 'Empower'
+        4 => [Some(5), None, None, None],
+        // 'Tailwind'
+        5 => [None, Some(3), None, None],
+        // 'Healing'
+        6 => [None, None, Some(4), None],
+        // 'Manawall'
+        7 => [None, None, None, Some(0)],
+        // 'Combustion'
+        8 => [Some(8), None, None, None],
+        // 'Tornado'
+        9 => [None, Some(10), None, None],
+        // 'Extinguish'
+        10 => [None, None, Some(6), None],
+        // 'Quake'
+        11 => [None, None, None, Some(10)],
+        // fallback
+        _ => [None, None, None, None],
+    }
+}
+
+pub fn skills(
+    index: u8,
+    command_level: u8,
+    &mut player: Hero,
+    &mut opponent: Hero,
+    &tiles: Option<[Option<u8>; 64]>,
+    &game_hash: Option<[u8; 32]>,
+    &depths: Option<[u8; 8]>,
+) {
+}
+
+struct CommandQueue {
+    hero: Hero,
+    skill: Option<u8>,
+    lvl: Option<u8>,
+    attack: Option<u8>,
+    armor: Option<u8>,
+}
+
+pub fn executable_commands(&original_hero: Hero, &absorbed_commands: [u8; 3]) {
+    let mut hero = original_hero.clone();
+    let mut flags = [false, false, false];
+    let mut queue: Vec<CommandQueue> = Vec::new();
+
+    if absorbed_commands[2] > 3 {
+        let costs = skill_cost(hero.special_skill);
+        if is_executable(hero, costs) {
+            deduct_mana(hero, costs);
+            queue.push(CommandQueue {
+                hero: hero.clone(),
+                skill: Some(hero.special_skill),
+                lvl: None,
+                attack: None,
+                armor: None,
+            });
+            flags[2] = true;
+        }
+    }
+
+    if absorbed_commands[1] > 2 {
+        let costs = skill_cost(hero.supportive_skill);
+        if is_executable(hero, costs) {
+            deduct_mana(hero, costs);
+            queue.push(CommandQueue {
+                hero: hero.clone(),
+                skill: Some(hero.supportive_skill),
+                lvl: Some(if absorbed_commands[1] > 4 {
+                    3
+                } else if absorbed_commands[1] == 4 {
+                    2
+                } else {
+                    1
+                }),
+                attack: None,
+                armor: None,
+            });
+            flags[1] = true;
+        } else {
+            queue.push(CommandQueue {
+                hero: hero.clone(),
+                skill: None,
+                lvl: None,
+                attack: None,
+                armor: absorbed_commands[1],
+            });
+        }
+    }
+
+    if absorbed_commands[0] > 2 {
+        let costs = skill_cost(hero.offensive_skill);
+        if is_executable(hero, costs) {
+            deduct_mana(hero, costs);
+            queue.push(CommandQueue {
+                hero: hero.clone(),
+                skill: Some(hero.offensive_skill),
+                lvl: Some(if absorbed_commands[0] > 4 {
+                    3
+                } else if absorbed_commands[0] == 4 {
+                    2
+                } else {
+                    1
+                }),
+                attack: None,
+                armor: None,
+            });
+            flags[0] = true;
+        } else {
+            queue.push(CommandQueue {
+                hero: hero.clone(),
+                skill: None,
+                lvl: None,
+                attack: absorbed_commands[0],
+                armor: None,
+            });
+        }
+    }
+
+    (flags, queue)
+}
