@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::hash::hashv};
 
-#[account(zero_copy)]
+#[account]
 pub struct Game {
     /// Bump nonce of the PDA. (1)
     bump: u8,
@@ -35,7 +35,7 @@ pub struct Game {
     /// Turns made by either player, capped at 100 turns.
     /// Reaching 100, the game should compare the HP of both players.
     /// Highest HP wins. If HP is the same, result is draw.
-    turns: [u8; 100],
+    turns: [u8; 128],
 }
 
 impl Game {
@@ -126,9 +126,9 @@ impl Hero {
         ]
     }
 
-    pub fn from_pubkey(&pubkey: Pubkey) -> Hero {
+    pub fn from_pubkey(pubkey: &Pubkey) -> Hero {
         let [int, spd, vit, str] = get_hero_attributes(pubkey);
-        let mut bytes = pubkey.to_bytes().as_ref();
+        let bytes = pubkey.to_bytes();
 
         Hero {
             hp: 80 + vit * 2,
@@ -145,10 +145,10 @@ impl Hero {
             watr_mp_cap: 10 + int,
             eart_mp: 0,
             eart_mp_cap: 10 + int,
-            int,
-            spd,
-            vit,
-            str,
+            attr_int: int,
+            attr_spd: spd,
+            attr_vit: vit,
+            attr_str: str,
             weight: 0,
             offensive_skill: bytes[0] % 4,
             supportive_skill: (bytes[1] % 4) + 4,
@@ -157,7 +157,7 @@ impl Hero {
     }
 }
 
-pub fn get_hero_attributes(&pubkey: Pubkey) -> Hero {
+pub fn get_hero_attributes(pubkey: &Pubkey) -> [u8; 4] {
     let mut attribs: [u8; 4] = [
         1, // INT - Mana cap increase
         1, // SPD - More likely to get a turn
@@ -166,11 +166,12 @@ pub fn get_hero_attributes(&pubkey: Pubkey) -> Hero {
     ];
     let mut cursor = 0;
     let mut remaining = 17;
-    let mut bytes = pubkey.to_bytes().as_ref();
+    let bytes = pubkey.to_bytes();
 
     let mut i = 0;
     while i < u8::MAX && remaining > 0 {
-        if bytes[i % 32] % 2 == 0 || attribs[cursor] == 10 {
+        let idx: usize = (i % 32).into();
+        if bytes[idx] % 2 == 0 || attribs[cursor] == 10 {
             cursor = (cursor + 1) % 4;
         } else {
             attribs[cursor] += 1;
@@ -181,24 +182,25 @@ pub fn get_hero_attributes(&pubkey: Pubkey) -> Hero {
     }
 
     if remaining != 0 {
+        let idx: usize = (bytes[0] % 4).into();
         attribs = [5, 5, 5, 5];
-        attribs[bytes[0] % 4] += 1;
+        attribs[idx] += 1;
     }
 
     attribs
 }
 
 pub fn apply_damage(
-    &mut hero: Hero,
+    hero: &mut Hero,
     physical: Option<u8>,
     magical: Option<u8>,
     ignore_armor: Option<bool>,
     ignore_shell: Option<bool>,
-) -> Result<Ok> {
-    physical = physical.unwrap_or(0);
-    magical = magical.unwrap_or(0);
-    ignore_armor = ignore_armor.unwrap_or(false);
-    ignore_shell = ignore_shell.unwrap_or(false);
+) -> Hero {
+    let mut physical = physical.unwrap_or(0);
+    let mut magical = magical.unwrap_or(0);
+    let ignore_armor = ignore_armor.unwrap_or(false);
+    let ignore_shell = ignore_shell.unwrap_or(false);
 
     if !ignore_armor {
         if hero.armor < physical {
@@ -222,120 +224,120 @@ pub fn apply_damage(
 
     hero.hp -= physical + magical;
 
-    hero
+    *hero
 }
 
 // TODO: simplify this, create a pure function to cap value (Math.max?)
-pub fn add_hp(&mut hero: Hero, amount: u8) -> Hero {
+pub fn add_hp(hero: &mut Hero, amount: u8) -> Hero {
     hero.hp += amount;
     if hero.hp > hero.hp_cap {
         hero.hp = hero.hp_cap;
     }
-    hero
+    *hero
 }
 
-pub fn absorb_mana(&mut hero: Hero, absorbed_mana: [u8; 4]) -> Hero {
+pub fn absorb_mana(hero: &mut Hero, absorbed_mana: [u8; 4]) -> Hero {
     hero.fire_mp += absorbed_mana[0];
     hero.wind_mp += absorbed_mana[1];
     hero.watr_mp += absorbed_mana[2];
     hero.eart_mp += absorbed_mana[3];
 
     if hero.fire_mp > hero.fire_mp_cap {
-        hero.fire_mp = hero.fire_mpCap;
+        hero.fire_mp = hero.fire_mp_cap;
     }
     if hero.wind_mp > hero.wind_mp_cap {
-        hero.wind_mp = hero.wind_mpCap;
+        hero.wind_mp = hero.wind_mp_cap;
     }
     if hero.watr_mp > hero.watr_mp_cap {
-        hero.watr_mp = hero.watr_mpCap;
+        hero.watr_mp = hero.watr_mp_cap;
     }
     if hero.eart_mp > hero.eart_mp_cap {
-        hero.eart_mp = hero.eart_mpCap;
+        hero.eart_mp = hero.eart_mp_cap;
     }
 
-    hero
+    *hero
 }
 
 pub fn get_next_turn(
-    &mut hero1: Hero,
-    &mut hero2: Hero,
-    &pubkey1: [u8; 32],
-    &pubkey2: [u8; 32],
-    &game_hash: [u8; 32],
+    hero1: &mut Hero,
+    hero2: &mut Hero,
+    pubkey1: &[u8; 32],
+    pubkey2: &[u8; 32],
+    game_hash: &[u8; 32],
 ) -> (Hero, [u8; 32]) {
     while hero1.turn_time < 200 && hero2.turn_time < 200 {
-        hero1.turn_time += hero1.spd + 10;
-        hero2.turn_time += hero2.spd + 10;
+        hero1.turn_time += hero1.attr_spd + 10;
+        hero2.turn_time += hero2.attr_spd + 10;
     }
 
     if hero1.turn_time >= 200 && hero2.turn_time >= 200 {
         let seq1 = [
             hero1.turn_time,
-            hero1.spd,
-            hero1.vit,
-            hero1.str,
-            hero1.int,
+            hero1.attr_spd,
+            hero1.attr_vit,
+            hero1.attr_str,
+            hero1.attr_int,
             hero1.hp,
         ];
         let seq2 = [
             hero2.turn_time,
-            hero2.spd,
-            hero2.vit,
-            hero2.str,
-            hero2.int,
+            hero2.attr_spd,
+            hero2.attr_vit,
+            hero2.attr_str,
+            hero2.attr_int,
             hero2.hp,
         ];
 
         let mut i = 0;
         while i < 6 {
             if seq1[i] > seq2[i] {
-                return (hero1, pubkey1);
+                return (*hero1, *pubkey1);
             } else if seq1[i] < seq2[i] {
-                return (hero2, pubkey2);
+                return (*hero2, *pubkey2);
             }
             i += 1;
         }
 
         // random using game hash
-        let hash1 = hashv(&[&pubkey1, &game_hash]);
-        let seq1 = &hash.to_bytes()[..32];
+        let hash1 = hashv(&[pubkey1, game_hash]);
+        let seq1 = &hash1.to_bytes()[..32];
 
-        let hash2 = hashv(&[&pubkey2, &game_hash]);
-        let seq2 = &hash.to_bytes()[..32];
+        let hash2 = hashv(&[pubkey2, game_hash]);
+        let seq2 = &hash2.to_bytes()[..32];
 
         let mut i = 0;
         while i < 32 {
             if seq1[i] > seq2[i] {
-                return (hero1, pubkey1);
+                return (*hero1, *pubkey1);
             } else if seq1[i] < seq2[i] {
-                return (hero2, pubkey2);
+                return (*hero2, *pubkey2);
             }
             i += 1;
         }
 
         panic!("Heroes are too identical, even having the same public key hash result.");
     } else if hero1.turn_time >= 200 {
-        return (hero1, pubkey1);
+        return (*hero1, *pubkey1);
     }
 
-    (hero2, pubkey2)
+    (*hero2, *pubkey2)
 }
 
-pub fn hash_to_tiles(&hash: [u8; 32]) -> [Option<u8>; 64] {
+pub fn hash_to_tiles(hash: &[u8; 32]) -> [Option<u8>; 64] {
     let mut tiles: [Option<u8>; 64] = [None; 64];
     let mut i = 0;
     while i < 32 {
         let byte = hash[i];
 
-        tiles[i] = (byte * 0xf) % 7;
-        tiles[i + 32] = ((byte >> 4) & 0xf) % 7;
+        tiles[i] = Some((byte * 0xf) % 7);
+        tiles[i + 32] = Some(((byte >> 4) & 0xf) % 7);
 
         i += 1;
     }
     tiles
 }
 
-pub fn has_match(&tiles: [Option<u8>; 64]) -> bool {
+pub fn has_match(tiles: &[Option<u8>; 64]) -> bool {
     let mut i = 0;
     while i < 64 {
         let node_type = tiles[i];
@@ -362,10 +364,10 @@ pub fn has_match(&tiles: [Option<u8>; 64]) -> bool {
     false
 }
 
-pub fn get_matches(&tiles: [Option<u8>; 64]) -> ([Option<u8>; 64], [u8; 7], [u8; 8]) {
+pub fn get_matches(tiles: &[Option<u8>; 64]) -> ([Option<u8>; 64], [u8; 8], [u8; 7]) {
     let mut matches: [Option<u8>; 64] = [None; 64];
-    let mut count: [u8; 7] = [0; 7];
     let mut depths: [u8; 8] = [0; 8];
+    let mut count: [u8; 7] = [0; 7];
 
     let mut i = 0;
     while i < 64 {
@@ -376,18 +378,18 @@ pub fn get_matches(&tiles: [Option<u8>; 64]) -> ([Option<u8>; 64], [u8; 7], [u8;
         // vertical
         if row < 6 {
             if !node_type.is_none() && node_type == tiles[i + 8] && node_type == tiles[i + 16] {
-                let node = node_type.unwrap();
-                if matches[i]._is_none {
+                let node = node_type.unwrap() as usize;
+                if matches[i].is_none() {
                     depths[col] += 1;
                     count[node] += 1;
                     matches[i] = node_type;
                 }
-                if matches[i + 8]._is_none {
+                if matches[i + 8].is_none() {
                     depths[col] += 1;
                     count[node] += 1;
                     matches[i + 8] = node_type;
                 }
-                if matches[i + 16]._is_none {
+                if matches[i + 16].is_none() {
                     depths[col] += 1;
                     count[node] += 1;
                     matches[i + 16] = node_type;
@@ -398,18 +400,18 @@ pub fn get_matches(&tiles: [Option<u8>; 64]) -> ([Option<u8>; 64], [u8; 7], [u8;
         // horizontal
         if col < 6 {
             if !node_type.is_none() && node_type == tiles[i + 1] && node_type == tiles[i + 2] {
-                let node = node_type.unwrap();
-                if matches[i]._is_none {
+                let node = node_type.unwrap() as usize;
+                if matches[i].is_none() {
                     depths[col] += 1;
                     count[node] += 1;
                     matches[i] = node_type;
                 }
-                if matches[i + 1]._is_none {
+                if matches[i + 1].is_none() {
                     depths[col + 1] += 1;
                     count[node] += 1;
                     matches[i + 1] = node_type;
                 }
-                if matches[i + 2]._is_none {
+                if matches[i + 2].is_none() {
                     depths[col + 2] += 1;
                     count[node] += 1;
                     matches[i + 2] = node_type;
@@ -423,7 +425,7 @@ pub fn get_matches(&tiles: [Option<u8>; 64]) -> ([Option<u8>; 64], [u8; 7], [u8;
     (matches, depths, count)
 }
 
-pub fn substract(&tiles: [Option<u8>; 64], &mask: [Option<u8>; 64]) -> [Option<u8>; 64] {
+pub fn substract(tiles: &[Option<u8>; 64], mask: &[Option<u8>; 64]) -> [Option<u8>; 64] {
     let mut result: [Option<u8>; 64] = [None; 64];
 
     let mut i = 0;
@@ -437,8 +439,8 @@ pub fn substract(&tiles: [Option<u8>; 64], &mask: [Option<u8>; 64]) -> [Option<u
     result
 }
 
-pub fn apply_gravity(&mut tiles: [Option<u8>; 64], depths: [u8; 8]) -> [Option<u8>; 64] {
-    let gravity_map: [Option<u8>; 64] = [None; 64];
+pub fn apply_gravity(tiles: &mut [Option<u8>; 64], depths: [u8; 8]) -> [Option<u8>; 64] {
+    let mut gravity_map: [Option<u8>; 64] = [None; 64];
 
     let mut i = 0;
     while i < 8 {
@@ -461,19 +463,21 @@ pub fn apply_gravity(&mut tiles: [Option<u8>; 64], depths: [u8; 8]) -> [Option<u
 
             let mut k = 0;
             while k < blanks.len() {
-                gravity_map[blanks[k]] = gravity
-                    + match gravity_map[blanks[k]] {
-                        Some(n) => n,
-                        None => 0,
-                    };
+                gravity_map[blanks[k]] = Some(
+                    gravity
+                        + match gravity_map[blanks[k]] {
+                            Some(n) => n,
+                            None => 0,
+                        },
+                );
 
                 k += 1;
             }
 
             blanks = Vec::new();
 
-            let node_type = tiles[id];
-            let dest = (j + gravity) * 8 + i;
+            let node_type = tiles[id].unwrap();
+            let dest = (j + (gravity as usize)) * 8 + i;
             tiles[id] = None;
             tiles[dest] = Some(node_type);
             gravity_map[id] = Some(gravity);
@@ -483,11 +487,13 @@ pub fn apply_gravity(&mut tiles: [Option<u8>; 64], depths: [u8; 8]) -> [Option<u
 
         let mut k = 0;
         while k < blanks.len() {
-            gravity_map[blanks[k]] = gravity
-                + match gravity_map[blanks[k]] {
-                    Some(n) => n,
-                    None => 0,
-                };
+            gravity_map[blanks[k]] = Some(
+                gravity
+                    + match gravity_map[blanks[k]] {
+                        Some(n) => n,
+                        None => 0,
+                    },
+            );
 
             k += 1;
         }
@@ -495,13 +501,13 @@ pub fn apply_gravity(&mut tiles: [Option<u8>; 64], depths: [u8; 8]) -> [Option<u
         i += 1;
     }
 
-    (gravity_map, tiles)
+    gravity_map
 }
 
 pub fn fill(
-    &tiles: [Option<u8>; 64],
-    &fillers: [Option<u8>; 64],
-    &depths: [u8; 8],
+    tiles: &mut [Option<u8>; 64],
+    fillers: &[Option<u8>; 64],
+    depths: &[u8; 8],
 ) -> [Option<u8>; 64] {
     let mut i = 0;
     while i < 8 {
@@ -510,16 +516,16 @@ pub fn fill(
         }
         let mut j = 0;
         while j < depths[i] {
-            let id = (j * 8) + i;
+            let id: usize = (j * 8) as usize + i;
             tiles[id] = fillers[id];
             j += 1;
         }
         i += 1;
     }
-    tiles
+    *tiles
 }
 
-pub fn skill_count_per_mana(mana: [u8; 4], &costs: [Option<u8>; 4]) -> [Option<u8>; 4] {
+pub fn skill_count_per_mana(mana: [u8; 4], costs: &[Option<u8>; 4]) -> [Option<u8>; 4] {
     let mut result: [Option<u8>; 4] = [None; 4];
     let mut i = 0;
 
@@ -529,12 +535,12 @@ pub fn skill_count_per_mana(mana: [u8; 4], &costs: [Option<u8>; 4]) -> [Option<u
         }
         let cost = costs[i].unwrap();
 
-        if (cost == 0) {
+        if cost == 0 {
             result[i] = if mana[i] >= 1 { Some(1) } else { Some(0) };
             continue;
         }
 
-        result[i] = mana[i] / cost;
+        result[i] = Some(mana[i] / cost);
 
         i += 1;
     }
@@ -542,7 +548,7 @@ pub fn skill_count_per_mana(mana: [u8; 4], &costs: [Option<u8>; 4]) -> [Option<u
     result
 }
 
-pub fn is_executable(&mut hero: Hero, &costs: [Option<u8>; 4]) -> bool {
+pub fn is_executable(hero: &mut Hero, costs: &[Option<u8>; 4]) -> bool {
     let counts = skill_count_per_mana(
         [hero.fire_mp, hero.wind_mp, hero.watr_mp, hero.eart_mp],
         &costs,
@@ -553,22 +559,22 @@ pub fn is_executable(&mut hero: Hero, &costs: [Option<u8>; 4]) -> bool {
 
     while i < 4 {
         if counts[i].is_none() {
+            i += 1;
             continue;
         }
         if counts[i].unwrap() >= 1 {
+            i += 1;
             continue;
         }
 
         result = false;
         break;
-
-        i += 1;
     }
 
     result
 }
 
-pub fn deduct_mana(&mut hero: Hero, &costs: [Option<u8>; 4]) -> Hero {
+pub fn deduct_mana(hero: &mut Hero, costs: &[Option<u8>; 4]) -> Hero {
     // NOTE: 0 cost means ALL mana. None means literally no cost.
     let mut mana = [hero.fire_mp, hero.wind_mp, hero.watr_mp, hero.eart_mp];
     let mut i = 0;
@@ -597,7 +603,7 @@ pub fn deduct_mana(&mut hero: Hero, &costs: [Option<u8>; 4]) -> Hero {
     hero.watr_mp = mana[2];
     hero.eart_mp = mana[3];
 
-    hero
+    *hero
 }
 
 pub fn skill_cost(index: u8) -> [Option<u8>; 4] {
@@ -635,15 +641,15 @@ pub fn skill_cost(index: u8) -> [Option<u8>; 4] {
 pub fn skills(
     index: u8,
     command_level: u8,
-    &mut player: Hero,
-    &mut opponent: Hero,
-    &tiles: Option<[Option<u8>; 64]>,
-    &game_hash: Option<[u8; 32]>,
-    &depths: Option<[u8; 8]>,
+    player: &mut Hero,
+    opponent: &mut Hero,
+    tiles: &Option<[Option<u8>; 64]>,
+    game_hash: &Option<[u8; 32]>,
+    depths: &Option<[u8; 8]>,
 ) {
 }
 
-struct CommandQueue {
+pub struct CommandQueue {
     hero: Hero,
     skill: Option<u8>,
     lvl: Option<u8>,
@@ -651,15 +657,18 @@ struct CommandQueue {
     armor: Option<u8>,
 }
 
-pub fn executable_commands(&original_hero: Hero, &absorbed_commands: [u8; 3]) {
+pub fn executable_commands(
+    original_hero: &Hero,
+    absorbed_commands: &[u8; 3],
+) -> ([bool; 3], Vec<CommandQueue>) {
     let mut hero = original_hero.clone();
     let mut flags = [false, false, false];
     let mut queue: Vec<CommandQueue> = Vec::new();
 
     if absorbed_commands[2] > 3 {
         let costs = skill_cost(hero.special_skill);
-        if is_executable(hero, costs) {
-            deduct_mana(hero, costs);
+        if is_executable(&mut hero, &costs) {
+            deduct_mana(&mut hero, &costs);
             queue.push(CommandQueue {
                 hero: hero.clone(),
                 skill: Some(hero.special_skill),
@@ -673,8 +682,8 @@ pub fn executable_commands(&original_hero: Hero, &absorbed_commands: [u8; 3]) {
 
     if absorbed_commands[1] > 2 {
         let costs = skill_cost(hero.supportive_skill);
-        if is_executable(hero, costs) {
-            deduct_mana(hero, costs);
+        if is_executable(&mut hero, &costs) {
+            deduct_mana(&mut hero, &costs);
             queue.push(CommandQueue {
                 hero: hero.clone(),
                 skill: Some(hero.supportive_skill),
@@ -695,15 +704,15 @@ pub fn executable_commands(&original_hero: Hero, &absorbed_commands: [u8; 3]) {
                 skill: None,
                 lvl: None,
                 attack: None,
-                armor: absorbed_commands[1],
+                armor: Some(absorbed_commands[1]),
             });
         }
     }
 
     if absorbed_commands[0] > 2 {
         let costs = skill_cost(hero.offensive_skill);
-        if is_executable(hero, costs) {
-            deduct_mana(hero, costs);
+        if is_executable(&mut hero, &costs) {
+            deduct_mana(&mut hero, &costs);
             queue.push(CommandQueue {
                 hero: hero.clone(),
                 skill: Some(hero.offensive_skill),
@@ -723,7 +732,7 @@ pub fn executable_commands(&original_hero: Hero, &absorbed_commands: [u8; 3]) {
                 hero: hero.clone(),
                 skill: None,
                 lvl: None,
-                attack: absorbed_commands[0],
+                attack: Some(absorbed_commands[0]),
                 armor: None,
             });
         }
