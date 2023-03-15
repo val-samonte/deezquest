@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.27.0",
     "@headlessui/react": "^1.7.11",
     "@metaplex-foundation/js": "^0.18.3",
     "@next/font": "^13.2.3",
