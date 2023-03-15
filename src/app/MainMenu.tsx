@@ -228,12 +228,19 @@ export default function MainMenu() {
                           />
                           {/* <span className='hidden md:inline'>Discord</span> */}
                         </li>
-                        <li className='opacity-20 flex items-center justify-center gap-3 p-2'>
-                          <img
-                            src='/github.svg'
-                            className='w-6 h-6'
-                            alt='Github'
-                          />
+                        <li className='flex items-center justify-center gap-3 p-2'>
+                          <a
+                            href='https://github.com/val-samonte/deezquest'
+                            target='_blank'
+                            rel='noreferrer'
+                          >
+                            <img
+                              src='/github.svg'
+                              className='w-6 h-6'
+                              alt='Github'
+                            />
+                          </a>
+
                           {/* <span className='hidden md:inline'>Github</span> */}
                         </li>
                       </ul>
