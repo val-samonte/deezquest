@@ -18,6 +18,8 @@ I started developing this project for several reasons:
 
 Please follow us on Twitter https://twitter.com/deezquest
 
+Pitch Deck: https://docs.google.com/presentation/d/1hS2_v6N4O-gLOCHs6A-t9J-LGty3xRRD7NbbWvCmnB4/edit?usp=sharing
+
 For business matters, please contact val.samonte@gmail.com
 
 We are also in Solarplex.xyz! https://www.solarplex.xyz/topic/10mN1GJDITxaHPXd
