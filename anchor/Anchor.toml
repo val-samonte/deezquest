@@ -8,8 +8,8 @@ deezquest = "4eMRK1vkaB3qN7Hxxdvu48bjaTb4bAKsh4KDTeffcu9Z"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
-wallet = "/keys/super_authority.json"
+cluster = "devnet"
+wallet = "./keys/super_authority.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

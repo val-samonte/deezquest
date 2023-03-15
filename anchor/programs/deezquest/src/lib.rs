@@ -29,4 +29,8 @@ pub mod deezquest {
     ) -> Result<()> {
         create_match_entry_handler(ctx, params)
     }
+
+    pub fn create_game_handler(ctx: Context<CreateGame>) -> Result<()> {
+        create_game_handler(ctx)
+    }
 }
