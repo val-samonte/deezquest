@@ -60,7 +60,7 @@ pub fn create_match_entry_handler(ctx: Context<CreateMatchEntry>, params: Create
     match_entry.burner_nonce = params.burner_nonce;
     match_entry.peer_nonce = params.peer_nonce;
     match_entry.code_challenge = params.code_challenge;
-    match_entry.paired_game = None;
+    match_entry.paired_match = None;
 
     Ok(())
 }

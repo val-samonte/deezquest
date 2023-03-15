@@ -1,75 +1,73 @@
 use anchor_lang::{prelude::*, solana_program::hash::hashv};
 
-use crate::instructions::player;
-
 #[account]
 pub struct Game {
     /// Bump nonce of the PDA. (1)
-    bump: u8,
+    pub bump: u8,
 
     /// The burner account of the player.
-    authority: Pubkey,
+    pub authority: Pubkey,
 
     /// State of the player.
-    player_hero: [u8; 22],
+    pub player_hero: [u8; 22],
 
     /// State of the opponent.
-    opponent_hero: [u8; 22],
+    pub opponent_hero: [u8; 22],
 
-    /// 0 - pending, 1 - win, 2 - lose, 3 - draw
-    game_state: u8,
+    /// 0 - not initialized, 1 - pending, 2 - win, 3 - lose, 4 - draw
+    pub game_state: u8,
 
     /// Representation of the board.
     /// TODO: this is wasteful, can be reduced to 3 bits per cell
-    tiles: [u8; 64],
+    pub tiles: [u8; 64],
 
     /// Starting hash of the game.
     /// Should be the combination of hashes of the burner pubkeys.
-    root_hash: [u8; 32],
+    pub root_hash: [u8; 32],
 
     /// Current hash of the game.
     /// Used for the "randomness" of the board.
-    game_hash: [u8; 32],
+    pub game_hash: [u8; 32],
 
     /// Mint address of the NFT who is currently allowed to make a move.
-    current_turn: Pubkey,
+    pub current_turn: Option<Pubkey>,
 
     /// Turns made by either player, capped at 100 turns.
     /// Reaching 100, the game should compare the HP of both players.
     /// Highest HP wins. If HP is the same, result is draw.
-    turns: [u8; 128],
+    pub turns: [u8; 128],
 }
 
 impl Game {
     pub fn len() -> usize {
-        8 + 1 + 32 + 22 + 22 + 1 + 64 + 32 + 32 + 32 + 100
+        8 + 1 + 32 + 22 + 22 + 1 + 64 + 32 + 32 + (1 + 32) + 128
     }
 }
 
 #[derive(Clone, Copy)]
 pub struct Hero {
-    hp: u8,
-    hp_cap: u8,
-    armor: u8,
-    shell: u8,
-    turn_time: u8,
-    base_dmg: u8,
-    fire_mp: u8,
-    fire_mp_cap: u8,
-    wind_mp: u8,
-    wind_mp_cap: u8,
-    watr_mp: u8,
-    watr_mp_cap: u8,
-    eart_mp: u8,
-    eart_mp_cap: u8,
-    attr_int: u8,
-    attr_spd: u8,
-    attr_vit: u8,
-    attr_str: u8,
-    weight: u8,
-    offensive_skill: u8,
-    supportive_skill: u8,
-    special_skill: u8,
+    pub hp: u8,
+    pub hp_cap: u8,
+    pub armor: u8,
+    pub shell: u8,
+    pub turn_time: u8,
+    pub base_dmg: u8,
+    pub fire_mp: u8,
+    pub fire_mp_cap: u8,
+    pub wind_mp: u8,
+    pub wind_mp_cap: u8,
+    pub watr_mp: u8,
+    pub watr_mp_cap: u8,
+    pub eart_mp: u8,
+    pub eart_mp_cap: u8,
+    pub attr_int: u8,
+    pub attr_spd: u8,
+    pub attr_vit: u8,
+    pub attr_str: u8,
+    pub weight: u8,
+    pub offensive_skill: u8,
+    pub supportive_skill: u8,
+    pub special_skill: u8,
 }
 
 // TODO: i don't know what i am doing :D

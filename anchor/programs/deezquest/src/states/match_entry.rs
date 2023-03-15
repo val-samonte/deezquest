@@ -29,7 +29,7 @@ pub struct MatchEntry {
     pub code_challenge: [u8; 16],
 
     /// Game PDA of the opponent who received the code verifier from the owner. (1 + 32)
-    pub paired_game: Option<Pubkey>,
+    pub paired_match: Option<Pubkey>,
 }
 
 impl MatchEntry {
