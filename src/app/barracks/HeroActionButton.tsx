@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation'
 import { Fragment, useMemo, useState } from 'react'
 import FriendlyMatch from './FriendlyMatch'
 import { userNftCollectionAtom } from './HeroContentPage'
+import RankedMatch from './RankedMatch'
 
 export default function HeroActionButtons() {
   const pathname = usePathname()
@@ -95,6 +96,10 @@ export default function HeroActionButtons() {
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
                           'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded',
                         )}
+                        onClick={() => {
+                          setShowRankedDialog(true)
+                          setShowFriendlyDialog(false)
+                        }}
                       >
                         <img
                           src='/match_ranked.svg'
@@ -117,7 +122,10 @@ export default function HeroActionButtons() {
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
                           'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded',
                         )}
-                        onClick={() => setShowFriendlyDialog(true)}
+                        onClick={() => {
+                          setShowRankedDialog(false)
+                          setShowFriendlyDialog(true)
+                        }}
                       >
                         <img
                           src='/match_practice.svg'
@@ -177,6 +185,11 @@ export default function HeroActionButtons() {
         onClose={() => {
           setShowFriendlyDialog(false)
         }}
+      />
+
+      <RankedMatch
+        show={showRankedDialog}
+        onClose={() => setShowRankedDialog(false)}
       />
     </>
   )
