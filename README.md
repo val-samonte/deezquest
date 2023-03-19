@@ -23,3 +23,11 @@ Pitch Deck: https://docs.google.com/presentation/d/1hS2_v6N4O-gLOCHs6A-t9J-LGty3
 For business matters, please contact val.samonte@gmail.com
 
 We are also in Solarplex.xyz! https://www.solarplex.xyz/topic/10mN1GJDITxaHPXd
+
+# For the Solana Grizzlython judges
+
+Please check the https://github.com/val-samonte/deezquest/tree/grizzly-hackathon branch as this is the last checkpoint before the hackathon ends. The hackathon branch features the Friendly Match (off-chain) and unfortunately wasn't able to reach the Ranked Match (on-chain).
+
+Dapp: https://deezquest-git-grizzly-hackathon-val-samonte.vercel.app/
+
+Will continue the development in the main branch to achieve the rest of the features. Thank you!
