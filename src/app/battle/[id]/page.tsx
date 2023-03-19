@@ -40,8 +40,6 @@ export default function BattleStagePage({
   const match = useAtomValue(matchAtom)
   const gameState = useAtomValue(gameStateAtom)
 
-  console.log('gameState', gameState)
-
   useEffect(() => {
     let id: number
     if (!match) {
@@ -283,97 +281,101 @@ function toIndex(x: number, y: number): number {
   return y * 8 + x
 }
 
-function findPossibleMoves(board: number[]): Move[] {
+function findPossibleMoves(tiles: number[]): Move[] {
   const moves: Move[] = []
 
   for (let i = 0; i < 64; i++) {
     const [x, y] = toCoord(i)
-    const a = { x, y }
-    const aSym = board[i]
 
     // horizontal swap check
     if (x < 7) {
       let hasMatch = false
       const points = [0, 0, 0, 0, 0, 0, 0]
+      const a = { x, y }
       const b = { x: a.x + 1, y: a.y }
+
+      const board = [...tiles]
+      const swap = board[i]
+      board[i] = board[toIndex(b.x, b.y)]
+      board[toIndex(b.x, b.y)] = swap
+
+      const aSym = board[i]
       const bSym = board[toIndex(b.x, b.y)]
 
-      // use bSym
       // top
       if (
         a.y > 1 &&
-        bSym === board[toIndex(a.x, a.y - 1)] &&
-        bSym === board[toIndex(a.x, a.y - 2)]
+        aSym === board[toIndex(a.x, a.y - 1)] &&
+        aSym === board[toIndex(a.x, a.y - 2)]
       ) {
         hasMatch = true
-        points[bSym] += 1
+        points[aSym] += 1
       }
       // right
       if (
         a.x < 6 &&
-        bSym === board[toIndex(a.x + 1, a.y)] &&
-        bSym === board[toIndex(a.x + 2, a.y)]
+        aSym === board[toIndex(a.x + 1, a.y)] &&
+        aSym === board[toIndex(a.x + 2, a.y)]
       ) {
         hasMatch = true
-        points[bSym] += 1
+        points[aSym] += 1
       }
       // bottom
       if (
         a.y < 6 &&
-        bSym === board[toIndex(a.x, a.y + 1)] &&
-        bSym === board[toIndex(a.x, a.y + 2)]
+        aSym === board[toIndex(a.x, a.y + 1)] &&
+        aSym === board[toIndex(a.x, a.y + 2)]
       ) {
         hasMatch = true
-        points[bSym] += 1
+        points[aSym] += 1
       }
       // center
       if (
         a.y > 0 &&
         a.y < 7 &&
-        bSym === board[toIndex(a.x, a.y - 1)] &&
-        bSym === board[toIndex(a.x, a.y + 1)]
+        aSym === board[toIndex(a.x, a.y - 1)] &&
+        aSym === board[toIndex(a.x, a.y + 1)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+
+      // top
+      if (
+        b.y > 1 &&
+        bSym === board[toIndex(b.x, b.y - 1)] &&
+        bSym === board[toIndex(b.x, b.y - 2)]
       ) {
         hasMatch = true
         points[bSym] += 1
       }
-
-      // use aSym
-      // top
-      if (
-        b.y > 1 &&
-        aSym === board[toIndex(b.x, b.y - 1)] &&
-        aSym === board[toIndex(b.x, b.y - 2)]
-      ) {
-        hasMatch = true
-        points[aSym] += 1
-      }
       // left
       if (
         b.x > 1 &&
-        aSym === board[toIndex(b.x - 1, b.y)] &&
-        aSym === board[toIndex(b.x - 2, b.y)]
+        bSym === board[toIndex(b.x - 1, b.y)] &&
+        bSym === board[toIndex(b.x - 2, b.y)]
       ) {
         hasMatch = true
-        points[aSym] += 1
+        points[bSym] += 1
       }
       // bottom
       if (
         b.y < 6 &&
-        aSym === board[toIndex(b.x, b.y + 1)] &&
-        aSym === board[toIndex(b.x, b.y + 2)]
+        bSym === board[toIndex(b.x, b.y + 1)] &&
+        bSym === board[toIndex(b.x, b.y + 2)]
       ) {
         hasMatch = true
-        points[aSym] += 1
+        points[bSym] += 1
       }
       // center
       if (
         b.y > 0 &&
         b.y < 7 &&
-        aSym === board[toIndex(b.x, b.y - 1)] &&
-        aSym === board[toIndex(b.x, b.y + 1)]
+        bSym === board[toIndex(b.x, b.y - 1)] &&
+        bSym === board[toIndex(b.x, b.y + 1)]
       ) {
         hasMatch = true
-        points[aSym] += 1
+        points[bSym] += 1
       }
 
       if (hasMatch) {
@@ -389,85 +391,91 @@ function findPossibleMoves(board: number[]): Move[] {
     if (y < 7) {
       let hasMatch = false
       const points = [0, 0, 0, 0, 0, 0, 0]
+      const a = { x, y }
       const b = { x: a.x, y: a.y + 1 }
+
+      const board = [...tiles]
+      const swap = board[i]
+      board[i] = board[toIndex(b.x, b.y)]
+      board[toIndex(b.x, b.y)] = swap
+
+      const aSym = board[i]
       const bSym = board[toIndex(b.x, b.y)]
 
-      // use bSym
       // left
       if (
         a.x > 1 &&
-        bSym === board[toIndex(a.x - 1, a.y)] &&
-        bSym === board[toIndex(a.x - 2, a.y)]
+        aSym === board[toIndex(a.x - 1, a.y)] &&
+        aSym === board[toIndex(a.x - 2, a.y)]
       ) {
         hasMatch = true
-        points[bSym] += 1
+        points[aSym] += 1
       }
       // top
       if (
         a.y > 1 &&
-        bSym === board[toIndex(a.x, a.y - 1)] &&
-        bSym === board[toIndex(a.x, a.y - 2)]
+        aSym === board[toIndex(a.x, a.y - 1)] &&
+        aSym === board[toIndex(a.x, a.y - 2)]
       ) {
         hasMatch = true
-        points[bSym] += 1
+        points[aSym] += 1
       }
       // right
       if (
         a.x < 6 &&
-        bSym === board[toIndex(a.x + 1, a.y)] &&
-        bSym === board[toIndex(a.x + 2, a.y)]
+        aSym === board[toIndex(a.x + 1, a.y)] &&
+        aSym === board[toIndex(a.x + 2, a.y)]
       ) {
         hasMatch = true
-        points[bSym] += 1
+        points[aSym] += 1
       }
       // center
       if (
         a.x > 0 &&
         a.x < 7 &&
-        bSym === board[toIndex(a.x - 1, a.y)] &&
-        bSym === board[toIndex(a.x + 1, a.y)]
+        aSym === board[toIndex(a.x - 1, a.y)] &&
+        aSym === board[toIndex(a.x + 1, a.y)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+
+      // left
+      if (
+        b.x > 1 &&
+        bSym === board[toIndex(b.x - 1, b.y)] &&
+        bSym === board[toIndex(b.x - 2, b.y)]
       ) {
         hasMatch = true
         points[bSym] += 1
       }
-
-      // use aSym
-      // left
-      if (
-        b.x > 1 &&
-        aSym === board[toIndex(b.x - 1, b.y)] &&
-        aSym === board[toIndex(b.x - 2, b.y)]
-      ) {
-        hasMatch = true
-        points[aSym] += 1
-      }
       // bottom
       if (
         b.y < 6 &&
-        aSym === board[toIndex(b.x, b.y + 1)] &&
-        aSym === board[toIndex(b.x, b.y + 2)]
+        bSym === board[toIndex(b.x, b.y + 1)] &&
+        bSym === board[toIndex(b.x, b.y + 2)]
       ) {
         hasMatch = true
-        points[aSym] += 1
+        points[bSym] += 1
       }
       // right
       if (
         b.x < 6 &&
-        aSym === board[toIndex(b.x + 1, b.y)] &&
-        aSym === board[toIndex(b.x + 2, b.y)]
+        bSym === board[toIndex(b.x + 1, b.y)] &&
+        bSym === board[toIndex(b.x + 2, b.y)]
       ) {
         hasMatch = true
-        points[aSym] += 1
+        points[bSym] += 1
       }
       // center
       if (
         b.x > 0 &&
         b.x < 7 &&
-        aSym === board[toIndex(b.x - 1, b.y)] &&
-        aSym === board[toIndex(b.x + 1, b.y)]
+        bSym === board[toIndex(b.x - 1, b.y)] &&
+        bSym === board[toIndex(b.x + 1, b.y)]
       ) {
         hasMatch = true
-        points[aSym] += 1
+        points[bSym] += 1
       }
 
       if (hasMatch) {
@@ -505,6 +513,8 @@ function BotMatchManager({ match }: { match: BotMatch }) {
       },
     }
 
+    console.log(moves)
+
     if (moves.length === 0) {
       // random
       const dir = Math.random() > 0.5 ? 'h' : 'v'
@@ -527,6 +537,7 @@ function BotMatchManager({ match }: { match: BotMatch }) {
         x: x + (dir === 'h' ? 1 : 0),
         y: y + (dir === 'v' ? 1 : 0),
       }
+      payload.data.source = 'random'
     } else {
       // priority
       // - skill consumption: if skill is available, prioritize to match sword / shield / amulet
@@ -549,7 +560,7 @@ function BotMatchManager({ match }: { match: BotMatch }) {
         moves.forEach((move, i) => {
           if (move.points[idx] > pt) {
             // amulets need 2 pts to be cast
-            if (!(idx === 2 && move.points[idx] > 1)) return
+            if (idx === 2 && move.points[idx] < 2) return
             highest = i
             pt = move.points[idx]
           }
@@ -558,9 +569,10 @@ function BotMatchManager({ match }: { match: BotMatch }) {
         return highest
       })
 
-      let move: Move
+      let move: Move | undefined
       if (prioritizedSkill > -1 && movIdxPerPts[prioritizedSkill] > -1) {
         move = moves[movIdxPerPts[prioritizedSkill]]
+        payload.data.source = 'command'
       } else {
         // try collect mana
         const manaPriority = uses
@@ -587,13 +599,14 @@ function BotMatchManager({ match }: { match: BotMatch }) {
 
         for (let e = 0; e < 4; e++) {
           const idx = manaPriority[e].elem
-          if (movIdxPerPts[2 + idx] !== -1 && manaNotFull[idx]) {
-            move = moves[movIdxPerPts[2 + idx]]
+          if (movIdxPerPts[3 + idx] !== -1 && manaNotFull[idx]) {
+            move = moves[movIdxPerPts[3 + idx]]
             break
           }
         }
 
-        move ??= moves[0]
+        move ??= moves[Math.floor(Math.random() * moves.length)]
+        payload.data.source = 'mana'
       }
 
       const [x, y] = toCoord(move.origin)

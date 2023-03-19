@@ -45,7 +45,10 @@ export const matchIdAtom = atom((get) => {
   const match = get(matchAtom)
   if (!match) return null
 
-  if (match.matchType === MatchTypes.FRIENDLY) {
+  if (
+    match.matchType === MatchTypes.FRIENDLY ||
+    match.matchType === MatchTypes.BOT
+  ) {
     return match.gameHash
   }
 
