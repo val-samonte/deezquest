@@ -25,10 +25,9 @@ import { Keypair, PublicKey } from '@solana/web3.js'
 import bs58 from 'bs58'
 import { getNextHash } from '@/utils/getNextHash'
 import { PeerMessages } from '@/enums/PeerMessages'
-import { matchAtom } from '@/atoms/matchAtom'
+import { FriendlyMatch, matchAtom } from '@/atoms/matchAtom'
 import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
 import { MatchTypes } from '@/enums/MatchTypes'
-import { sleep } from '@/utils/sleep'
 
 interface FriendlyMatchProps {
   show: boolean
@@ -41,7 +40,10 @@ interface Parts {
   peerNonce: string | null
 }
 
-export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
+export default function FriendlyMatchDialog({
+  show,
+  onClose,
+}: FriendlyMatchProps) {
   const router = useRouter()
   const pathname = usePathname()
   const nftAddress = useMemo(() => {
@@ -122,7 +124,8 @@ export default function FriendlyMatch({ show, onClose }: FriendlyMatchProps) {
           case PeerMessages.ACCEPT_INVITATION:
             setMatch((match) => {
               if (!match) return null
-              if (message.from !== match.opponent.publicKey) return match
+              if (message.from !== (match as FriendlyMatch).opponent.publicKey)
+                return match
 
               return {
                 ...match,

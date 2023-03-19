@@ -17,6 +17,7 @@ import { atomFamily } from 'jotai/utils'
 import { useMemo } from 'react'
 import HeroPortrait from './HeroPortrait'
 import MiniSkillDisplay from './MiniSkillDisplay'
+import useUseCount from './useUseCount'
 
 export const heroDisplayAtom = atomFamily((pubkey: string) =>
   atom<Hero>(heroFromPublicKey(pubkey)),
@@ -34,13 +35,15 @@ export const updateHeroesAtom = atom(
 )
 
 export default function PlayerCard({
-  player,
+  heroPublicKey,
   asOpponent,
+  dummy,
 }: {
-  player: Player
+  heroPublicKey: string
   asOpponent?: boolean
+  dummy?: boolean
 }) {
-  const hero = useAtomValue(heroDisplayAtom(player.nft))
+  const hero = useAtomValue(heroDisplayAtom(heroPublicKey))
   const gameState = useAtomValue(gameStateAtom)
   const isTransitioning = useAtomValue(isGameTransitioningAtom)
 
@@ -68,62 +71,10 @@ export default function PlayerCard({
     }
   }, [hero.hp, hero.hpCap, hero.armor, hero.shell])
 
-  const [offensive, supportive, special] = useMemo(() => {
-    return [
-      skills[hero.offensiveSkill],
-      skills[hero.supportiveSkill],
-      skills[hero.specialSkill],
-    ].map((skill) => {
-      const useCountPerElement = skillCountPerMana(
-        [hero.fireMp, hero.windMp, hero.watrMp, hero.eartMp],
-        skill.cost,
-      )
+  const [offensive, supportive, special] = useUseCount(hero)
 
-      const maxUseCountPerElement = skillCountPerMana(
-        [hero.fireMpCap, hero.windMpCap, hero.watrMpCap, hero.eartMpCap],
-        skill.cost,
-      ).map((e) => e && Math.floor(e))
-
-      const { fire, wind, water, earth } = skill.cost
-      const elem = [fire, wind, water, earth]
-      const elemSum = (fire ?? 0) + (wind ?? 0) + (water ?? 0) + (earth ?? 0)
-      const ratio = elem.map((e) => {
-        if (typeof e === 'undefined') return undefined
-        if (e === 0) return 1
-        return e / elemSum
-      })
-
-      return {
-        useCount: Math.min(
-          ...useCountPerElement
-            .filter((n) => typeof n === 'number')
-            .map((n) => Math.floor(n ?? 0)),
-        ),
-        maxUseCount: Math.min(
-          ...maxUseCountPerElement
-            .filter((n) => typeof n === 'number')
-            .map((n) => n ?? 0),
-        ),
-        useCountPerElement,
-        maxUseCountPerElement,
-        ratio,
-      }
-    })
-  }, [
-    hero.fireMp,
-    hero.fireMpCap,
-    hero.windMp,
-    hero.windMpCap,
-    hero.watrMp,
-    hero.watrMpCap,
-    hero.eartMp,
-    hero.eartMpCap,
-    hero.offensiveSkill,
-    hero.supportiveSkill,
-    hero.specialSkill,
-  ])
-
-  const currentTurn = gameState?.currentTurn === player.nft && !isTransitioning
+  const currentTurn =
+    gameState?.currentTurn === heroPublicKey && !isTransitioning
 
   return (
     <div
@@ -142,9 +93,10 @@ export default function PlayerCard({
         )}
       >
         <HeroPortrait
-          publicKey={player.nft}
+          publicKey={heroPublicKey}
           flip={asOpponent}
           spotlight={currentTurn}
+          dummy={dummy}
         />
       </div>
       <div className='flex-[2_2_0%] flex flex-col text-xs xs:text-sm lg:text-base xl:text-lg py-2 gap-1 xl:gap-2'>

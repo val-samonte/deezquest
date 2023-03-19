@@ -6,7 +6,8 @@ import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import { usePathname } from 'next/navigation'
 import { Fragment, useMemo, useState } from 'react'
-import FriendlyMatch from './FriendlyMatch'
+import BotMatchDialog from './BotDialogMatch'
+import FriendlyMatchDialog from './FriendlyMatchDialog'
 import { userNftCollectionAtom } from './HeroContentPage'
 import RankedMatch from './RankedMatch'
 
@@ -99,6 +100,7 @@ export default function HeroActionButtons() {
                         onClick={() => {
                           setShowRankedDialog(true)
                           setShowFriendlyDialog(false)
+                          setShowBotDialog(false)
                         }}
                       >
                         <img
@@ -125,6 +127,7 @@ export default function HeroActionButtons() {
                         onClick={() => {
                           setShowRankedDialog(false)
                           setShowFriendlyDialog(true)
+                          setShowBotDialog(false)
                         }}
                       >
                         <img
@@ -139,7 +142,7 @@ export default function HeroActionButtons() {
                         </div>
                       </button>
                     </li>
-                    <li className='brightness-50 grayscale'>
+                    <li>
                       <button
                         type='button'
                         className={classNames(
@@ -148,6 +151,11 @@ export default function HeroActionButtons() {
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
                           'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded',
                         )}
+                        onClick={() => {
+                          setShowRankedDialog(false)
+                          setShowFriendlyDialog(false)
+                          setShowBotDialog(true)
+                        }}
                       >
                         <img
                           src='/match_bot.svg'
@@ -156,7 +164,7 @@ export default function HeroActionButtons() {
                         <div className='flex flex-col landscape:gap-2'>
                           <h3 className='text-lg font-bold'>Practice</h3>
                           <p className='text-sm text-neutral-300'>
-                            Play against a bot off-chain (coming soon!)
+                            Play against a bot off-chain
                           </p>
                         </div>
                       </button>
@@ -180,16 +188,21 @@ export default function HeroActionButtons() {
         </Dialog>
       </Transition>
 
-      <FriendlyMatch
+      <RankedMatch
+        show={showRankedDialog}
+        onClose={() => setShowRankedDialog(false)}
+      />
+
+      <FriendlyMatchDialog
         show={showFriendlyDialog}
         onClose={() => {
           setShowFriendlyDialog(false)
         }}
       />
 
-      <RankedMatch
-        show={showRankedDialog}
-        onClose={() => setShowRankedDialog(false)}
+      <BotMatchDialog
+        show={showBotDialog}
+        onClose={() => setShowBotDialog(false)}
       />
     </>
   )

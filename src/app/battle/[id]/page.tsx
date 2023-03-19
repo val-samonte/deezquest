@@ -5,8 +5,9 @@ import {
   gameResultAtom,
   GameState,
   gameStateAtom,
+  isGameTransitioningAtom,
 } from '@/atoms/gameStateAtom'
-import { matchAtom } from '@/atoms/matchAtom'
+import { BotMatch, FriendlyMatch, matchAtom } from '@/atoms/matchAtom'
 import {
   connectionListAtom,
   messagesAtom,
@@ -24,6 +25,8 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
+import { heroDisplayAtom } from '../PlayerCard'
+import useUseCount from '../useUseCount'
 
 const Stage = dynamic(() => import('../Stage'), { ssr: false })
 
@@ -36,6 +39,8 @@ export default function BattleStagePage({
   const router = useRouter()
   const match = useAtomValue(matchAtom)
   const gameState = useAtomValue(gameStateAtom)
+
+  console.log('gameState', gameState)
 
   useEffect(() => {
     let id: number
@@ -59,7 +64,10 @@ export default function BattleStagePage({
 
   return (
     <div className='max-w-full max-h-full landscape:w-full landscape:aspect-[2/1] portrait:h-full portrait:aspect-[1/2] mx-auto'>
-      {match?.matchType === MatchTypes.FRIENDLY && <FriendlyMatchManager />}
+      {match?.matchType === MatchTypes.FRIENDLY && (
+        <FriendlyMatchManager match={match} />
+      )}
+      {match?.matchType === MatchTypes.BOT && <BotMatchManager match={match} />}
       <Stage />
       {turnsLeft < 50 && (
         <div
@@ -84,12 +92,12 @@ export default function BattleStagePage({
   )
 }
 
-function FriendlyMatchManager() {
+function FriendlyMatchManager({ match }: { match: FriendlyMatch }) {
   const router = useRouter()
   const peerInstance = useAtomValue(peerAtom)
   const messages = useAtomValue(messagesAtom)
   const connections = useAtomValue(connectionListAtom)
-  const [match, setMatch] = useAtom(matchAtom)
+  const setMatch = useSetAtom(matchAtom)
   const [gameState, setGameState] = useAtom(gameStateAtom)
   const gameFn = useSetAtom(gameFunctions)
   const setGameResult = useSetAtom(gameResultAtom)
@@ -257,6 +265,350 @@ function FriendlyMatchManager() {
       }
     }
   }, [peerInstance, match, gameState])
+
+  return null
+}
+
+type Move = {
+  origin: number
+  dir: 'v' | 'h'
+  points: number[]
+}
+
+function toCoord(index: number): [number, number] {
+  return [index % 8, Math.floor(index / 8)]
+}
+
+function toIndex(x: number, y: number): number {
+  return y * 8 + x
+}
+
+function findPossibleMoves(board: number[]): Move[] {
+  const moves: Move[] = []
+
+  for (let i = 0; i < 64; i++) {
+    const [x, y] = toCoord(i)
+    const a = { x, y }
+    const aSym = board[i]
+
+    // horizontal swap check
+    if (x < 7) {
+      let hasMatch = false
+      const points = [0, 0, 0, 0, 0, 0, 0]
+      const b = { x: a.x + 1, y: a.y }
+      const bSym = board[toIndex(b.x, b.y)]
+
+      // use bSym
+      // top
+      if (
+        a.y > 1 &&
+        bSym === board[toIndex(a.x, a.y - 1)] &&
+        bSym === board[toIndex(a.x, a.y - 2)]
+      ) {
+        hasMatch = true
+        points[bSym] += 1
+      }
+      // right
+      if (
+        a.x < 6 &&
+        bSym === board[toIndex(a.x + 1, a.y)] &&
+        bSym === board[toIndex(a.x + 2, a.y)]
+      ) {
+        hasMatch = true
+        points[bSym] += 1
+      }
+      // bottom
+      if (
+        a.y < 6 &&
+        bSym === board[toIndex(a.x, a.y + 1)] &&
+        bSym === board[toIndex(a.x, a.y + 2)]
+      ) {
+        hasMatch = true
+        points[bSym] += 1
+      }
+      // center
+      if (
+        a.y > 0 &&
+        a.y < 7 &&
+        bSym === board[toIndex(a.x, a.y - 1)] &&
+        bSym === board[toIndex(a.x, a.y + 1)]
+      ) {
+        hasMatch = true
+        points[bSym] += 1
+      }
+
+      // use aSym
+      // top
+      if (
+        b.y > 1 &&
+        aSym === board[toIndex(b.x, b.y - 1)] &&
+        aSym === board[toIndex(b.x, b.y - 2)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+      // left
+      if (
+        b.x > 1 &&
+        aSym === board[toIndex(b.x - 1, b.y)] &&
+        aSym === board[toIndex(b.x - 2, b.y)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+      // bottom
+      if (
+        b.y < 6 &&
+        aSym === board[toIndex(b.x, b.y + 1)] &&
+        aSym === board[toIndex(b.x, b.y + 2)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+      // center
+      if (
+        b.y > 0 &&
+        b.y < 7 &&
+        aSym === board[toIndex(b.x, b.y - 1)] &&
+        aSym === board[toIndex(b.x, b.y + 1)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+
+      if (hasMatch) {
+        moves.push({
+          dir: 'h',
+          origin: i,
+          points,
+        })
+      }
+    }
+
+    // vertical swap check
+    if (y < 7) {
+      let hasMatch = false
+      const points = [0, 0, 0, 0, 0, 0, 0]
+      const b = { x: a.x, y: a.y + 1 }
+      const bSym = board[toIndex(b.x, b.y)]
+
+      // use bSym
+      // left
+      if (
+        a.x > 1 &&
+        bSym === board[toIndex(a.x - 1, a.y)] &&
+        bSym === board[toIndex(a.x - 2, a.y)]
+      ) {
+        hasMatch = true
+        points[bSym] += 1
+      }
+      // top
+      if (
+        a.y > 1 &&
+        bSym === board[toIndex(a.x, a.y - 1)] &&
+        bSym === board[toIndex(a.x, a.y - 2)]
+      ) {
+        hasMatch = true
+        points[bSym] += 1
+      }
+      // right
+      if (
+        a.x < 6 &&
+        bSym === board[toIndex(a.x + 1, a.y)] &&
+        bSym === board[toIndex(a.x + 2, a.y)]
+      ) {
+        hasMatch = true
+        points[bSym] += 1
+      }
+      // center
+      if (
+        a.x > 0 &&
+        a.x < 7 &&
+        bSym === board[toIndex(a.x - 1, a.y)] &&
+        bSym === board[toIndex(a.x + 1, a.y)]
+      ) {
+        hasMatch = true
+        points[bSym] += 1
+      }
+
+      // use aSym
+      // left
+      if (
+        b.x > 1 &&
+        aSym === board[toIndex(b.x - 1, b.y)] &&
+        aSym === board[toIndex(b.x - 2, b.y)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+      // bottom
+      if (
+        b.y < 6 &&
+        aSym === board[toIndex(b.x, b.y + 1)] &&
+        aSym === board[toIndex(b.x, b.y + 2)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+      // right
+      if (
+        b.x < 6 &&
+        aSym === board[toIndex(b.x + 1, b.y)] &&
+        aSym === board[toIndex(b.x + 2, b.y)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+      // center
+      if (
+        b.x > 0 &&
+        b.x < 7 &&
+        aSym === board[toIndex(b.x - 1, b.y)] &&
+        aSym === board[toIndex(b.x + 1, b.y)]
+      ) {
+        hasMatch = true
+        points[aSym] += 1
+      }
+
+      if (hasMatch) {
+        moves.push({
+          dir: 'v',
+          origin: i,
+          points,
+        })
+      }
+    }
+  }
+
+  return moves
+}
+
+function BotMatchManager({ match }: { match: BotMatch }) {
+  const gameFn = useSetAtom(gameFunctions)
+  const gameState = useAtomValue(gameStateAtom)
+  const hero = useAtomValue(heroDisplayAtom(match.opponent.nft))
+  const uses = useUseCount(hero)
+  const isTransitioning = useAtomValue(isGameTransitioningAtom)
+
+  useEffect(() => {
+    if (isTransitioning) return
+    if (!match) return
+    if (!gameState) return
+    if (match.opponent.nft !== gameState.currentTurn) return
+
+    const moves = findPossibleMoves([...gameState.tiles])
+
+    let payload: any = {
+      type: GameStateFunctions.SWAP_NODE,
+      data: {
+        publicKey: match.opponent.nft,
+      },
+    }
+
+    if (moves.length === 0) {
+      // random
+      const dir = Math.random() > 0.5 ? 'h' : 'v'
+      let origin = Math.floor(Math.random() * 56)
+
+      // flip
+      origin =
+        dir === 'v'
+          ? origin
+          : (() => {
+              const [x, y] = toCoord(origin)
+              return toIndex(y, x)
+            })()
+
+      const [x, y] = toCoord(origin)
+
+      payload.data.origin = dir + origin
+      payload.data.node1 = { x, y }
+      payload.data.node2 = {
+        x: x + (dir === 'h' ? 1 : 0),
+        y: y + (dir === 'v' ? 1 : 0),
+      }
+    } else {
+      // priority
+      // - skill consumption: if skill is available, prioritize to match sword / shield / amulet
+      // - mana collection: find dominant mana requirements (each skills, sum mana)
+      // - execute ordinary commands (sword / shield / amulet)
+
+      let prioritizedSkill = -1
+      let count = 0
+
+      uses.forEach((use, i) => {
+        if (use.useCount > count) {
+          prioritizedSkill = i
+          count = use.useCount
+        }
+      })
+
+      const movIdxPerPts = [-1, -1, -1, -1, -1, -1, -1].map((_, idx) => {
+        let highest = -1
+        let pt = 0
+        moves.forEach((move, i) => {
+          if (move.points[idx] > pt) {
+            // amulets need 2 pts to be cast
+            if (!(idx === 2 && move.points[idx] > 1)) return
+            highest = i
+            pt = move.points[idx]
+          }
+        })
+
+        return highest
+      })
+
+      let move: Move
+      if (prioritizedSkill > -1 && movIdxPerPts[prioritizedSkill] > -1) {
+        move = moves[movIdxPerPts[prioritizedSkill]]
+      } else {
+        // try collect mana
+        const manaPriority = uses
+          .reduce(
+            (acc, curr) => {
+              curr.ratio.forEach((value, elem) => {
+                if (typeof value !== 'undefined') {
+                  acc[elem] += value
+                }
+              })
+              return acc
+            },
+            [0, 0, 0, 0],
+          )
+          .map((amt, elem) => ({ amt, elem }))
+          .sort((a, b) => b.amt - a.amt)
+
+        const manaNotFull = [
+          hero.fireMp !== hero.fireMpCap,
+          hero.windMp !== hero.windMpCap,
+          hero.watrMp !== hero.watrMpCap,
+          hero.eartMp !== hero.eartMpCap,
+        ]
+
+        for (let e = 0; e < 4; e++) {
+          const idx = manaPriority[e].elem
+          if (movIdxPerPts[2 + idx] !== -1 && manaNotFull[idx]) {
+            move = moves[movIdxPerPts[2 + idx]]
+            break
+          }
+        }
+
+        move ??= moves[0]
+      }
+
+      const [x, y] = toCoord(move.origin)
+      payload.data.origin = move.dir + move.origin
+      payload.data.node1 = { x, y }
+      payload.data.node2 = {
+        x: x + (move.dir === 'h' ? 1 : 0),
+        y: y + (move.dir === 'v' ? 1 : 0),
+      }
+    }
+
+    console.log(payload)
+
+    gameFn(payload)
+  }, [match, isTransitioning, hero, uses, gameState, gameFn])
 
   return null
 }

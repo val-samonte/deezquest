@@ -143,7 +143,7 @@ export default function Stage() {
   return (
     <div className='relative w-full h-full flex portrait:flex-col-reverse'>
       <div className='relative p-2 w-full h-full'>
-        {match?.player && <PlayerCard player={match.player} />}
+        {match?.player && <PlayerCard heroPublicKey={match.player.nft} />}
       </div>
       <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5'>
         <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden rounded'>
@@ -169,7 +169,13 @@ export default function Stage() {
         <CastingDisplay skill={skill} />
       </div>
       <div className='relative p-2 w-full h-full'>
-        {match?.opponent && <PlayerCard asOpponent player={match.opponent} />}
+        {match?.opponent && (
+          <PlayerCard
+            asOpponent
+            heroPublicKey={match.opponent.nft}
+            dummy={match.matchType === MatchTypes.BOT}
+          />
+        )}
       </div>
       {gameResult && (
         <Transition
@@ -188,45 +194,47 @@ export default function Stage() {
             }
             className='m-10 mb-5 max-h-32 lg:max-h-none'
           />
-          <div className='flex gap-5 mx-5'>
-            <button
-              className='px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded'
-              onClick={() => {
-                window.sessionStorage.clear()
-                setGameState(null)
-                gameFn({
-                  type: GameStateFunctions.INIT,
-                })
-                setGameResult('')
-                match?.opponent?.peerId &&
-                  peerInstance?.sendMessage(match.opponent.peerId, {
-                    type: PeerMessages.REMATCH,
+          {match?.matchType === MatchTypes.FRIENDLY && (
+            <div className='flex gap-5 mx-5'>
+              <button
+                className='px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded'
+                onClick={() => {
+                  window.sessionStorage.clear()
+                  setGameState(null)
+                  gameFn({
+                    type: GameStateFunctions.INIT,
                   })
-              }}
-            >
-              Rematch
-            </button>
-            <button
-              className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-              onClick={() => {
-                if (
-                  match?.matchType === MatchTypes.FRIENDLY &&
-                  match?.opponent.peerId
-                ) {
-                  peerInstance?.sendMessage(match?.opponent.peerId, {
-                    type: PeerMessages.QUIT,
-                  })
-                }
-                window.sessionStorage.clear()
-                setGameState(null)
-                setMatch(null)
-                setGameResult('')
-                router.push('/barracks')
-              }}
-            >
-              Return to Barracks
-            </button>
-          </div>
+                  setGameResult('')
+                  match?.opponent?.peerId &&
+                    peerInstance?.sendMessage(match.opponent.peerId, {
+                      type: PeerMessages.REMATCH,
+                    })
+                }}
+              >
+                Rematch
+              </button>
+              <button
+                className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+                onClick={() => {
+                  if (
+                    match?.matchType === MatchTypes.FRIENDLY &&
+                    match?.opponent.peerId
+                  ) {
+                    peerInstance?.sendMessage(match?.opponent.peerId, {
+                      type: PeerMessages.QUIT,
+                    })
+                  }
+                  window.sessionStorage.clear()
+                  setGameState(null)
+                  setMatch(null)
+                  setGameResult('')
+                  router.push('/barracks')
+                }}
+              >
+                Return to Barracks
+              </button>
+            </div>
+          )}
         </Transition>
       )}
     </div>

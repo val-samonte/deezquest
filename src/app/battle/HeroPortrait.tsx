@@ -6,7 +6,7 @@ import { useSpring, animated } from '@react-spring/web'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import { atom, useAtom } from 'jotai'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export const heroDamagedAtom = atom<{ hero: string; amount: number } | null>(
   null,
@@ -14,12 +14,14 @@ export const heroDamagedAtom = atom<{ hero: string; amount: number } | null>(
 
 interface HeroPortraitProps {
   publicKey: string
+  dummy?: boolean
   flip?: boolean
   spotlight?: boolean
 }
 
 export default function HeroPortrait({
   publicKey,
+  dummy,
   flip,
   spotlight,
 }: HeroPortraitProps) {
@@ -64,6 +66,7 @@ export default function HeroPortrait({
 
   useEffect(() => {
     if (!publicKey || !metaplex) return
+    if (dummy) return
 
     metaplex
       .nfts()
@@ -71,7 +74,14 @@ export default function HeroPortrait({
       .then((nft) => {
         setMetadata(nft.json)
       })
-  }, [publicKey, metaplex])
+  }, [publicKey, dummy, metaplex])
+
+  const url = useMemo(() => {
+    if (dummy) {
+      return 'https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png'
+    }
+    return metadata?.image ?? ''
+  }, [metadata, dummy])
 
   return (
     <>
@@ -82,7 +92,7 @@ export default function HeroPortrait({
         )}
         style={{
           ...wobbleAnimation,
-          backgroundImage: `url("${metadata?.image ?? ''}")`,
+          backgroundImage: `url("${url}")`,
         }}
       />
     </>
