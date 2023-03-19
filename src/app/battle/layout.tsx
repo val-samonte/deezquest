@@ -44,6 +44,11 @@ export default function BattleLayout({ children }: { children: ReactNode }) {
               Friendly <span className='hidden sm:inline'>Match</span>
             </h1>
           )}
+          {match?.matchType === MatchTypes.BOT && (
+            <h1 className='text-lg xl:text-2xl'>
+              Practice <span className='hidden sm:inline'>Match</span>
+            </h1>
+          )}
         </div>
         <button
           type='button'
