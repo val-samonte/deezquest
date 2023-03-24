@@ -237,10 +237,20 @@ pub fn add_hp(hero: &mut Hero, amount: u8) -> Hero {
 }
 
 pub fn absorb_mana(hero: &mut Hero, absorbed_mana: [u8; 4]) -> Hero {
-    hero.fire_mp += absorbed_mana[0];
-    hero.wind_mp += absorbed_mana[1];
-    hero.watr_mp += absorbed_mana[2];
-    hero.eart_mp += absorbed_mana[3];
+    let bonus = (hero.attr_int - 1) / 3;
+    let mut i = 0;
+    let mut mana = absorbed_mana.clone();
+    while i < 4 {
+        if mana[i] > 0 {
+            mana[i] += bonus;
+        }
+        i += 1;
+    }
+
+    hero.fire_mp += mana[0];
+    hero.wind_mp += mana[1];
+    hero.watr_mp += mana[2];
+    hero.eart_mp += mana[3];
 
     if hero.fire_mp > hero.fire_mp_cap {
         hero.fire_mp = hero.fire_mp_cap;

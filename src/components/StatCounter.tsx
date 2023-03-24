@@ -34,7 +34,7 @@ export default function StatCounter({
       {children && (
         <span
           className={classNames(
-            'hidden mx-1 md:mx-0 landscape:md:flex opacity-30',
+            'hidden mx-1 md:mx-0 landscape:md:flex opacity-30 font-sans',
           )}
         >
           {children}

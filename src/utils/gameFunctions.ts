@@ -136,6 +136,9 @@ export const absorbMana = (
   hero: Hero,
   absorbedMana: number[] /* [FIRE, WIND, WATR, EART] */,
 ) => {
+  const bonus = Math.floor((hero.int - 1) / 3)
+  absorbedMana = absorbedMana.map((m) => (m ? m + bonus : m))
+
   hero.fireMp += absorbedMana[0]
   hero.windMp += absorbedMana[1]
   hero.watrMp += absorbedMana[2]
