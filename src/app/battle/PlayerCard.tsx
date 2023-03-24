@@ -73,6 +73,13 @@ export default function PlayerCard({
 
   const [offensive, supportive, special] = useUseCount(hero)
 
+  const healthBarColor = useMemo(() => {
+    const unit = Math.min(hero.hp / (hero.hpCap * 0.8), 1)
+    const red = 236 - 221 * unit
+    const green = 15 + 221 * unit
+    return `linear-gradient(180deg, rgba(${red},${green},0,0) 40%, rgba(${red},${green},0,0.25) 89%, rgba(${red},${green},0,1) 90%)`
+  }, [hero.hp, hero.hpCap])
+
   const currentTurn =
     gameState?.currentTurn === heroPublicKey && !isTransitioning
 
@@ -141,8 +148,7 @@ export default function PlayerCard({
                   className='h-full'
                   style={{
                     width: hp,
-                    background:
-                      'linear-gradient(180deg, rgba(15,236,0,0) 40%, rgba(15,236,0,0.25) 89%, rgba(15,236,0,1) 90%)',
+                    background: healthBarColor,
                   }}
                 />
                 <div

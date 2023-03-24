@@ -161,7 +161,7 @@ export default function HeroPortrait({
         <animated.div
           className={classNames(
             'text-3xl md:text-4xl xl:text-7xl',
-            hpDiff.amt > 0 ? 'text-green-600' : 'text-red-600',
+            hpDiff.amt > 0 ? 'text-lime-500' : 'text-red-600',
             'font-mono font-black',
             'absolute inset-0 text-center',
           )}
