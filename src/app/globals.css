@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.stroked {
+  -webkit-text-stroke: 5px black;
+}
+
+@media (min-width: 1280px) {
+  .stroked {
+    -webkit-text-stroke: 10px black;
+  }
+}

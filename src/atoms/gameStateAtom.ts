@@ -288,7 +288,6 @@ export const gameFunctions = atom(
               queue.push({
                 type: GameTransitions.ATTACK_NORMAL,
                 turn: gameState!.currentTurn,
-                damage: opponentPubkey,
                 heroes: {
                   [opponentPubkey]: { ...opponentHero },
                 },
@@ -416,15 +415,6 @@ export const gameFunctions = atom(
                 heroes[opponentPubkey] = { ...opponentHero }
               }
 
-              // const heroDmgAmt = preCommandHero.hp - playerHero.hp
-              const opponentDmgAmt = preCommandOpponent.hp - opponentHero.hp
-
-              // TODO: included BOTH
-              let damage = null
-              if (opponentDmgAmt > 0) {
-                damage = { hero: opponentPubkey, amount: opponentDmgAmt }
-              }
-
               queue.push({
                 type,
                 turn: gameState!.currentTurn,
@@ -432,7 +422,6 @@ export const gameFunctions = atom(
                 // TODO: fade transition
                 // tiles: [...newTiles],
                 // nodes (check DRAIN)
-                damage,
                 heroes,
                 duration: 100,
               })

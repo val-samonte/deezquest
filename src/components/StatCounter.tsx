@@ -20,6 +20,7 @@ export default function StatCounter({
   return (
     <div
       className={classNames(
+        'font-mono',
         'relative flex items-center md:gap-1',
         children && 'w-full',
       )}

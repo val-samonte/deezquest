@@ -1,16 +1,14 @@
 'use client'
 
+import { gameStateAtom } from '@/atoms/gameStateAtom'
 import { useMetaplex } from '@/atoms/metaplexAtom'
 import { JsonMetadata } from '@metaplex-foundation/js'
-import { useSpring, animated } from '@react-spring/web'
+import { useSpring, animated, useSpringValue } from '@react-spring/web'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
-import { atom, useAtom } from 'jotai'
-import { useEffect, useMemo, useState } from 'react'
-
-export const heroDamagedAtom = atom<{ hero: string; amount: number } | null>(
-  null,
-)
+import { atom, useAtom, useAtomValue } from 'jotai'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { heroDisplayAtom } from './PlayerCard'
 
 interface HeroPortraitProps {
   publicKey: string
@@ -19,13 +17,32 @@ interface HeroPortraitProps {
   spotlight?: boolean
 }
 
+const textSpring = {
+  delay: 300,
+  from: {
+    opacity: 0,
+    marginBottom: '-200px',
+  },
+  to: {
+    opacity: 1,
+    marginBottom: '0px',
+  },
+  config: {
+    mass: 1,
+    tension: 180,
+    friction: 12,
+  },
+}
+
 export default function HeroPortrait({
   publicKey,
   dummy,
   flip,
   spotlight,
 }: HeroPortraitProps) {
-  const [damage, setDamage] = useAtom(heroDamagedAtom)
+  const hero = useAtomValue(heroDisplayAtom(publicKey))
+  const hpState = useRef(0)
+  const [hpDiff, setHpDiff] = useState({ amt: 0 })
   const [isWobbling, setIsWobbling] = useState(false)
   const [inSpotlight, setInSpotlight] = useState(false)
 
@@ -45,24 +62,25 @@ export default function HeroPortrait({
   })
 
   useEffect(() => {
-    // TODO: just check HP difference instead of damage
+    if (!hero) return
+    if (hpState.current === hero.hp) return
+    setHpDiff({ amt: hero.hp - hpState.current })
+    hpState.current = hero.hp
+  }, [hero, setHpDiff])
 
-    if (!publicKey) return
-    if (publicKey !== damage?.hero) return
-    setDamage(null)
-    if (damage?.amount === 0) {
-      return
-    }
+  useEffect(() => {
+    setInSpotlight(true)
+    setTimeout(() => {
+      setInSpotlight(false)
+    }, 1000)
+
+    if (hpDiff.amt > 0) return
 
     setIsWobbling(true)
     setTimeout(() => {
       setIsWobbling(false)
     }, 100)
-    setInSpotlight(true)
-    setTimeout(() => {
-      setInSpotlight(false)
-    }, 600)
-  }, [publicKey, damage, setDamage, setIsWobbling, setInSpotlight])
+  }, [hpDiff, setIsWobbling, setInSpotlight])
 
   useEffect(() => {
     if (!publicKey || !metaplex) return
@@ -83,6 +101,37 @@ export default function HeroPortrait({
     return metadata?.image ?? ''
   }, [metadata, dummy])
 
+  const opacity = useSpringValue(0)
+  const [textProps, api] = useSpring(() => textSpring, [])
+  const durationRef = useRef<number>()
+  useEffect(() => {
+    if (durationRef.current) {
+      window.clearTimeout(durationRef.current)
+    }
+    opacity.start({
+      from: 0,
+      to: 1,
+    })
+    api.set({
+      opacity: 0,
+      marginBottom: '-100px',
+    })
+    api.start(textSpring)
+
+    durationRef.current = window.setTimeout(() => {
+      opacity.start({
+        to: 0,
+      })
+    }, 1500)
+
+    return () => {
+      window.clearTimeout(durationRef.current)
+      opacity.start({
+        to: 0,
+      })
+    }
+  }, [hpDiff, opacity, api])
+
   return (
     <>
       <animated.div
@@ -95,6 +144,32 @@ export default function HeroPortrait({
           backgroundImage: `url("${url}")`,
         }}
       />
+      <animated.div
+        className='absolute bottom-0 inset-x-0 text-center'
+        style={{ opacity }}
+      >
+        <animated.div
+          className={classNames(
+            'text-3xl md:text-4xl xl:text-7xl',
+            'text-black stroked font-mono font-black',
+            'text-center',
+          )}
+          style={textProps}
+        >
+          {hpDiff.amt ?? ''}
+        </animated.div>
+        <animated.div
+          className={classNames(
+            'text-3xl md:text-4xl xl:text-7xl',
+            hpDiff.amt > 0 ? 'text-green-600' : 'text-red-600',
+            'font-mono font-black',
+            'absolute inset-0 text-center',
+          )}
+          style={textProps}
+        >
+          {hpDiff.amt ?? ''}
+        </animated.div>
+      </animated.div>
     </>
   )
 }

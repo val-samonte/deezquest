@@ -109,6 +109,7 @@ export default function PlayerCard({
           {/* HP */}
           <div
             className={classNames(
+              'font-mono',
               'flex flex-col items-center w-14 md:w-20 xl:w-36',
               highlight,
             )}
@@ -163,6 +164,7 @@ export default function PlayerCard({
               </div>
               <span
                 className={classNames(
+                  'font-mono',
                   'hidden xs:font-bold xl:flex whitespace-nowrap',
                   highlight,
                 )}
@@ -211,7 +213,9 @@ export default function PlayerCard({
                   style={{
                     width: (timeDisplay > 0 ? timeDisplay : 0) + '%',
                     background:
-                      'linear-gradient(180deg, rgba(255,189,241,0) 40%, rgba(255,189,241,0.25) 89%, rgba(255,189,241,1) 90%)',
+                      currentTurn && !asOpponent
+                        ? 'linear-gradient(180deg, rgba(255,0,255,0) 40%, rgba(255,0,255,0.25) 89%, rgba(255,0,255,1) 90%)'
+                        : 'linear-gradient(180deg, rgba(255,189,241,0) 40%, rgba(255,189,241,0.25) 89%, rgba(255,189,241,1) 90%)',
                   }}
                 />
               </div>

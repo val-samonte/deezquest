@@ -23,7 +23,6 @@ import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import CastingDisplay from './CastingDisplay'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { GameTransitions } from '@/enums/GameTransitions'
-import { heroDamagedAtom } from './HeroPortrait'
 import { sleep } from '@/utils/sleep'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { useRouter } from 'next/navigation'
@@ -38,7 +37,6 @@ export default function Stage() {
   const setGameState = useSetAtom(gameStateAtom)
   const updateHeroes = useSetAtom(updateHeroesAtom)
   const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
-  const setDamage = useSetAtom(heroDamagedAtom)
   const [transitionQueue, setTransitionQueue] = useAtom(gameTransitionQueueAtom)
   const [tiles, setTiles] = useState<any[]>([])
   const [skill, setSkill] = useState<{
@@ -99,10 +97,6 @@ export default function Stage() {
         setSkill(next.skill)
       }
 
-      if (next.damage) {
-        setDamage(next.damage)
-      }
-
       if (next.type === GameTransitions.WIN) {
         setGameResult('win')
       } else if (next.type === GameTransitions.LOSE) {
@@ -123,7 +117,6 @@ export default function Stage() {
     updateHeroes,
     setIsTransitioning,
     setGameResult,
-    setDamage,
     setTiles,
     setSkill,
   ])

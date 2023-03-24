@@ -513,8 +513,6 @@ function BotMatchManager({ match }: { match: BotMatch }) {
       },
     }
 
-    console.log(moves)
-
     if (moves.length === 0) {
       // random
       const dir = Math.random() > 0.5 ? 'h' : 'v'
@@ -617,8 +615,6 @@ function BotMatchManager({ match }: { match: BotMatch }) {
         y: y + (move.dir === 'v' ? 1 : 0),
       }
     }
-
-    console.log(payload)
 
     gameFn(payload)
   }, [match, isTransitioning, hero, uses, gameState, gameFn])
