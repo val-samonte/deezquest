@@ -241,7 +241,10 @@ export default function PlayerCard({
                 />
               )}
               <span className='hidden xl:flex mx-auto' />
-              <StatCounter img='/stat_spd.svg' value={hero.spd} />
+              <StatCounter
+                img='/stat_spd.svg'
+                value={Math.min(hero.spd + 15, 50)}
+              />
             </div>
           </div>
         </div>

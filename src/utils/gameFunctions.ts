@@ -160,9 +160,12 @@ export const getNextTurn = (
   pubkey2: Uint8Array,
   gameHash: Uint8Array,
 ) => {
+  const turnPt1 = Math.min(hero1.spd + 15, 50)
+  const turnPt2 = Math.min(hero2.spd + 15, 50)
+
   while (hero1.turnTime < 200 && hero2.turnTime < 200) {
-    hero1.turnTime += hero1.spd + 10
-    hero2.turnTime += hero2.spd + 10
+    hero1.turnTime += turnPt1
+    hero2.turnTime += turnPt2
   }
 
   if (hero1.turnTime >= 200 && hero2.turnTime >= 200) {

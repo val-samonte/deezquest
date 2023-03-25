@@ -276,9 +276,12 @@ pub fn get_next_turn(
     pubkey2: &[u8; 32],
     game_hash: &[u8; 32],
 ) -> (Hero, [u8; 32]) {
+    let turn_pt_1 = std::cmp::min(hero1.attr_spd + 15, 50);
+    let turn_pt_2 = std::cmp::min(hero2.attr_spd + 15, 50);
+
     while hero1.turn_time < 200 && hero2.turn_time < 200 {
-        hero1.turn_time += hero1.attr_spd + 10;
-        hero2.turn_time += hero2.attr_spd + 10;
+        hero1.turn_time += turn_pt_1;
+        hero2.turn_time += turn_pt_2;
     }
 
     if hero1.turn_time >= 200 && hero2.turn_time >= 200 {
