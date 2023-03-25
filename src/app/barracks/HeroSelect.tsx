@@ -141,7 +141,7 @@ export default function HeroSelect({ onMint }: HeroSelectProps) {
           </div>
         )}
       </HeroRollDisplay>
-      <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5'>
+      <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5 px-5'>
         <button
           type='button'
           disabled={busy}

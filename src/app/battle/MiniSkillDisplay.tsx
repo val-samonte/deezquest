@@ -86,7 +86,7 @@ export default function MiniSkillDisplay({
         <div className='min-w-[200px] flex flex-col'>
           <span>{skill.desc}</span>
           {skill.type === SkillTypes.SPECIAL && (
-            <span className='mt-2 pt-2 border-t border-t-white/5 italic'>
+            <span className='mt-2 pt-2 italic opacity-50'>
               A Special Skill needs 4 or more amulet matches to be used.
             </span>
           )}

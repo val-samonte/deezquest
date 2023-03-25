@@ -104,7 +104,7 @@ export default function SkillView({
             <span className='flex items-center xl:gap-2'>
               <img
                 src='/elem_fire.svg'
-                className='w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
+                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
               />
               {skill.cost.fire === 0 ? 'ALL' : skill.cost.fire}
             </span>
@@ -113,7 +113,7 @@ export default function SkillView({
             <span className='flex items-center xl:gap-2'>
               <img
                 src='/elem_wind.svg'
-                className='w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
+                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
               />
               {skill.cost.wind === 0 ? 'ALL' : skill.cost.wind}
             </span>
@@ -122,7 +122,7 @@ export default function SkillView({
             <span className='flex items-center xl:gap-2'>
               <img
                 src='/elem_water.svg'
-                className='w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
+                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
               />
               {skill.cost.water === 0 ? 'ALL' : skill.cost.water}
             </span>
@@ -131,7 +131,7 @@ export default function SkillView({
             <span className='flex items-center xl:gap-2'>
               <img
                 src='/elem_earth.svg'
-                className='w-4 h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
+                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
               />
               {skill.cost.earth === 0 ? 'ALL' : skill.cost.earth}
             </span>

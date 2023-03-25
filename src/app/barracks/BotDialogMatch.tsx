@@ -74,7 +74,7 @@ export default function BotMatchDialog({ show, onClose }: BotMatchProps) {
           />
         </HeroRollDisplay>
       </div>
-      <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5'>
+      <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5 px-5'>
         <button
           type='button'
           className='px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded'
