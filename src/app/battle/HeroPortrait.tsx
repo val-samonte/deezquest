@@ -152,7 +152,7 @@ export default function HeroPortrait({
         }}
       />
       <animated.div
-        className='absolute bottom-0 inset-x-0 text-center'
+        className='absolute bottom-0 inset-x-0 text-center pointer-events-none'
         style={{ opacity }}
       >
         <animated.div
@@ -382,7 +382,7 @@ function AttributeTile({ children, attrName, value }: AttributeTileProps) {
       >
         <img
           src={`/stat_${attrName}.svg`}
-          className='w-8 h-8 aspect-square object-contain'
+          className='w-10 h-10 aspect-square object-contain'
         />
         <div className='flex justify-center gap-2 items-center'>
           <span className='opacity-50 uppercase'>{attrName}</span>{' '}

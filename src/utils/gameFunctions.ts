@@ -253,23 +253,26 @@ export const burningPunch: SkillFn = ({
   return { player, opponent, tiles, gameHash }
 }
 
-export const swiftStrike: SkillFn = ({
+export const knifehandStrike: SkillFn = ({
   commandLevel,
   player,
   opponent,
   tiles,
   gameHash,
 }) => {
-  // Deals 6|8|10 MAGIC DMG.
+  // Deals 6|8|10 MAGIC DMG and 60|80|100 Turn Time reduction.
   // Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.
-  // LVL 3 stuns the opponent.
 
   let mag = [6, 8, 10][commandLevel - 1]
   if (commandLevel === 3) {
     mag += player.spd > opponent.spd ? player.spd - opponent.spd : 0
-    opponent.turnTime -= 100
   }
   opponent = applyDamage(opponent, 0, mag)
+  const turnTimeReduction = commandLevel * 20 + 40
+  opponent.turnTime =
+    opponent.turnTime < turnTimeReduction
+      ? 0
+      : opponent.turnTime - turnTimeReduction
 
   return { player, opponent, tiles, gameHash }
 }
@@ -515,17 +518,16 @@ export const skills: Skill[] = [
     fn: burningPunch,
   },
   {
-    name: 'Swift Strike',
+    name: 'Knifehand Strike',
     desc:
-      'Deals 6|8|10 MAGIC DMG.\n' +
-      'Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.\n' +
-      'LVL 3 stuns the opponent.',
+      'Deals 6|8|10 MAGIC DMG and 60|80|100 Turn Time reduction\n' +
+      'Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.\n',
     type: SkillTypes.ATTACK,
     target: TargetHero.ENEMY,
     cost: {
       wind: 3,
     },
-    fn: swiftStrike,
+    fn: knifehandStrike,
   },
   {
     name: 'Aquashot',

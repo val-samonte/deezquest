@@ -625,7 +625,7 @@ pub fn skill_cost(index: u8) -> [Option<u8>; 4] {
     match index {
         // 'Burning Punch'
         0 => [Some(5), None, None, None],
-        // 'Swift Strike'
+        // 'Knifehand Strike'
         1 => [None, Some(3), None, None],
         // 'Aquashot'
         2 => [None, None, Some(4), None],
@@ -677,7 +677,7 @@ pub fn skills(
 
             return (*player, *opponent, None, None);
         }
-        // 'Swift Strike'
+        // 'Knifehand Strike'
         1 => {
             let mut mag = match command_level {
                 1 => 6,
@@ -691,13 +691,16 @@ pub fn skills(
                 } else {
                     0
                 };
-                opponent.turn_time = if opponent.turn_time > 100 {
-                    opponent.turn_time - 100
-                } else {
-                    0
-                };
             }
             apply_damage(opponent, None, Some(mag), None, None);
+
+            let turn_time_reduction = (command_level * 20) + 40;
+
+            opponent.turn_time = if opponent.turn_time < turn_time_reduction {
+                0
+            } else {
+                opponent.turn_time - turn_time_reduction
+            };
 
             return (*player, *opponent, None, None);
         }
