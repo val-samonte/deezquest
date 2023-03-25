@@ -66,11 +66,12 @@ export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
   }
 
   const [int, spd, vit, str] = getHeroAttributes(publicKey)
+  const hp = 80 + vit * 3 + Math.floor((vit - 1) / 3) * 5
   const bytes = publicKey.toBytes()
 
   return {
-    hp: 80 + vit * 2,
-    hpCap: 80 + vit * 2,
+    hp,
+    hpCap: hp,
     armor: 0,
     shell: 0,
     turnTime: 0,

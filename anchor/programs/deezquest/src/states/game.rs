@@ -128,11 +128,12 @@ impl Hero {
 
     pub fn from_pubkey(pubkey: &Pubkey) -> Hero {
         let [int, spd, vit, str] = get_hero_attributes(pubkey);
+        let hp = 80 + (vit * 2) + (((vit - 1) / 3) * 5);
         let bytes = pubkey.to_bytes();
 
         Hero {
-            hp: 80 + vit * 2,
-            hp_cap: 80 + vit * 2,
+            hp,
+            hp_cap: hp,
             armor: 0,
             shell: 0,
             turn_time: 0,

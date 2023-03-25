@@ -5,12 +5,7 @@ import { Player } from '@/atoms/matchAtom'
 import AnimatedCounter from '@/components/AnimatedCounter'
 import SkillView from '@/components/SkillView'
 import StatCounter from '@/components/StatCounter'
-import {
-  Hero,
-  heroFromPublicKey,
-  skillCountPerMana,
-  skills,
-} from '@/utils/gameFunctions'
+import { Hero, heroFromPublicKey, skills } from '@/utils/gameFunctions'
 import classNames from 'classnames'
 import { atom, useAtomValue } from 'jotai'
 import { atomFamily } from 'jotai/utils'
