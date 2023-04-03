@@ -49,7 +49,7 @@ export default function PlayerCard({
 
   const { hp, armor, shell, highlight } = useMemo(() => {
     const effectiveHp = hero.hp + hero.armor + hero.shell
-    const cap = effectiveHp > hero.hpCap ? effectiveHp : hero.hpCap
+    const cap = effectiveHp > hero.maxHp ? effectiveHp : hero.maxHp
 
     return {
       hp: (hero.hp / cap) * 100 + '%',
@@ -64,16 +64,16 @@ export default function PlayerCard({
           ? 'text-fuchsia-600'
           : '',
     }
-  }, [hero.hp, hero.hpCap, hero.armor, hero.shell])
+  }, [hero.hp, hero.maxHp, hero.armor, hero.shell])
 
   const [offensive, supportive, special] = useUseCount(hero)
 
   const healthBarColor = useMemo(() => {
-    const unit = Math.min(hero.hp / (hero.hpCap * 0.8), 1)
+    const unit = Math.min(hero.hp / (hero.maxHp * 0.8), 1)
     const red = 236 - 221 * unit
     const green = 15 + 221 * unit
     return `linear-gradient(180deg, rgba(${red},${green},0,0) 40%, rgba(${red},${green},0,0.25) 89%, rgba(${red},${green},0,1) 90%)`
-  }, [hero.hp, hero.hpCap])
+  }, [hero.hp, hero.maxHp])
 
   const currentTurn =
     gameState?.currentTurn === heroPublicKey && !isTransitioning
@@ -121,7 +121,7 @@ export default function PlayerCard({
               value={Math.max(hero.hp, 0)}
             />
             <span className='xs:font-bold xl:hidden whitespace-nowrap'>
-              / {hero.hpCap}
+              / {hero.maxHp}
             </span>
           </div>
 
@@ -170,7 +170,7 @@ export default function PlayerCard({
                   highlight,
                 )}
               >
-                / {hero.hpCap}
+                / {hero.maxHp}
               </span>
               <span className='mx-auto'></span>
               <StatCounter img='/armor.svg' value={hero.armor} />
@@ -261,7 +261,7 @@ export default function PlayerCard({
               <div
                 className='h-full'
                 style={{
-                  width: (hero.fireMp / hero.fireMpCap) * 100 + '%',
+                  width: (hero.fireMp / hero.maxMp) * 100 + '%',
                   background:
                     'linear-gradient(180deg, rgba(246,0,0,0) 40%, rgba(246,0,0,0.25) 89%, rgba(246,0,0,1) 90%)',
                 }}
@@ -281,7 +281,7 @@ export default function PlayerCard({
               <div
                 className='h-full'
                 style={{
-                  width: (hero.windMp / hero.windMpCap) * 100 + '%',
+                  width: (hero.windMp / hero.maxMp) * 100 + '%',
                   background:
                     'linear-gradient(180deg, rgba(35,220,31,0) 40%, rgba(35,220,31,0.25) 89%, rgba(35,220,31,1) 90%)',
                 }}
@@ -301,7 +301,7 @@ export default function PlayerCard({
               <div
                 className='h-full'
                 style={{
-                  width: (hero.watrMp / hero.watrMpCap) * 100 + '%',
+                  width: (hero.watrMp / hero.maxMp) * 100 + '%',
                   background:
                     'linear-gradient(180deg, rgba(19,113,255,0) 40%, rgba(19,113,255,0.25) 89%, rgba(19,113,255,1) 90%)',
                 }}
@@ -321,7 +321,7 @@ export default function PlayerCard({
               <div
                 className='h-full'
                 style={{
-                  width: (hero.eartMp / hero.eartMpCap) * 100 + '%',
+                  width: (hero.eartMp / hero.maxMp) * 100 + '%',
                   background:
                     'linear-gradient(180deg, rgba(253,169,10,0) 40%, rgba(253,169,10,0.25) 89%, rgba(253,169,10,1) 90%)',
                 }}

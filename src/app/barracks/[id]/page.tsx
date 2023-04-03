@@ -73,7 +73,7 @@ export default function HeroDetailsPage({
                 HP: <span className='font-bold'>{hero.hp}</span>
               </span>
               <span>
-                MP: <span className='font-bold'>{hero.fireMpCap}</span>
+                MP: <span className='font-bold'>{hero.maxMp}</span>
               </span>
             </div>
           </div>

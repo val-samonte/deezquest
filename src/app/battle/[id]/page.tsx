@@ -589,10 +589,10 @@ function BotMatchManager({ match }: { match: BotMatch }) {
           .sort((a, b) => b.amt - a.amt)
 
         const manaNotFull = [
-          hero.fireMp !== hero.fireMpCap,
-          hero.windMp !== hero.windMpCap,
-          hero.watrMp !== hero.watrMpCap,
-          hero.eartMp !== hero.eartMpCap,
+          hero.fireMp !== hero.maxMp,
+          hero.windMp !== hero.maxMp,
+          hero.watrMp !== hero.maxMp,
+          hero.eartMp !== hero.maxMp,
         ]
 
         for (let e = 0; e < 4; e++) {

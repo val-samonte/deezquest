@@ -6,24 +6,37 @@ import { getNextHash } from './getNextHash'
 
 export interface Hero {
   hp: number
-  hpCap: number
+  maxHp: number
+  maxMp: number
   armor: number
   shell: number
   turnTime: number
   baseDmg: number
+  weight: number
+  carryCap: number
   fireMp: number
-  fireMpCap: number
   windMp: number
-  windMpCap: number
   watrMp: number
-  watrMpCap: number
   eartMp: number
-  eartMpCap: number
   int: number
   spd: number
   vit: number
   str: number
-  weight: number
+  poison: number
+  poisonStack: number
+  envenom: number
+  regen: number
+  regenStack: number
+  reflect: number
+  haste: number
+  slow: number
+  sleep: number
+  silence: number
+  confusion: number
+  berserk: number
+  autoLife: number
+  trance: number
+  xTrance: number
   offensiveSkill: number
   supportiveSkill: number
   specialSkill: number
@@ -71,24 +84,37 @@ export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
 
   return {
     hp,
-    hpCap: hp,
+    maxHp: hp,
+    maxMp: 10 + int,
     armor: 0,
     shell: 0,
     turnTime: 0,
     baseDmg: str,
+    weight: 0,
+    carryCap: str,
     fireMp: 0,
-    fireMpCap: 10 + int,
     windMp: 0,
-    windMpCap: 10 + int,
     watrMp: 0,
-    watrMpCap: 10 + int,
     eartMp: 0,
-    eartMpCap: 10 + int,
     int: int,
     spd: spd,
     vit: vit,
     str: str,
-    weight: 0,
+    poison: 0,
+    poisonStack: 0,
+    envenom: 0,
+    regen: 0,
+    regenStack: 0,
+    reflect: 0,
+    haste: 0,
+    slow: 0,
+    sleep: 0,
+    silence: 0,
+    confusion: 0,
+    berserk: 0,
+    autoLife: 0,
+    trance: 0,
+    xTrance: 0,
     offensiveSkill: bytes[0] % 4,
     supportiveSkill: (bytes[1] % 4) + 4,
     specialSkill: (bytes[2] % 4) + 8,
@@ -129,7 +155,7 @@ export const applyDamage = (
 
 export const addHp = (hero: Hero, amount: number) => {
   hero.hp += amount
-  if (hero.hp > hero.hpCap) hero.hp = hero.hpCap
+  if (hero.hp > hero.maxHp) hero.hp = hero.maxHp
   return hero
 }
 
@@ -140,15 +166,10 @@ export const absorbMana = (
   const bonus = Math.floor((hero.int - 1) / 3)
   absorbedMana = absorbedMana.map((m) => (m ? m + bonus : m))
 
-  hero.fireMp += absorbedMana[0]
-  hero.windMp += absorbedMana[1]
-  hero.watrMp += absorbedMana[2]
-  hero.eartMp += absorbedMana[3]
-
-  if (hero.fireMp > hero.fireMpCap) hero.fireMp = hero.fireMpCap
-  if (hero.windMp > hero.windMpCap) hero.windMp = hero.windMpCap
-  if (hero.watrMp > hero.watrMpCap) hero.watrMp = hero.watrMpCap
-  if (hero.eartMp > hero.eartMpCap) hero.eartMp = hero.eartMpCap
+  hero.fireMp = Math.min(hero.fireMp + absorbedMana[0], hero.maxMp)
+  hero.windMp = Math.min(hero.windMp + absorbedMana[1], hero.maxMp)
+  hero.watrMp = Math.min(hero.watrMp + absorbedMana[2], hero.maxMp)
+  hero.eartMp = Math.min(hero.eartMp + absorbedMana[3], hero.maxMp)
 
   return hero
 }

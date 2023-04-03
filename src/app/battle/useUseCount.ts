@@ -14,7 +14,7 @@ export default function useUseCount(hero: Hero) {
       )
 
       const maxUseCountPerElement = skillCountPerMana(
-        [hero.fireMpCap, hero.windMpCap, hero.watrMpCap, hero.eartMpCap],
+        [hero.maxMp, hero.maxMp, hero.maxMp, hero.maxMp],
         skill.cost,
       ).map((e) => e && Math.floor(e))
 
@@ -45,14 +45,11 @@ export default function useUseCount(hero: Hero) {
       }
     })
   }, [
+    hero.maxMp,
     hero.fireMp,
-    hero.fireMpCap,
     hero.windMp,
-    hero.windMpCap,
     hero.watrMp,
-    hero.watrMpCap,
     hero.eartMp,
-    hero.eartMpCap,
     hero.offensiveSkill,
     hero.supportiveSkill,
     hero.specialSkill,

@@ -221,9 +221,7 @@ export default function HeroPortrait({
             <div className='grid grid-cols-2 mb-2'>
               <span>
                 <span className='text-neutral-300'>Total MP: </span>
-                <span className='font-bold text-lime-600'>
-                  {hero.fireMpCap}
-                </span>
+                <span className='font-bold text-lime-600'>{hero.maxMp}</span>
               </span>
               <span>
                 <span className='text-neutral-300'>Absorb MP: </span>
@@ -277,7 +275,7 @@ export default function HeroPortrait({
             <div className='grid grid-cols-1 mb-2'>
               <span>
                 <span className='text-neutral-300'>Total HP: </span>
-                <span className='font-bold text-lime-600'>{hero.hpCap}</span>
+                <span className='font-bold text-lime-600'>{hero.maxHp}</span>
               </span>
             </div>
             <div className='text-xs'>
@@ -318,7 +316,7 @@ export default function HeroPortrait({
         <div className='grid grid-cols-2 px-5 gap-x-5 gap-y-2 mb-5'>
           <span className='flex items-center'>
             <span className='text-neutral-300 flex-auto'>Total HP: </span>
-            <span className='font-bold text-lime-600'>{hero.hpCap}</span>
+            <span className='font-bold text-lime-600'>{hero.maxHp}</span>
           </span>
           <span className='flex items-center'>
             <span className='text-neutral-300 flex-auto'>Turn Points: </span>
@@ -328,7 +326,7 @@ export default function HeroPortrait({
           </span>
           <span className='flex items-center'>
             <span className='text-neutral-300 flex-auto'>Total MP: </span>
-            <span className='font-bold text-lime-600'>{hero.fireMpCap}</span>
+            <span className='font-bold text-lime-600'>{hero.maxMp}</span>
           </span>
           <span className='flex items-center'>
             <span className='text-neutral-300 flex-auto'>Absorb MP: </span>
