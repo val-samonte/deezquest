@@ -1,5 +1,5 @@
-import { SkillTypes } from '@/enums/SkillTypes'
-import { TargetHero } from '@/enums/TargetHero'
+import { SkillTypes } from '../enums/SkillTypes'
+import { TargetHero } from '../enums/TargetHero'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
 import { getNextHash } from './getNextHash'

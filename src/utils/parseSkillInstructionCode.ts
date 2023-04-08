@@ -1,15 +1,17 @@
+import { SkillTypes } from '@/enums/SkillTypes'
 import { Hero } from './gameFunctions'
 
-interface OperationArguments {
+export interface OperationArguments {
   commandLevel: number
+  skillType: SkillTypes
   player: Hero
   opponent: Hero
   tiles: (number | null)[]
   gameHash: Uint8Array
-  depths: number
+  depths: (number | null)[]
 }
 
-interface OperationContext {
+export interface OperationContext {
   code: number[]
   cursor: number
   current: {
@@ -87,7 +89,8 @@ const propertyIdMap = {
   'opponent.autoLife': 62,
   'opponent.trance': 63,
   'opponent.xTrance': 64,
-  commandLevel: 65,
+  // global turn count
+  commandLevel: 66,
 }
 
 export const ops: {
@@ -277,7 +280,7 @@ export const ops: {
     },
   },
   [53]: {
-    len: 4,
+    len: 3,
     fn: (state: VariableMapper, context: OperationContext) => {
       // add (assign)
       // VAR1 += VAR2, Note max value is 255
@@ -289,7 +292,7 @@ export const ops: {
     },
   },
   [54]: {
-    len: 4,
+    len: 3,
     fn: (state: VariableMapper, context: OperationContext) => {
       // subtract (assign)
       // VAR1 -= VAR2, Note it cannot go down below 0
@@ -301,7 +304,7 @@ export const ops: {
     },
   },
   [55]: {
-    len: 4,
+    len: 3,
     fn: (state: VariableMapper, context: OperationContext) => {
       // multiply (assign)
       // VAR1 *= VAR2, Note max value is 255
@@ -316,7 +319,7 @@ export const ops: {
     },
   },
   [56]: {
-    len: 4,
+    len: 3,
     fn: (state: VariableMapper, context: OperationContext) => {
       // divide (assign)
       // VAR1 /= VAR2, Note value is floored down (no floating pt)
@@ -338,7 +341,7 @@ export const ops: {
     },
   },
   [57]: {
-    len: 4,
+    len: 3,
     fn: (state: VariableMapper, context: OperationContext) => {
       // modulo (assign)
       // VAR1 %= VAR2
@@ -398,11 +401,11 @@ export const ops: {
     len: 5,
     fn: (state: VariableMapper, context: OperationContext) => {
       // damage
-      // dmg(VAR1: hp, VAR2: shield, VAR3: damage amount, VAR4: is piercing)
+      // dmg(VAR1: hp, VAR2: shield, VAR3: damage amount, BOOL: is piercing)
       const args = context.current!.args
       switch (context.current!.operationVersion) {
         case 1: {
-          if (state.get(args[3]) === 0) {
+          if (args[3] === 0) {
             if (state.get(args[1]) < state.get(args[2])) {
               state.set(
                 args[2],
@@ -671,7 +674,7 @@ export function parseSkillInstructionCode(
       throw new Error(`Operation with ID ${idx} does not exists`)
     }
 
-    context.versions[idx] = code[idx + 1]
+    context.versions[idx] = code[ctr * 2 + 5]
     ctr += 1
   }
 
@@ -688,7 +691,7 @@ export function parseSkillInstructionCode(
     context.cursor < 255 &&
     opStartIndex + context.cursor < context.code.length
   ) {
-    const opId = context.code[context.cursor]
+    const opId = context.code[opStartIndex + context.cursor]
 
     if (opId >= 64) {
       // check if operation version exists
