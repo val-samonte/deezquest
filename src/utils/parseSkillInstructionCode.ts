@@ -109,7 +109,7 @@ export const ops: {
     },
   },
   [2]: {
-    len: 4,
+    len: 2,
     fn: (state: VariableMapper, context: OperationContext) => {
       // skip
       // If VAR1 is truthy, skip the next OP
@@ -441,7 +441,10 @@ export const ops: {
         case 1: {
           state.set(
             args[0],
-            Math.min(state.get(args[1]), state.get(args[1] + 1)),
+            Math.min(
+              state.get(args[0]) + state.get(args[1]),
+              state.get(args[0] + 1), // always the max hp
+            ),
           )
           break
         }
