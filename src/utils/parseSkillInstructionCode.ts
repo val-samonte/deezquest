@@ -625,6 +625,33 @@ export const ops: {
       }
     },
   },
+  [72]: {
+    len: 3,
+    fn: (state: VariableMapper, context: OperationContext) => {
+      // replace nodes
+      // replace(tiles, LITERAL1: symbol flags, LITERAL2: specific symbol type)
+      const args = context.current!.args
+      switch (context.current!.operationVersion) {
+        case 1: {
+          // 1  - 0 - sword
+          // 2  - 1 - shield
+          // 4  - 2 - amulet
+          // 8  - 3 - fire mana
+          // 16 - 4 - wind mana
+          // 32 - 5 - water mana
+          // 64 - 6 - earth mana
+          const replaceValue = args[1] % 7 // loop to prevent unknown symbols
+          state.args.tiles = state.args.tiles.map((sym) => {
+            if (sym !== null && ((args[0] >> sym) & 0b1) === 1) {
+              return replaceValue
+            }
+            return sym
+          })
+          break
+        }
+      }
+    },
+  },
 }
 
 function getPropertyPath(id: number) {

@@ -331,7 +331,11 @@ describe('Harden', () => {
   })
 })
 
-describe('Other operations', () => {
+////////////////////////////////////////////////////////////
+// Misc Operators
+////////////////////////////////////////////////////////////
+
+describe('Misc Operators', () => {
   test('Shuffle', () => {
     const code = getOperationsFromCode('02 02 02 02 46 01 00 46')
     const preShuffleTiles = JSON.stringify(args.tiles)
@@ -355,5 +359,21 @@ describe('Other operations', () => {
     parseSkillInstructionCode(args, code)
     expect(args.player.armor).toBe(count)
     expect(args.player.shell).toBe(64)
+  })
+
+  test('Replace Nodes', () => {
+    const code = getOperationsFromCode('02 02 02 02 48 01 00 48 50 00')
+
+    parseSkillInstructionCode(args, code)
+
+    const found = args.tiles.find((cur) => {
+      // 0x50 check for wind / earth nodes (should be absent since they're already replaced)
+      if (cur === 4 || cur === 6) {
+        return true
+      }
+      return false
+    })
+
+    expect(found).toBeUndefined()
   })
 })
