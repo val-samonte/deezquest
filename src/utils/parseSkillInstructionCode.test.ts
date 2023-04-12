@@ -115,6 +115,53 @@ describe('Flow Control', () => {
 })
 
 ////////////////////////////////////////////////////////////
+// Misc Operators
+////////////////////////////////////////////////////////////
+
+describe('Misc Operators', () => {
+  test('Shuffle', () => {
+    const code = getOperationsFromCode('02 02 02 02 46 01 00 46')
+    const preShuffleTiles = JSON.stringify(args.tiles)
+    const preShuffleHash = JSON.stringify(args.gameHash)
+    parseSkillInstructionCode(args, code)
+    expect(JSON.stringify(args.tiles)).not.toBe(preShuffleTiles)
+    expect(JSON.stringify(args.gameHash)).not.toBe(preShuffleHash)
+  })
+
+  test('Count', () => {
+    const code = getOperationsFromCode('02 02 02 02 47 01 00 47 04 49 47 05 FF')
+
+    const count = args.tiles.reduce((acc: number, cur) => {
+      // 0x49 count only sword, fire and earth nodes in the tile
+      if (cur === 0 || cur === 3 || cur === 6) {
+        acc += 1
+      }
+      return acc
+    }, 0)
+
+    parseSkillInstructionCode(args, code)
+    expect(args.player.armor).toBe(count)
+    expect(args.player.shell).toBe(64)
+  })
+
+  test('Replace Nodes', () => {
+    const code = getOperationsFromCode('02 02 02 02 48 01 00 48 50 00')
+
+    parseSkillInstructionCode(args, code)
+
+    const found = args.tiles.find((cur) => {
+      // 0x50 check for wind / earth nodes (should be absent since they're already replaced)
+      if (cur === 4 || cur === 6) {
+        return true
+      }
+      return false
+    })
+
+    expect(found).toBeUndefined()
+  })
+})
+
+////////////////////////////////////////////////////////////
 // Innate Skills
 ////////////////////////////////////////////////////////////
 
@@ -332,48 +379,154 @@ describe('Harden', () => {
 })
 
 ////////////////////////////////////////////////////////////
-// Misc Operators
+// Sample Skills (Old skills during Grizzlython)
 ////////////////////////////////////////////////////////////
 
-describe('Misc Operators', () => {
-  test('Shuffle', () => {
-    const code = getOperationsFromCode('02 02 02 02 46 01 00 46')
-    const preShuffleTiles = JSON.stringify(args.tiles)
-    const preShuffleHash = JSON.stringify(args.gameHash)
-    parseSkillInstructionCode(args, code)
-    expect(JSON.stringify(args.tiles)).not.toBe(preShuffleTiles)
-    expect(JSON.stringify(args.gameHash)).not.toBe(preShuffleHash)
-  })
+describe('Burning Punch (Old)', () => {
+  //   // Deals x2 of ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.
+  //   // LVL 3 deals x2 of the mana gap instead.
+  //   const atk = (player.baseDmg + commandLevel) * 2
+  //   const mag = Math.abs((preCommandHero?.fireMp ?? 0) - opponent.fireMp)
+  //   opponent = applyDamage(opponent, atk, mag * (commandLevel === 3 ? 2 : 1))
+  //   return { player, opponent, tiles, gameHash }
+})
 
-  test('Count', () => {
-    const code = getOperationsFromCode('02 02 02 02 47 01 00 47 04 49 47 05 FF')
+describe('Knifehand Strike (Old)', () => {
+  //   // Deals 6|8|10 MAGIC DMG and 60|80|100 Turn Time reduction.
+  //   // Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.
+  //   let mag = [6, 8, 10][commandLevel - 1]
+  //   if (commandLevel === 3) {
+  //     mag += player.spd > opponent.spd ? player.spd - opponent.spd : 0
+  //   }
+  //   opponent = applyDamage(opponent, 0, mag)
+  //   const turnTimeReduction = commandLevel * 20 + 40
+  //   opponent.turnTime =
+  //     opponent.turnTime < turnTimeReduction
+  //       ? 0
+  //       : opponent.turnTime - turnTimeReduction
+  //   return { player, opponent, tiles, gameHash }
+})
 
-    const count = args.tiles.reduce((acc: number, cur) => {
-      // 0x49 count only sword, fire and earth nodes in the tile
-      if (cur === 0 || cur === 3 || cur === 6) {
-        acc += 1
-      }
-      return acc
-    }, 0)
+describe('Aquashot', () => {
+  //   // Deals 4|12|16 MAGIC DMG.
+  //   // Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes.
+  //   // LVL 3 pierces through SHELL.
+  //   let mag = [4, 12, 16][commandLevel - 1]
+  //   if (commandLevel === 3) {
+  //     mag += player.vit > opponent.vit ? player.vit - opponent.vit : 0
+  //   }
+  //   opponent = applyDamage(opponent, 0, mag, false, commandLevel === 3)
+  //   return { player, opponent, tiles, gameHash }
+})
 
-    parseSkillInstructionCode(args, code)
-    expect(args.player.armor).toBe(count)
-    expect(args.player.shell).toBe(64)
-  })
+describe('Crushing Blow (Old)', () => {
+  //   // Deals 2 MAGIC DMG per EARTH MANA of the hero.
+  //   // LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5.
+  //   // LVL 3 destroys ARMOR after damage is applied.
+  //   let mag = (preCommandHero?.eartMp ?? 1) * 2
+  //   let atk = 0
+  //   if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
+  //     atk = player.str
+  //   }
+  //   opponent = applyDamage(opponent, atk, mag)
+  //   if (commandLevel === 3) {
+  //     opponent.armor = 0
+  //   }
+  //   return { player, opponent, tiles, gameHash }
+})
 
-  test('Replace Nodes', () => {
-    const code = getOperationsFromCode('02 02 02 02 48 01 00 48 50 00')
+describe('Empower', () => {
+  //   // Adds 3|6|9 to ATTACK DMG during the match, stacks indefinitely.
+  //   player.baseDmg += commandLevel * 3
+  //   return { player: { ...player }, opponent, tiles, gameHash }
+})
 
-    parseSkillInstructionCode(args, code)
+describe('Tailwind (Old)', () => {
+  //   // Adds 3|6|9 to SPD during the match, stacks indefinitely.
+  //   player.spd += commandLevel
+  //   return { player, opponent, tiles, gameHash }
+})
 
-    const found = args.tiles.find((cur) => {
-      // 0x50 check for wind / earth nodes (should be absent since they're already replaced)
-      if (cur === 4 || cur === 6) {
-        return true
-      }
-      return false
-    })
+describe('Healing', () => {
+  //   // Recover 6|8|10 HP.
+  //   // LVL 3 adds x2 value of VIT as HP.
+  //   let heal = [6, 8, 10][commandLevel - 1]
+  //   if (commandLevel === 3) {
+  //     heal += player.vit * 2
+  //   }
+  //   player = addHp(player, heal)
+  //   return { player, opponent, tiles, gameHash }
+})
 
-    expect(found).toBeUndefined()
-  })
+describe('Manawall', () => {
+  //   // Converts all EARTH MANA into SHELL.
+  //   // Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.
+  //   player.shell += preCommandHero?.eartMp ?? 1
+  //   if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
+  //     player.armor += player.str
+  //   }
+  //   return { player, opponent, tiles, gameHash }
+})
+
+describe('Combustion', () => {
+  //   // Converts all WATER MANA in the board into FIRE MANA, deals x2 MAGIC DMG per each converted WATER MANA.
+  //   if (!tiles) return { player, opponent, tiles, gameHash }
+  //   let count = 0
+  //   let newTiles = [...tiles]
+  //   for (let i = 0; i < tiles.length; i++) {
+  //     // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+  //     if (tiles[i] === 5) {
+  //       count++
+  //       newTiles[i] = 3
+  //     }
+  //   }
+  //   if (count === 0) return { player, opponent, tiles, gameHash }
+  //   let mag = count * 2
+  //   opponent = applyDamage(opponent, undefined, mag)
+  //   return { player, opponent, tiles: newTiles, gameHash }
+})
+
+describe('Tornado', () => {
+  //   // Shuffles the board, deals MAGIC DMG based on how many WIND + EARTH MANA appear after the shuffle.
+  //   if (!gameHash || !tiles) return { player, opponent, tiles, gameHash }
+  //   const newHash = getNextHash([Buffer.from('SHUFFLE'), gameHash])
+  //   const newTiles = hashToTiles(newHash) as (number | null)[]
+  //   let count = 0
+  //   for (let i = 0; i < tiles.length; i++) {
+  //     if (tiles[i] === null) {
+  //       newTiles[i] = null
+  //     } else if (tiles[i] === 4 || tiles[i] === 6) {
+  //       // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+  //       count++
+  //     }
+  //   }
+  //   opponent = applyDamage(opponent, undefined, count)
+  //   return { player, opponent, tiles: newTiles, gameHash: newHash }
+})
+
+describe('Extinguish', () => {
+  //   // Converts all FIRE MANA in the board into WATER MANA, recover 2 HP per each converted FIRE MANA.
+  //   if (!tiles) return { player, opponent, tiles, gameHash }
+  //   let count = 0
+  //   let newTiles = [...tiles]
+  //   for (let i = 0; i < tiles.length; i++) {
+  //     // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+  //     if (tiles[i] === 3) {
+  //       count++
+  //       newTiles[i] = 5
+  //     }
+  //   }
+  //   if (count === 0) return { player, opponent, tiles, gameHash }
+  //   let restoredHp = count * 2
+  //   player = addHp(player, restoredHp)
+  //   return { player, opponent, tiles: newTiles, gameHash }
+})
+
+describe('Quake', () => {
+  //   // Deals 30 MAGIC DMG on both players. Damage is reduced based on each respective heroes' WIND MANA.
+  //   const playerDmg = Math.max(30 - player.windMp, 0)
+  //   const opponentDmg = Math.max(30 - opponent.windMp, 0)
+  //   player = applyDamage(player, undefined, playerDmg)
+  //   opponent = applyDamage(opponent, undefined, opponentDmg)
+  //   return { player, opponent, tiles, gameHash }
 })
