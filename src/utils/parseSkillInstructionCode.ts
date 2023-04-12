@@ -1,5 +1,7 @@
 import { SkillTypes } from '@/enums/SkillTypes'
-import { Hero } from './gameFunctions'
+import { hashToTiles, Hero } from './gameFunctions'
+import { getNextHash } from './getNextHash'
+import crypto from 'crypto'
 
 export interface OperationArguments {
   commandLevel: number
@@ -574,10 +576,23 @@ export const ops: {
     fn: (state: VariableMapper, context: OperationContext) => {
       // shuffle
       // shuffle's the board
-      const args = context.current!.args
       switch (context.current!.operationVersion) {
         case 1: {
-          //
+          state.args.gameHash = crypto
+            .createHash('sha256')
+            .update(
+              Buffer.concat([Buffer.from('SHUFFLE'), state.args.gameHash]),
+            )
+            .digest()
+
+          const tiles = new Array(64)
+
+          for (let i = 0; i < 32; i++) {
+            const byte = state.args.gameHash[i]
+            tiles[i] = (byte & 0xf) % 7
+            tiles[i + 32] = ((byte >> 4) & 0xf) % 7
+          }
+          state.args.tiles = tiles
           break
         }
       }
@@ -591,7 +606,20 @@ export const ops: {
       const args = context.current!.args
       switch (context.current!.operationVersion) {
         case 1: {
-          //
+          // 1  - 0 - sword
+          // 2  - 1 - shield
+          // 4  - 2 - amulet
+          // 8  - 3 - fire mana
+          // 16 - 4 - wind mana
+          // 32 - 5 - water mana
+          // 64 - 6 - earth mana
+          const count = state.args.tiles.reduce((acc: number, cur) => {
+            if (cur !== null && ((args[1] >> cur) & 0b1) === 1) {
+              acc += 1
+            }
+            return acc
+          }, 0)
+          state.set(args[0], count)
           break
         }
       }
@@ -615,7 +643,7 @@ function getPropertyById(id: number) {
 
 class VariableMapper {
   vars = Array.from(Array(55)).fill(0)
-  constructor(public state: OperationArguments) {}
+  constructor(public args: OperationArguments) {}
 
   set(id: number, value: number) {
     if (id >= 200) {
@@ -624,7 +652,7 @@ class VariableMapper {
     }
 
     const propertyPath = getPropertyPath(id)
-    let obj: { [key: string]: any } = this.state
+    let obj: { [key: string]: any } = this.args
     for (let i = 0; i < propertyPath.length - 1; i++) {
       obj = obj[propertyPath[i]]
     }
@@ -638,7 +666,7 @@ class VariableMapper {
     }
 
     const propertyPath = getPropertyPath(id)
-    let obj: { [key: string]: any } = this.state
+    let obj: { [key: string]: any } = this.args
     for (let i = 0; i < propertyPath.length - 1; i++) {
       obj = obj[propertyPath[i]]
     }

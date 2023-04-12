@@ -330,3 +330,30 @@ describe('Harden', () => {
     expect(args.player.shell).toBe(preMutPlayer.shell + 5)
   })
 })
+
+describe('Other operations', () => {
+  test('Shuffle', () => {
+    const code = getOperationsFromCode('02 02 02 02 46 01 00 46')
+    const preShuffleTiles = JSON.stringify(args.tiles)
+    const preShuffleHash = JSON.stringify(args.gameHash)
+    parseSkillInstructionCode(args, code)
+    expect(JSON.stringify(args.tiles)).not.toBe(preShuffleTiles)
+    expect(JSON.stringify(args.gameHash)).not.toBe(preShuffleHash)
+  })
+
+  test('Count', () => {
+    const code = getOperationsFromCode('02 02 02 02 47 01 00 47 04 49 47 05 FF')
+
+    const count = args.tiles.reduce((acc: number, cur) => {
+      // 0x49 count only sword, fire and earth nodes in the tile
+      if (cur === 0 || cur === 3 || cur === 6) {
+        acc += 1
+      }
+      return acc
+    }, 0)
+
+    parseSkillInstructionCode(args, code)
+    expect(args.player.armor).toBe(count)
+    expect(args.player.shell).toBe(64)
+  })
+})
