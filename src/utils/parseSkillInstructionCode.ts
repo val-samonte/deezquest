@@ -114,11 +114,9 @@ export const ops: {
     len: 2,
     fn: (state: VariableMapper, context: OperationContext) => {
       // skip
-      // If VAR1 is truthy, skip the next OP
+      // skip count = VAR1, skip # of operators
       const args = context.current!.args
-      if (args[0] !== 0) {
-        context.skip += 1
-      }
+      context.skip += state.get(args[0])
     },
   },
   [3]: {
@@ -358,14 +356,18 @@ export const ops: {
     },
   },
   [64]: {
-    len: 3,
+    len: 4,
     fn: (state: VariableMapper, context: OperationContext) => {
-      // absolute
-      // VAR1 = abs(VAR2)
+      // gap
+      // VAR1 = abs(VAR2 - VAR3)
       const args = context.current!.args
       switch (context.current!.operationVersion) {
         case 1: {
-          state.set(args[0], Math.abs(state.get(args[1])))
+          if (state.get(args[1]) > state.get(args[2])) {
+            state.set(args[0], state.get(args[1]) - state.get(args[2]))
+          } else {
+            state.set(args[0], state.get(args[2]) - state.get(args[1]))
+          }
           break
         }
       }
@@ -400,33 +402,27 @@ export const ops: {
     },
   },
   [67]: {
-    len: 5,
+    len: 4,
     fn: (state: VariableMapper, context: OperationContext) => {
       // damage
-      // dmg(VAR1: hp, VAR2: shield, VAR3: damage amount, BOOL: is piercing)
+      // dmg(VAR1: hp, VAR2: shield, VAR3: damage amount)
       const args = context.current!.args
       switch (context.current!.operationVersion) {
         case 1: {
-          if (args[3] === 0) {
-            if (state.get(args[1]) < state.get(args[2])) {
-              state.set(
-                args[2],
-                Math.max(state.get(args[2]) - state.get(args[1]), 0),
-              )
-              state.set(args[1], 0)
-            } else {
-              state.set(
-                args[1],
-                Math.max(state.get(args[1]) - state.get(args[2]), 0),
-              )
-              state.set(args[2], 0)
-            }
+          const hp = state.get(args[0])
+          let shield = state.get(args[1])
+          let damage = state.get(args[2])
+
+          if (shield < damage) {
+            damage -= shield
+            shield = 0
+          } else {
+            shield -= damage
+            damage = 0
           }
 
-          state.set(
-            args[0],
-            Math.max(state.get(args[0]) - state.get(args[2]), 0),
-          )
+          state.set(args[1], shield)
+          state.set(args[0], Math.min(Math.max(hp - damage, 0), 255))
 
           break
         }
