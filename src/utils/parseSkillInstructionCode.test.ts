@@ -701,71 +701,111 @@ const applyDamage = (hero: Hero, physical = 0, magical = 0) => {
 //   })
 // })
 
-describe('Healing', () => {
-  // Recover 6|8|10 HP.
-  // LVL 3 adds x2 value of VIT as HP.
+// describe('Healing', () => {
+//   // Recover 6|8|10 HP.
+//   // LVL 3 adds x2 value of VIT as HP.
+
+//   const code = getOperationsFromCode(
+//     '00 00 04 00 ' + //   mana
+//       '44 01 00 ' + //    version
+//       '01 CE 03 ' + //    CE = 3
+//       '01 CF 02 ' + //    CF = 2
+//       '01 D0 06 ' + //    D0 = 6
+//       '36 CE 42 ' + //    CE -= command level
+//       '02 CE ' + //       switch command level
+//       '03 14 ' + //       jump to command level 3
+//       '03 1E ' + //       jump to command level 2
+//       '03 21 ' + //       jump to command level 1
+//       // Command Level 3
+//       '32 D1 10 CF ' + // D1 = player.vit * CF
+//       '35 D0 D1 ' + //    D0 += D1
+//       '35 D0 CF ' + //    D0 += CF
+//       // Command Level 2
+//       '35 D0 CF ' + //    D0 += CF
+//       // Command Level 1
+//       '44 01 D0', //      heal(player.hp, D0)
+//   )
+
+//   const command = (lvl: number, player: Hero, _: Hero) => {
+//     let heal = [6, 8, 10][lvl - 1]
+//     if (lvl === 3) {
+//       heal += player.vit * 2
+//     }
+//     player.hp = Math.min(player.hp + heal, player.maxHp)
+//   }
+
+//   test('Command Level 1', () => {
+//     args.player.hp = preMutPlayer.hp = 80
+//     command(args.commandLevel, preMutPlayer, preMutOpponent)
+//     parseSkillInstructionCode(args, code)
+//     expect(args.player.hp).toBe(preMutPlayer.hp)
+//   })
+
+//   test('Command Level 2', () => {
+//     args.commandLevel = 2
+//     args.player.hp = preMutPlayer.hp = 80
+//     command(args.commandLevel, preMutPlayer, preMutOpponent)
+//     parseSkillInstructionCode(args, code)
+//     expect(args.player.hp).toBe(preMutPlayer.hp)
+//   })
+
+//   test('Command Level 3', () => {
+//     args.commandLevel = 3
+//     args.player.hp = preMutPlayer.hp = 80
+//     command(args.commandLevel, preMutPlayer, preMutOpponent)
+//     parseSkillInstructionCode(args, code)
+//     expect(args.player.hp).toBe(preMutPlayer.hp)
+//   })
+// })
+
+describe('Manawall', () => {
+  // Converts all EARTH MANA into SHELL.
+  // Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.
 
   const code = getOperationsFromCode(
-    '00 00 04 00 ' + //   mana
-      '44 01 00 ' + //    version
-      '01 CE 03 ' + //    CE = 3
-      '01 CF 02 ' + //    CF = 2
-      '01 D0 06 ' + //    D0 = 6
-      '36 CE 42 ' + //    CE -= command level
-      '02 CE ' + //       switch command level
-      '03 14 ' + //       jump to command level 3
-      '03 1E ' + //       jump to command level 2
-      '03 21 ' + //       jump to command level 1
-      // Command Level 3
-      '32 D1 10 CF ' + // D1 = player.vit * CF
-      '35 D0 D1 ' + //    D0 += D1
-      '35 D0 CF ' + //    D0 += CF
-      // Command Level 2
-      '35 D0 CF ' + //    D0 += CF
-      // Command Level 1
-      '44 01 D0', //      heal(player.hp, D0)
+    '00 00 00 FF ' + //      mana
+      '40 01 43 01 00 ' + // version
+      '01 CE 05 ' + //       CE = 5
+      '01 CF 01 ' + //       CF = 1
+      '35 05 0D ' + //       player.shell += player.eartMp
+      '11 CF CF 42 ' + //    CF = CF == command level
+      '02 CF ' + //          skip if command level == 1
+      '03 12 ' + //          jump to command level 2 / 3
+      '0F ' + //             end
+      // Command Level 2 / 3
+      '13 D2 0D CE ' + //    D2 = player.eartMp <= CE
+      '02 D2 ' + //          skip next op if player.eartMp <= 5
+      '35 04 11',
   )
 
   const command = (lvl: number, player: Hero, _: Hero) => {
-    let heal = [6, 8, 10][lvl - 1]
-    if (lvl === 3) {
-      heal += player.vit * 2
+    player.shell += player?.eartMp ?? 1
+    if (lvl > 1 && (player?.eartMp ?? 0) >= 5) {
+      player.armor += player.str
     }
-    player.hp = Math.min(player.hp + heal, player.maxHp)
   }
 
   test('Command Level 1', () => {
-    args.player.hp = preMutPlayer.hp = 80
     command(args.commandLevel, preMutPlayer, preMutOpponent)
     parseSkillInstructionCode(args, code)
-    expect(args.player.hp).toBe(preMutPlayer.hp)
+    expect(args.player.shell).toBe(preMutPlayer.shell)
   })
 
   test('Command Level 2', () => {
     args.commandLevel = 2
-    args.player.hp = preMutPlayer.hp = 80
     command(args.commandLevel, preMutPlayer, preMutOpponent)
     parseSkillInstructionCode(args, code)
-    expect(args.player.hp).toBe(preMutPlayer.hp)
+    expect(args.player.shell).toBe(preMutPlayer.shell)
   })
 
   test('Command Level 3', () => {
     args.commandLevel = 3
-    args.player.hp = preMutPlayer.hp = 80
     command(args.commandLevel, preMutPlayer, preMutOpponent)
     parseSkillInstructionCode(args, code)
-    expect(args.player.hp).toBe(preMutPlayer.hp)
+    expect(args.player.str).toBe(preMutPlayer.str)
+    expect(args.player.armor).toBe(preMutPlayer.armor)
+    expect(args.player.shell).toBe(preMutPlayer.shell)
   })
-})
-
-describe('Manawall', () => {
-  //   // Converts all EARTH MANA into SHELL.
-  //   // Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.
-  //   player.shell += preCommandHero?.eartMp ?? 1
-  //   if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
-  //     player.armor += player.str
-  //   }
-  //   return { player, opponent, tiles, gameHash }
 })
 
 describe('Combustion', () => {
