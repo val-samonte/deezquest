@@ -56,6 +56,9 @@ beforeEach(() => {
   preMutPlayer.turnTime = args.player.turnTime
   preMutOpponent.turnTime = args.opponent.turnTime
   args.player.fireMp = preMutPlayer.fireMp = Math.floor(Math.random() * 10)
+  args.player.windMp = preMutPlayer.windMp = Math.floor(Math.random() * 10)
+  args.player.watrMp = preMutPlayer.watrMp = Math.floor(Math.random() * 10)
+  args.player.eartMp = preMutPlayer.eartMp = Math.floor(Math.random() * 10)
   args.opponent.armor = preMutOpponent.armor = Math.floor(Math.random() * 10)
   args.opponent.shell = preMutOpponent.shell = Math.floor(Math.random() * 10)
   args.opponent.fireMp = preMutOpponent.fireMp = Math.floor(Math.random() * 10)
@@ -505,8 +508,9 @@ describe('Burning Punch (Old)', () => {
 describe('Knifehand Strike (Old)', () => {
   // Deals 6|8|10 MAGIC DMG and 60|80|100 Turn Time reduction.
   // Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.
+
   const code = getOperationsFromCode(
-    '00 05 00 00 ' + //      mana
+    '00 03 00 00 ' + //      mana
       '40 01 43 01 00 ' + // version
       '01 CF 03 ' + //       CF = 3
       '01 D0 02 ' + //       D0 = 2
@@ -568,48 +572,133 @@ describe('Knifehand Strike (Old)', () => {
 })
 
 describe('Aquashot', () => {
+  // Deals 4|12|16 MAGIC DMG.
+  // Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes.
+  // LVL 3 pierces through SHELL.
+
   const code = getOperationsFromCode(
-    '05 00 00 00 ' + //
-      '00 ' + //
-      '',
+    '00 00 04 00 ' + //      mana
+      '40 01 43 01 00 ' + // version
+      '02 42 ' + //          switch command level
+      '0F ' + //             end (noop)
+      '03 09 ' + //          jump to command level 1
+      '03 0E ' + //          jump to command level 2
+      '03 16 ' + //          jump to command level 3
+      // Command Level 1
+      '01 D0 04 ' + //       D0 = 4
+      '03 11 ' + //          jump to apply damage
+      // Command Level 2
+      '01 D0 0C ' + //       D0 = 12
+      '43 21 25 D0 ' + //    apply damage D0
+      '0F ' + //             end
+      // Command Level 3
+      '01 D0 10 ' + //       D0 = 16
+      '40 D1 10 30 ' + //    D1 = gap between player and opponent's VIT
+      '12 CF 10 30 ' + //    CF = player.vit < opponent.vit
+      '02 CF ' + //          skip if player.vit < opponent.vit
+      '35 D0 D1 ' + //       add diff to damage (D0)
+      '36 21 D0', //         direct damage HP (piercing)
   )
-  //   // Deals 4|12|16 MAGIC DMG.
-  //   // Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes.
-  //   // LVL 3 pierces through SHELL.
-  //   let mag = [4, 12, 16][commandLevel - 1]
-  //   if (commandLevel === 3) {
-  //     mag += player.vit > opponent.vit ? player.vit - opponent.vit : 0
-  //   }
-  //   opponent = applyDamage(opponent, 0, mag, false, commandLevel === 3)
-  //   return { player, opponent, tiles, gameHash }
+
+  const command = (lvl: number, player: Hero, opponent: Hero) => {
+    let mag = [4, 12, 16][lvl - 1]
+    if (lvl === 3) {
+      mag += player.vit > opponent.vit ? player.vit - opponent.vit : 0
+      opponent.hp -= mag
+    } else {
+      opponent = applyDamage(opponent, 0, mag)
+    }
+  }
+
+  test('Command Level 1', () => {
+    command(args.commandLevel, preMutPlayer, preMutOpponent)
+    parseSkillInstructionCode(args, code)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+    expect(args.opponent.shell).toBe(preMutOpponent.shell)
+  })
+
+  test('Command Level 2', () => {
+    args.commandLevel = 2
+    command(args.commandLevel, preMutPlayer, preMutOpponent)
+    parseSkillInstructionCode(args, code)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+    expect(args.opponent.shell).toBe(preMutOpponent.shell)
+  })
+
+  test('Command Level 3', () => {
+    args.commandLevel = 3
+    command(args.commandLevel, preMutPlayer, preMutOpponent)
+    parseSkillInstructionCode(args, code)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+    expect(args.opponent.shell).toBe(preMutOpponent.shell)
+  })
 })
 
 describe('Crushing Blow (Old)', () => {
-  //   // Deals 2 MAGIC DMG per EARTH MANA of the hero.
-  //   // LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5.
-  //   // LVL 3 destroys ARMOR after damage is applied.
-  //   let mag = (preCommandHero?.eartMp ?? 1) * 2
-  //   let atk = 0
-  //   if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
-  //     atk = player.str
-  //   }
-  //   opponent = applyDamage(opponent, atk, mag)
-  //   if (commandLevel === 3) {
-  //     opponent.armor = 0
-  //   }
-  //   return { player, opponent, tiles, gameHash }
-})
+  // Deals 2 MAGIC DMG per EARTH MANA of the hero.
+  // LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5.
+  // LVL 3 destroys ARMOR after damage is applied.
 
-describe('Empower', () => {
-  //   // Adds 3|6|9 to ATTACK DMG during the match, stacks indefinitely.
-  //   player.baseDmg += commandLevel * 3
-  //   return { player: { ...player }, opponent, tiles, gameHash }
-})
+  const code = getOperationsFromCode(
+    '00 00 00 FF ' + //      mana
+      '40 01 43 01 00 ' + // version
+      '01 CE 05 ' + //       CE = 5
+      '01 CF 02 ' + //       CF = 2
+      '32 D0 0D CF ' + //    D0 = player.eartMp * CF
+      '43 21 25 D0 ' + //    apply magic damage D0
+      '02 42 ' + //          switch command level
+      '0F ' + //             end (noop)
+      '0F ' + //             end (command level 1)
+      '03 17 ' + //          jump to command level 2
+      // Command Level 3
+      '01 D1 01 ' + //       enable destroy armor flag
+      // Command Level 2 & 3
+      '13 D2 0D CE ' + //    D2 = player.eartMp <= CE
+      '02 D2 ' + //          skip next op if player.eartMp <= 5
+      '43 21 24 11 ' + //    apply physical damage with player.str
+      '02 D1 ' + //          skip end if armor flag
+      '0F ' + //             end
+      '01 24 00', //         opponent.armor = 0 (destroy opponent armor)
+  )
 
-describe('Tailwind (Old)', () => {
-  //   // Adds 3|6|9 to SPD during the match, stacks indefinitely.
-  //   player.spd += commandLevel
-  //   return { player, opponent, tiles, gameHash }
+  const command = (lvl: number, player: Hero, opponent: Hero) => {
+    let mag = (player?.eartMp ?? 1) * 2
+    let atk = 0
+    if (lvl > 1 && (player?.eartMp ?? 0) >= 5) {
+      atk = player.str
+    }
+    opponent = applyDamage(opponent, atk, mag)
+    if (lvl === 3) {
+      opponent.armor = 0
+    }
+  }
+
+  test('Command Level 1', () => {
+    command(args.commandLevel, preMutPlayer, preMutOpponent)
+    parseSkillInstructionCode(args, code)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+    expect(args.opponent.armor).toBe(preMutOpponent.armor)
+    expect(args.opponent.shell).toBe(preMutOpponent.shell)
+  })
+
+  test('Command Level 2', () => {
+    args.commandLevel = 2
+    command(args.commandLevel, preMutPlayer, preMutOpponent)
+    parseSkillInstructionCode(args, code)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+    expect(args.opponent.armor).toBe(preMutOpponent.armor)
+    expect(args.opponent.shell).toBe(preMutOpponent.shell)
+  })
+
+  test('Command Level 3', () => {
+    args.commandLevel = 3
+    command(args.commandLevel, preMutPlayer, preMutOpponent)
+    parseSkillInstructionCode(args, code)
+    expect(args.player.str).toBe(preMutPlayer.str)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+    expect(args.opponent.armor).toBe(preMutOpponent.armor)
+    expect(args.opponent.shell).toBe(preMutOpponent.shell)
+  })
 })
 
 describe('Healing', () => {

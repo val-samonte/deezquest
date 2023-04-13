@@ -773,6 +773,8 @@ export function parseSkillInstructionCode(
       ),
     }
 
+    // console.log(context.current)
+
     if (context.skip > 0) {
       context.skip -= 1
       context.cursor += opLen
