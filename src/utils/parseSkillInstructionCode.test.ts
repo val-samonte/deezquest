@@ -8,6 +8,7 @@ import {
   parseSkillInstructionCode,
 } from './parseSkillInstructionCode'
 import { getNextHash } from './getNextHash'
+import { getOperationsFromCode, innateSkills } from './innateSkills'
 
 let playerKeypair: Keypair
 let opponentKeypair: Keypair
@@ -15,10 +16,6 @@ let preMutPlayer: Hero
 let preMutOpponent: Hero
 let hash: Buffer
 let args: OperationArguments
-
-const getOperationsFromCode = (codeStr: string) => {
-  return new Uint8Array(codeStr.split(' ').map((n) => parseInt(n, 16)))
-}
 
 const applyDamage = (hero: Hero, physical = 0, magical = 0) => {
   if (hero.armor < physical) {
@@ -195,7 +192,7 @@ describe('Flow Control', () => {
 
 describe('Misc Operators', () => {
   test('Shuffle', () => {
-    const code = getOperationsFromCode('02 02 02 02 46 01 00 46')
+    const code = innateSkills[8].code
     const preShuffleTiles = JSON.stringify(args.tiles)
     const preShuffleHash = JSON.stringify(args.gameHash)
     parseSkillInstructionCode(args, code)
@@ -241,19 +238,12 @@ describe('Misc Operators', () => {
 ////////////////////////////////////////////////////////////
 
 describe('Burning Punch', () => {
-  const code = getOperationsFromCode(
-    '03 00 00 00 ' + // mana
-      '43 01 00 ' + //  version
-      '01 D0 03 ' + //  D0 = 3
-      '37 D0 42 ' + //  D0 *= command level
-      '35 D0 07 ' + //  D0 += base damage
-      '43 21 25 D0', // apply damage D0
-  )
+  const code = innateSkills[0].code
 
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 3 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, 4 + preMutPlayer.baseDmg).hp,
     )
   })
 
@@ -261,7 +251,7 @@ describe('Burning Punch', () => {
     args.commandLevel = 2
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 6 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, 8 + preMutPlayer.baseDmg).hp,
     )
   })
 
@@ -269,13 +259,13 @@ describe('Burning Punch', () => {
     args.commandLevel = 3
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 9 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, 12 + preMutPlayer.baseDmg).hp,
     )
   })
 })
 
 describe('Focus', () => {
-  const code = getOperationsFromCode('04 00 00 00 00 35 07 42')
+  const code = innateSkills[4].code
 
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
@@ -296,18 +286,7 @@ describe('Focus', () => {
 })
 
 describe('Knifehand Strike', () => {
-  const code = getOperationsFromCode(
-    '00 03 00 00 ' + //   mana
-      '43 01 00 ' + //    version
-      '01 D0 02 ' + //    D0 = 2
-      '01 D1 04 ' + //    D1 = 4
-      '01 D2 0A ' + //    D2 = 10
-      '37 D0 42 ' + //    D0 *= command level
-      '35 D0 D1 ' + //    D0 += D1
-      '43 21 25 D0 ' + // apply damage D0
-      '37 D0 D2 ' + //    D0 *= D2
-      '36 26 D0', //      turnTime -= D0
-  )
+  const code = innateSkills[1].code
 
   test('Command Level 1', () => {
     const preMutTurnTime = args.opponent.turnTime
@@ -334,7 +313,7 @@ describe('Knifehand Strike', () => {
 })
 
 describe('Tailwind', () => {
-  const code = getOperationsFromCode('00 04 00 00 00 35 0F 42')
+  const code = innateSkills[5].code
 
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
@@ -355,9 +334,7 @@ describe('Tailwind', () => {
 })
 
 describe('Whip Kick', () => {
-  const code = getOperationsFromCode(
-    '00 00 04 00 43 01 00 01 D0 0A 37 D0 42 43 21 25 D0',
-  )
+  const code = innateSkills[2].code
 
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
@@ -378,15 +355,7 @@ describe('Whip Kick', () => {
 })
 
 describe('First Aid', () => {
-  const code = getOperationsFromCode(
-    '00 00 03 00 ' + // mana
-      '44 01 00 ' + //  versions
-      '01 D0 02 ' + //  D0 = 2
-      '01 D1 04 ' + //  D1 = 4
-      '37 D0 42 ' + //  D0 *= command level
-      '35 D0 D1 ' + //  D0 += D1
-      '44 01 D0', //    player.hp += D0
-  )
+  const code = innateSkills[6].code
 
   test('Command Level 1', () => {
     args.player.hp = 20
@@ -410,12 +379,7 @@ describe('First Aid', () => {
 })
 
 describe('Crushing Blow', () => {
-  const code = getOperationsFromCode(
-    '00 00 00 FF ' + //   mana
-      '43 01 00 ' + //    version
-      '32 D0 42 0D ' + // D0 = command level * player.earthMp
-      '43 21 25 D0', //   apply damage D0
-  )
+  const code = innateSkills[3].code
 
   test('Command Level 1', () => {
     args.player.eartMp = 6
@@ -445,9 +409,7 @@ describe('Crushing Blow', () => {
 })
 
 describe('Harden', () => {
-  const code = getOperationsFromCode(
-    '00 00 00 03 00 01 D0 01 01 D1 02 35 D0 42 35 D1 42 35 04 D0 35 05 D1',
-  )
+  const code = innateSkills[7].code
 
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
@@ -835,145 +797,147 @@ describe('Manawall', () => {
   })
 })
 
-test('Combustion', () => {
-  // Converts all WATER MANA in the board into FIRE MANA, deals x2 MAGIC DMG per each converted WATER MANA.
+describe('Grizzlython Old Special Skills', () => {
+  test('Combustion', () => {
+    // Converts all WATER MANA in the board into FIRE MANA, deals x2 MAGIC DMG per each converted WATER MANA.
 
-  const code = getOperationsFromCode(
-    '08 00 00 00 ' + //            mana
-      '43 01 47 01 48 01 00 ' + // versions (damage, count, replace)
-      '01 CF 02 ' + //             CF = 2
-      '47 D0 20 ' + //             D0 = count water nodes
-      '48 20 03 ' + //             replace water nodes (0x20) with fire nodes (0x3, exact symbol 0-7)
-      '37 D0 CF ' + //             D0 *= CF
-      '43 21 25 D0', //            apply damage D0
-  )
+    const code = getOperationsFromCode(
+      '08 00 00 00 ' + //            mana
+        '43 01 47 01 48 01 00 ' + // versions (damage, count, replace)
+        '01 CF 02 ' + //             CF = 2
+        '47 D0 20 ' + //             D0 = count water nodes
+        '48 20 03 ' + //             replace water nodes (0x20) with fire nodes (0x3, exact symbol 0-7)
+        '37 D0 CF ' + //             D0 *= CF
+        '43 21 25 D0', //            apply damage D0
+    )
 
-  const command = (tiles: (number | null)[], opponent: Hero) => {
-    let count = 0
-    let newTiles = [...tiles]
-    for (let i = 0; i < tiles.length; i++) {
-      // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-      if (tiles[i] === 5) {
-        count++
-        newTiles[i] = 3
-      }
-    }
-    if (count === 0) return
-    let mag = count * 2
-    applyDamage(opponent, undefined, mag)
-    return newTiles
-  }
-
-  const newTiles = command(args.tiles, preMutOpponent)
-  parseSkillInstructionCode(args, code)
-  expect(args.tiles).toEqual(newTiles)
-  expect(args.opponent.hp).toBe(preMutOpponent.hp)
-})
-
-test('Tornado', () => {
-  // Shuffles the board, deals MAGIC DMG based on how many WIND + EARTH MANA appear after the shuffle.
-
-  const code = getOperationsFromCode(
-    '00 0A 00 00 ' + //            mana
-      '43 01 46 01 47 01 00 ' + // versions (damage, count, replace)
-      '46 ' + //                   shuffle
-      '47 D0 50 ' + //             D0 = count wind and earth nodes 0b0101_0000 / 0x50
-      '43 21 25 D0', //            apply damage D0
-  )
-
-  const command = (
-    tiles: (number | null)[],
-    gameHash: Uint8Array,
-    opponent: Hero,
-  ) => {
-    const newHash = getNextHash([Buffer.from('SHUFFLE'), gameHash])
-    const newTiles = hashToTiles(newHash) as (number | null)[]
-    let count = 0
-    for (let i = 0; i < tiles.length; i++) {
-      if (tiles[i] === null) {
-        newTiles[i] = null
-      } else if (newTiles[i] === 4 || newTiles[i] === 6) {
+    const command = (tiles: (number | null)[], opponent: Hero) => {
+      let count = 0
+      let newTiles = [...tiles]
+      for (let i = 0; i < tiles.length; i++) {
         // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-        count++
+        if (tiles[i] === 5) {
+          count++
+          newTiles[i] = 3
+        }
       }
+      if (count === 0) return
+      let mag = count * 2
+      applyDamage(opponent, undefined, mag)
+      return newTiles
     }
-    applyDamage(opponent, undefined, count)
-    return { newTiles, newHash }
-  }
 
-  const { newTiles, newHash } = command(
-    args.tiles,
-    args.gameHash,
-    preMutOpponent,
-  )
+    const newTiles = command(args.tiles, preMutOpponent)
+    parseSkillInstructionCode(args, code)
+    expect(args.tiles).toEqual(newTiles)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+  })
 
-  parseSkillInstructionCode(args, code)
-  expect(args.tiles).toEqual(newTiles)
-  expect(args.gameHash).toEqual(newHash)
-  expect(args.opponent.shell).toBe(preMutOpponent.shell)
-  expect(args.opponent.hp).toBe(preMutOpponent.hp)
-})
+  test('Tornado', () => {
+    // Shuffles the board, deals MAGIC DMG based on how many WIND + EARTH MANA appear after the shuffle.
 
-test('Extinguish', () => {
-  // Converts all FIRE MANA in the board into WATER MANA, recover 2 HP per each converted FIRE MANA.
+    const code = getOperationsFromCode(
+      '00 0A 00 00 ' + //            mana
+        '43 01 46 01 47 01 00 ' + // versions (damage, count, replace)
+        '46 ' + //                   shuffle
+        '47 D0 50 ' + //             D0 = count wind and earth nodes 0b0101_0000 / 0x50
+        '43 21 25 D0', //            apply damage D0
+    )
 
-  const code = getOperationsFromCode(
-    '00 00 06 00 ' + //            mana
-      '44 01 47 01 48 01 00 ' + // versions (damage, count, replace)
-      '01 CF 02 ' + //             CF = 2
-      '47 D0 08 ' + //             D0 = count fire nodes
-      '48 08 05 ' + //             replace fire nodes (0x8) with water nodes (0x5, exact symbol 0-7)
-      '37 D0 CF ' + //             D0 *= CF
-      '44 01 D0', //               heal for D0
-  )
-
-  const command = (tiles: (number | null)[], player: Hero) => {
-    let count = 0
-    let newTiles = [...tiles]
-    for (let i = 0; i < tiles.length; i++) {
-      // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-      if (tiles[i] === 3) {
-        count++
-        newTiles[i] = 5
+    const command = (
+      tiles: (number | null)[],
+      gameHash: Uint8Array,
+      opponent: Hero,
+    ) => {
+      const newHash = getNextHash([Buffer.from('SHUFFLE'), gameHash])
+      const newTiles = hashToTiles(newHash) as (number | null)[]
+      let count = 0
+      for (let i = 0; i < tiles.length; i++) {
+        if (tiles[i] === null) {
+          newTiles[i] = null
+        } else if (newTiles[i] === 4 || newTiles[i] === 6) {
+          // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+          count++
+        }
       }
+      applyDamage(opponent, undefined, count)
+      return { newTiles, newHash }
     }
-    if (count === 0) return
-    let mag = count * 2
 
-    player.hp = Math.min(player.hp + mag, player.maxHp)
+    const { newTiles, newHash } = command(
+      args.tiles,
+      args.gameHash,
+      preMutOpponent,
+    )
 
-    return newTiles
-  }
+    parseSkillInstructionCode(args, code)
+    expect(args.tiles).toEqual(newTiles)
+    expect(args.gameHash).toEqual(newHash)
+    expect(args.opponent.shell).toBe(preMutOpponent.shell)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+  })
 
-  args.player.hp = preMutPlayer.hp = 20
+  test('Extinguish', () => {
+    // Converts all FIRE MANA in the board into WATER MANA, recover 2 HP per each converted FIRE MANA.
 
-  const newTiles = command(args.tiles, preMutPlayer)
-  parseSkillInstructionCode(args, code)
-  expect(args.tiles).toEqual(newTiles)
-  expect(args.player.hp).toBe(preMutPlayer.hp)
-})
+    const code = getOperationsFromCode(
+      '00 00 06 00 ' + //            mana
+        '44 01 47 01 48 01 00 ' + // versions (heal, count, replace)
+        '01 CF 02 ' + //             CF = 2
+        '47 D0 08 ' + //             D0 = count fire nodes
+        '48 08 05 ' + //             replace fire nodes (0x8) with water nodes (0x5, exact symbol 0-7)
+        '37 D0 CF ' + //             D0 *= CF
+        '44 01 D0', //               heal for D0
+    )
 
-test('Quake', () => {
-  // Deals 30 MAGIC DMG on both players. Damage is reduced based on each respective heroes' WIND MANA.
-  const code = getOperationsFromCode(
-    '00 00 00 0A ' + //   mana
-      '43 01 00 ' + //    version
-      '01 D0 1E ' + //    D0 = 30
-      '01 D1 1E ' + //    D1 = 30
-      '36 D0 0B ' + //    D0 -= player.windMp
-      '36 D1 2B ' + //    D1 -= opponent.windMp
-      '43 01 05 D0 ' + // apply damage to player D0
-      '43 21 25 D1', //   apply damage to opponent D1
-  )
+    const command = (tiles: (number | null)[], player: Hero) => {
+      let count = 0
+      let newTiles = [...tiles]
+      for (let i = 0; i < tiles.length; i++) {
+        // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
+        if (tiles[i] === 3) {
+          count++
+          newTiles[i] = 5
+        }
+      }
+      if (count === 0) return
+      let mag = count * 2
 
-  const playerDmg = Math.max(30 - preMutPlayer.windMp, 0)
-  const opponentDmg = Math.max(30 - preMutOpponent.windMp, 0)
-  applyDamage(preMutPlayer, undefined, playerDmg)
-  applyDamage(preMutOpponent, undefined, opponentDmg)
+      player.hp = Math.min(player.hp + mag, player.maxHp)
 
-  parseSkillInstructionCode(args, code)
-  expect(args.player.hp).toBe(preMutPlayer.hp)
-  expect(args.player.shell).toBe(preMutPlayer.shell)
-  expect(args.opponent.hp).toBe(preMutOpponent.hp)
-  expect(args.opponent.shell).toBe(preMutOpponent.shell)
+      return newTiles
+    }
+
+    args.player.hp = preMutPlayer.hp = 20
+
+    const newTiles = command(args.tiles, preMutPlayer)
+    parseSkillInstructionCode(args, code)
+    expect(args.tiles).toEqual(newTiles)
+    expect(args.player.hp).toBe(preMutPlayer.hp)
+  })
+
+  test('Quake', () => {
+    // Deals 30 MAGIC DMG on both players. Damage is reduced based on each respective heroes' WIND MANA.
+    const code = getOperationsFromCode(
+      '00 00 00 0A ' + //   mana
+        '43 01 00 ' + //    version
+        '01 D0 1E ' + //    D0 = 30
+        '01 D1 1E ' + //    D1 = 30
+        '36 D0 0B ' + //    D0 -= player.windMp
+        '36 D1 2B ' + //    D1 -= opponent.windMp
+        '43 01 05 D0 ' + // apply damage to player D0
+        '43 21 25 D1', //   apply damage to opponent D1
+    )
+
+    const playerDmg = Math.max(30 - preMutPlayer.windMp, 0)
+    const opponentDmg = Math.max(30 - preMutOpponent.windMp, 0)
+    applyDamage(preMutPlayer, undefined, playerDmg)
+    applyDamage(preMutOpponent, undefined, opponentDmg)
+
+    parseSkillInstructionCode(args, code)
+    expect(args.player.hp).toBe(preMutPlayer.hp)
+    expect(args.player.shell).toBe(preMutPlayer.shell)
+    expect(args.opponent.hp).toBe(preMutOpponent.hp)
+    expect(args.opponent.shell).toBe(preMutOpponent.shell)
+  })
 })
