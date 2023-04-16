@@ -774,7 +774,7 @@ export function parseSkillInstructionCode(
     }
 
     // console.log(context.current)
-    // console.log(opId)
+    // console.log(opId, map.get(0xd0))
 
     if (context.skip > 0) {
       context.skip -= 1

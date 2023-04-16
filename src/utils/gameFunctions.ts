@@ -452,7 +452,7 @@ export const tornado: SkillFn = ({
   for (let i = 0; i < tiles.length; i++) {
     if (tiles[i] === null) {
       newTiles[i] = null
-    } else if (tiles[i] === 4 || tiles[i] === 6) {
+    } else if (newTiles[i] === 4 || newTiles[i] === 6) {
       // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
       count++
     }
