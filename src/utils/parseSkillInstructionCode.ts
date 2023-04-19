@@ -702,9 +702,6 @@ export function parseSkillInstructionCode(
   args: OperationArguments,
   code: Uint8Array,
 ) {
-  // [MANA     ] [O.V]    [OPERATIONS                             ]
-  // 03 00 00 00 43 01 00 01 D0 03 37 D0 42 35 D0 07 43 21 25 D0 00
-
   // shortest code is 8 bytes
   if (code.length < 8) {
     throw new Error('Code size is invalid')
