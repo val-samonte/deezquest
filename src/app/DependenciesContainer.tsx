@@ -3,9 +3,10 @@
 import { userWalletAtom } from '@/atoms/userWalletAtom'
 import { useWallet, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 import { useSetAtom } from 'jotai'
-import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { BackpackIframeAdapter } from '@/adapter/BackpackIframeAdapter'
+
 // import { idbAtom } from '@/atoms/idbAtom'
 
 export default function DependenciesContainer({
@@ -13,7 +14,14 @@ export default function DependenciesContainer({
 }: {
   children: React.ReactNode
 }) {
-  const wallets = useMemo(() => [new PhantomWalletAdapter()], [])
+  const [backpack, setBackpack] = useState<BackpackIframeAdapter | null>(null)
+  const wallets = useMemo(() => (backpack ? [backpack] : []), [backpack])
+
+  useEffect(() => {
+    try {
+      BackpackIframeAdapter.make().then((backpack) => setBackpack(backpack))
+    } catch (e) {}
+  }, [setBackpack])
 
   return (
     <WalletProvider wallets={wallets} autoConnect>
