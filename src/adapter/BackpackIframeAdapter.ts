@@ -4,6 +4,7 @@ import {
   WalletReadyState,
 } from '@solana/wallet-adapter-base'
 import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js'
+import bs58 from 'bs58'
 
 const BACKPACK_ORIGIN =
   process.env.NODE_ENV === 'development'
@@ -61,12 +62,13 @@ export class BackpackIframeAdapter extends BaseMessageSignerWalletAdapter {
       window.parent.postMessage(
         JSON.stringify({
           action: 'signMessage',
-          payload: toBase64(message),
+          payload: bs58.encode(message),
         }),
         BACKPACK_ORIGIN,
       )
 
-      const signedMessage = toUint8Array(await getXnftResultPromise<string>())
+      const signedMessage = bs58.decode(await getXnftResultPromise<string>())
+
       return signedMessage
     } catch (error: any) {
       this.emit('error', error)
@@ -79,7 +81,7 @@ export class BackpackIframeAdapter extends BaseMessageSignerWalletAdapter {
       window.parent.postMessage(
         JSON.stringify({
           action: 'signTransaction',
-          payload: toBase64(
+          payload: bs58.encode(
             Uint8Array.from(transaction.serialize({ verifySignatures: false })),
           ),
         }),
@@ -87,7 +89,8 @@ export class BackpackIframeAdapter extends BaseMessageSignerWalletAdapter {
       )
 
       const payload = await getXnftResultPromise<string>()
-      return Transaction.from(toUint8Array(payload)) as T
+
+      return Transaction.from(bs58.decode(payload)) as T
     } catch (error: any) {
       this.emit('error', error)
       throw error
@@ -104,11 +107,6 @@ export class BackpackIframeAdapter extends BaseMessageSignerWalletAdapter {
     return Promise.resolve()
   }
 }
-
-const toBase64 = (uint8Array: Uint8Array) =>
-  Buffer.from(uint8Array).toString('base64')
-
-const toUint8Array = (data: string) => Buffer.from(data, 'base64')
 
 const getXnftResultPromise = <U>(): Promise<U> =>
   new Promise((resolve, reject) => {

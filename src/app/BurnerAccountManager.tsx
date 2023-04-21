@@ -124,7 +124,7 @@ export default function BurnerAccountManager() {
     } catch (e) {
       console.error(e)
       setErrorMsg(
-        'An error occurred. If you are using Phantom wallet with multichain beta, you will most likely receive an error when signing.',
+        e + '', //'An error occurred. If you are using Phantom wallet with multichain beta, you will most likely receive an error when signing.',
       )
     }
 
