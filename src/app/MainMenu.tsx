@@ -16,6 +16,7 @@ import { gameResultAtom, gameStateAtom } from '@/atoms/gameStateAtom'
 import { peerAtom } from '@/atoms/peerConnectionAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { MatchTypes } from '@/enums/MatchTypes'
+import { isBackpackAtom } from '@/atoms/isBackpackAtom'
 
 export const showMenuAtom = atom(false)
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
@@ -27,6 +28,7 @@ export default function MainMenu() {
   const wallet = useUserWallet()
   const pathname = usePathname()
   const peerInstance = useAtomValue(peerAtom)
+  const isBackpack = useAtomValue(isBackpackAtom)
   const [open, setOpen] = useAtom(showMenuAtom)
   const [match, setMatch] = useAtom(matchAtom)
   const setGameState = useSetAtom(gameStateAtom)
@@ -85,13 +87,19 @@ export default function MainMenu() {
                           </span>
                           <PeerConnectionIndicator />
                         </span>
-                        <button
-                          type='button'
-                          className='underline font-bold'
-                          onClick={() => wallet.disconnect()}
-                        >
-                          Disconnect
-                        </button>
+                        {isBackpack ? (
+                          <span className='bg-amber-400 text-black font-bold px-4 py-1 rounded-full uppercase'>
+                            Alpha on Devnet
+                          </span>
+                        ) : (
+                          <button
+                            type='button'
+                            className='underline font-bold'
+                            onClick={() => wallet.disconnect()}
+                          >
+                            Disconnect
+                          </button>
+                        )}
                       </li>
                     )}
                     {match && !pathname?.includes('/battle') && (

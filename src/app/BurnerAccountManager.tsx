@@ -2,13 +2,14 @@
 
 import { useUserWallet } from '@/atoms/userWalletAtom'
 import { Keypair } from '@solana/web3.js'
-import { atom, useAtom } from 'jotai'
+import { atom, useAtom, useAtomValue } from 'jotai'
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import bs58 from 'bs58'
 import { Dialog } from '@/components/Dialog'
 import classNames from 'classnames'
 import { getNextHash } from '@/utils/getNextHash'
+import { isBackpackAtom } from '@/atoms/isBackpackAtom'
 
 // Backend (Dapp) Seed:
 // to strengthen the security, an extra seed is given by the backend so that no other dapps
@@ -40,6 +41,7 @@ export default function BurnerAccountManager() {
   const wallet = useUserWallet()
   const publicKey = wallet?.publicKey ?? null
   const signMessage = wallet?.signMessage ?? null
+  const isBackpack = useAtomValue(isBackpackAtom)
   const [dappSeed, setDappSeed] = useAtom(dappSeedAtom)
   const [burnerNonce, setBurnerNonce] = useAtom(burnerNonceAtom)
   const [burner, setBurner] = useAtom(burnerKeypairAtom)
@@ -112,9 +114,13 @@ export default function BurnerAccountManager() {
         })
       }
 
+      // TODO: if backpack, burner is stored in storage
+      // streamline this with "checkbox" option if user prefers to store keypair in browser
+      // implementation note: possible issue when user go through ordinary webpage
+
       // sign 2nd half
       const signedMessage = await signMessage(
-        Buffer.from(`Please sign to retrieve your burner account`, 'utf8'),
+        Buffer.from(`Please sign to retrieve your game account`, 'utf8'),
       )
 
       const hash = getNextHash([appSeed, signedMessage.slice(0, 16)])
@@ -130,6 +136,7 @@ export default function BurnerAccountManager() {
 
     setBusy(false)
   }, [
+    isBackpack,
     publicKey,
     burnerNonce,
     burner,
@@ -165,18 +172,20 @@ export default function BurnerAccountManager() {
         Please sign using your wallet to continue <br />
         (you <span className='font-bold'>WILL NOT</span> pay anything)
       </p>
-      <p className='text-center px-5 mb-5'>
-        Or click here to{' '}
-        <button
-          tabIndex={2}
-          type='button'
-          className='underline outline-none'
-          onClick={() => wallet?.disconnect()}
-        >
-          Disconnect Wallet
-        </button>{' '}
-        instead
-      </p>
+      {!isBackpack && (
+        <p className='text-center px-5 mb-5'>
+          Or click here to{' '}
+          <button
+            tabIndex={2}
+            type='button'
+            className='underline outline-none'
+            onClick={() => wallet?.disconnect()}
+          >
+            Disconnect Wallet
+          </button>{' '}
+          instead
+        </p>
+      )}
       {errorMsg && (
         <p className='mx-5 mb-5 text-red-400 bg-red-800/10 p-5 text-sm rounded'>
           {errorMsg}

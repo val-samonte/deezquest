@@ -5,7 +5,11 @@ import { useWallet, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { useSetAtom } from 'jotai'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { BackpackIframeAdapter } from '@/adapter/BackpackIframeAdapter'
+import {
+  BackpackIframeAdapter,
+  BackpackIframeWalletName,
+} from '@/adapter/BackpackIframeAdapter'
+import { isBackpackAtom } from '@/atoms/isBackpackAtom'
 
 // import { idbAtom } from '@/atoms/idbAtom'
 
@@ -47,8 +51,21 @@ export function AtomsInitializer() {
   const walletContextStateSerialized = useRef('')
   const walletContextState = useWallet()
   const setUserWalletContextState = useSetAtom(userWalletAtom)
+  const setIsBackpack = useSetAtom(isBackpackAtom)
 
   useEffect(() => {
+    // If wallet is disconnected, always check if
+    // Backpack Iframe is present, then auto select it
+    const backpackIframe = walletContextState.wallets.find(
+      (w) => w.adapter.name === BackpackIframeWalletName,
+    )
+    setIsBackpack(!!backpackIframe)
+
+    if (backpackIframe && !walletContextState.connected) {
+      walletContextState.select(BackpackIframeWalletName)
+      return
+    }
+
     const serialized = JSON.stringify({
       wallet: walletContextState.wallet?.readyState,
       publicKey: walletContextState.publicKey,
@@ -62,7 +79,7 @@ export function AtomsInitializer() {
 
       setUserWalletContextState(walletContextState)
     }
-  }, [walletContextState, setUserWalletContextState])
+  }, [walletContextState, setUserWalletContextState, setIsBackpack])
 
   return null
 }
