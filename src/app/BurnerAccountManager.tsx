@@ -9,7 +9,7 @@ import bs58 from 'bs58'
 import { Dialog } from '@/components/Dialog'
 import classNames from 'classnames'
 import { getNextHash } from '@/utils/getNextHash'
-import { isBackpackAtom } from '@/atoms/isBackpackAtom'
+import { isXNftAtom } from '@/atoms/isXNftAtom'
 
 // Backend (Dapp) Seed:
 // to strengthen the security, an extra seed is given by the backend so that no other dapps
@@ -41,7 +41,7 @@ export default function BurnerAccountManager() {
   const wallet = useUserWallet()
   const publicKey = wallet?.publicKey ?? null
   const signMessage = wallet?.signMessage ?? null
-  const isBackpack = useAtomValue(isBackpackAtom)
+  const isXNft = useAtomValue(isXNftAtom)
   const [dappSeed, setDappSeed] = useAtom(dappSeedAtom)
   const [burnerNonce, setBurnerNonce] = useAtom(burnerNonceAtom)
   const [burner, setBurner] = useAtom(burnerKeypairAtom)
@@ -136,7 +136,7 @@ export default function BurnerAccountManager() {
 
     setBusy(false)
   }, [
-    isBackpack,
+    isXNft,
     publicKey,
     burnerNonce,
     burner,
@@ -172,7 +172,7 @@ export default function BurnerAccountManager() {
         Please sign using your wallet to continue <br />
         (you <span className='font-bold'>WILL NOT</span> pay anything)
       </p>
-      {!isBackpack && (
+      {!isXNft && (
         <p className='text-center px-5 mb-5'>
           Or click here to{' '}
           <button

@@ -9,7 +9,7 @@ import {
   BackpackIframeAdapter,
   BackpackIframeWalletName,
 } from '@/adapter/BackpackIframeAdapter'
-import { isBackpackAtom } from '@/atoms/isBackpackAtom'
+import { isXNftAtom } from '@/atoms/isXNftAtom'
 
 // import { idbAtom } from '@/atoms/idbAtom'
 
@@ -51,7 +51,7 @@ export function AtomsInitializer() {
   const walletContextStateSerialized = useRef('')
   const walletContextState = useWallet()
   const setUserWalletContextState = useSetAtom(userWalletAtom)
-  const setIsBackpack = useSetAtom(isBackpackAtom)
+  const setIsXNft = useSetAtom(isXNftAtom)
 
   useEffect(() => {
     // If wallet is disconnected, always check if
@@ -59,7 +59,7 @@ export function AtomsInitializer() {
     const backpackIframe = walletContextState.wallets.find(
       (w) => w.adapter.name === BackpackIframeWalletName,
     )
-    setIsBackpack(!!backpackIframe)
+    setIsXNft(!!backpackIframe)
 
     if (backpackIframe && !walletContextState.connected) {
       walletContextState.select(BackpackIframeWalletName)
@@ -79,7 +79,7 @@ export function AtomsInitializer() {
 
       setUserWalletContextState(walletContextState)
     }
-  }, [walletContextState, setUserWalletContextState, setIsBackpack])
+  }, [walletContextState, setUserWalletContextState, setIsXNft])
 
   return null
 }

@@ -16,7 +16,7 @@ import { gameResultAtom, gameStateAtom } from '@/atoms/gameStateAtom'
 import { peerAtom } from '@/atoms/peerConnectionAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { MatchTypes } from '@/enums/MatchTypes'
-import { isBackpackAtom } from '@/atoms/isBackpackAtom'
+import { isXNftAtom } from '@/atoms/isXNftAtom'
 
 export const showMenuAtom = atom(false)
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
@@ -28,7 +28,7 @@ export default function MainMenu() {
   const wallet = useUserWallet()
   const pathname = usePathname()
   const peerInstance = useAtomValue(peerAtom)
-  const isBackpack = useAtomValue(isBackpackAtom)
+  const isXNft = useAtomValue(isXNftAtom)
   const [open, setOpen] = useAtom(showMenuAtom)
   const [match, setMatch] = useAtom(matchAtom)
   const setGameState = useSetAtom(gameStateAtom)
@@ -79,16 +79,18 @@ export default function MainMenu() {
                     {wallet?.connected && (
                       <li className='flex items-center justify-between text-base py-5'>
                         <span className='flex items-center gap-2'>
-                          <span className='hidden sm:inline-block'>
-                            Connected as:
-                          </span>
+                          {!isXNft && (
+                            <span className='hidden sm:inline-block'>
+                              Connected as:
+                            </span>
+                          )}
                           <span className='font-bold'>
                             {trimAddress(wallet.publicKey?.toBase58() ?? '')}
                           </span>
                           <PeerConnectionIndicator />
                         </span>
-                        {isBackpack ? (
-                          <span className='bg-amber-400 text-black font-bold px-4 py-1 rounded-full uppercase'>
+                        {isXNft ? (
+                          <span className='bg-amber-400 text-black font-bold px-4 py-1 rounded-full uppercase text-sm'>
                             Alpha on Devnet
                           </span>
                         ) : (
