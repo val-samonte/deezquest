@@ -113,7 +113,7 @@ const getXnftResultPromise = <U>(): Promise<U> =>
   new Promise((resolve, reject) => {
     const listener = (event: MessageEvent<any>) => {
       if (event.origin !== BACKPACK_ORIGIN) {
-        return
+        throw new Error('Invalid origin')
       }
       window.removeEventListener('message', listener)
       const result = JSON.parse(event.data)
