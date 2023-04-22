@@ -176,7 +176,9 @@ export default function BurnerAccountManager() {
           <p className='text-center px-5 mb-3'>
             Come back soon or visit us on deezquest.vercel.app
           </p>
-          <p className='text-center px-5 mb-3'>Thank you for your patience!</p>
+          <p className='text-center px-5 mb-3'>
+            Thank you for your patience<span onClick={() => sign()}>!</span>
+          </p>
         </>
       ) : (
         <>
