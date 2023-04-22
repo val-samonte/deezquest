@@ -168,51 +168,65 @@ export default function BurnerAccountManager() {
 
   return (
     <Dialog show={requiredSignatures > 0 && !!signMessage} className='max-w-sm'>
-      <p className='text-center px-5 mb-5'>
-        Please sign using your wallet to continue <br />
-        (you <span className='font-bold'>WILL NOT</span> pay anything)
-      </p>
-      {!isXNft && (
-        <p className='text-center px-5 mb-5'>
-          Or click here to{' '}
-          <button
-            tabIndex={2}
-            type='button'
-            className='underline outline-none'
-            onClick={() => wallet?.disconnect()}
-          >
-            Disconnect Wallet
-          </button>{' '}
-          instead
-        </p>
-      )}
-      {errorMsg && (
-        <p className='mx-5 mb-5 text-red-400 bg-red-800/10 p-5 text-sm rounded'>
-          {errorMsg}
-        </p>
-      )}
-      <div className='flex-auto' />
-      <div className='px-5'>
-        <button
-          tabIndex={1}
-          type='button'
-          disabled={busy}
-          className={classNames(
-            busy && 'opacity-20',
-            'px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded w-full',
+      {isXNft ? (
+        <>
+          <p className='text-center px-5 mb-3'>
+            Sorry, our xNFT is currently undergoing maintanence!
+          </p>
+          <p className='text-center px-5 mb-3'>
+            Come back soon or visit us on deezquest.vercel.app
+          </p>
+          <p className='text-center px-5 mb-3'>Thank you for your patience!</p>
+        </>
+      ) : (
+        <>
+          <p className='text-center px-5 mb-5'>
+            Please sign using your wallet to continue <br />
+            (you <span className='font-bold'>WILL NOT</span> pay anything)
+          </p>
+          {!isXNft && (
+            <p className='text-center px-5 mb-5'>
+              Or click here to{' '}
+              <button
+                tabIndex={2}
+                type='button'
+                className='underline outline-none'
+                onClick={() => wallet?.disconnect()}
+              >
+                Disconnect Wallet
+              </button>{' '}
+              instead
+            </p>
           )}
-          onClick={() => sign()}
-        >
-          <>
-            Sign{' '}
-            {Math.min(
-              totalRequiredSigs.current - requiredSignatures + 1,
-              totalRequiredSigs.current,
-            )}{' '}
-            of {totalRequiredSigs.current}
-          </>
-        </button>
-      </div>
+          {errorMsg && (
+            <p className='mx-5 mb-5 text-red-400 bg-red-800/10 p-5 text-sm rounded'>
+              {errorMsg}
+            </p>
+          )}
+          <div className='flex-auto' />
+          <div className='px-5'>
+            <button
+              tabIndex={1}
+              type='button'
+              disabled={busy}
+              className={classNames(
+                busy && 'opacity-20',
+                'px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded w-full',
+              )}
+              onClick={() => sign()}
+            >
+              <>
+                Sign{' '}
+                {Math.min(
+                  totalRequiredSigs.current - requiredSignatures + 1,
+                  totalRequiredSigs.current,
+                )}{' '}
+                of {totalRequiredSigs.current}
+              </>
+            </button>
+          </div>
+        </>
+      )}
     </Dialog>
   )
 }
