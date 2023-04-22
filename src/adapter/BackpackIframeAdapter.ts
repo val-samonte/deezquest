@@ -9,7 +9,7 @@ import bs58 from 'bs58'
 const BACKPACK_ORIGIN =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:19006'
-    : 'https://t4l63xb7teughz33ccno55tkcynqbl3wgsdusjilecy4yvd6jeua.arweave.net'
+    : 'https://eks6jja4suy7ikkm4hkfdcdozxwobturd2ljbgbmafc4ny2osb6q.arweave.net'
 
 export const BackpackIframeWalletName =
   'Backpack Iframe' as WalletName<'Backpack Iframe'>
@@ -113,7 +113,9 @@ const getXnftResultPromise = <U>(): Promise<U> =>
   new Promise((resolve, reject) => {
     const listener = (event: MessageEvent<any>) => {
       if (event.origin !== BACKPACK_ORIGIN) {
-        throw new Error('Invalid origin')
+        throw new Error(
+          `Invalid origin ${event.origin}, expecting ${BACKPACK_ORIGIN}`,
+        )
       }
       window.removeEventListener('message', listener)
       const result = JSON.parse(event.data)
