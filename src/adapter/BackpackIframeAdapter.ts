@@ -9,7 +9,7 @@ import bs58 from 'bs58'
 const BACKPACK_ORIGIN =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:19006'
-    : 'https://eks6jja4suy7ikkm4hkfdcdozxwobturd2ljbgbmafc4ny2osb6q.arweave.net'
+    : 'https://xnfts.s3.us-west-2.amazonaws.com'
 
 export const BackpackIframeWalletName =
   'Backpack Iframe' as WalletName<'Backpack Iframe'>
