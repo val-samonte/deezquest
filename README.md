@@ -24,10 +24,8 @@ For business matters, please contact val.samonte@gmail.com
 
 We are also in Solarplex.xyz! https://www.solarplex.xyz/topic/10mN1GJDITxaHPXd
 
-# For the Solana Grizzlython judges
+We are in xNFT! https://www.xnft.gg/app/J15EFLZCaUNaVN57Yvp4JjU6mGi3M3m24jgR6Vm46aLd
 
-Please check the https://github.com/val-samonte/deezquest/tree/grizzly-hackathon branch as this is the last checkpoint before the hackathon ends. The hackathon branch features the Friendly Match (off-chain) and unfortunately wasn't able to reach the Ranked Match (on-chain).
+## Special Thanks
 
-Dapp: https://deezquest-git-grizzly-hackathon-val-samonte.vercel.app/
-
-Will continue the development in the main branch to achieve the rest of the features. Thank you!
+- To [@sol_idity](https://github.com/nelsontky) to letting me borrow some codes for xNFT!

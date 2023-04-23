@@ -260,7 +260,7 @@ export default function MainMenu() {
                         </ul>
                       ) : (
                         <button
-                          className='flex items-center justify-center gap-2 font-bold'
+                          className='flex items-center justify-center gap-2 font-bold text-base w-full'
                           type='button'
                           onClick={() => setOpen(false)}
                         >

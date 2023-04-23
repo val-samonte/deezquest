@@ -6,6 +6,9 @@ import {
 import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js'
 import bs58 from 'bs58'
 
+// original code by nelsontky
+// https://github.com/nelsontky/web3-plays-pokemon/blob/1b20a70039f10ae550e41a3bb31f43074b333d2f/packages/ui/adapters/BackpackIframeAdapter.tsx
+
 const BACKPACK_ORIGIN =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:19006'
