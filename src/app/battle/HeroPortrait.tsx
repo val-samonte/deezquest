@@ -1,6 +1,7 @@
 'use client'
 
 import { gameStateAtom } from '@/atoms/gameStateAtom'
+import { isXNftAtom } from '@/atoms/isXNftAtom'
 import { useMetaplex } from '@/atoms/metaplexAtom'
 import { Dialog } from '@/components/Dialog'
 import { trimAddress } from '@/utils/trimAddress'
@@ -9,7 +10,7 @@ import { JsonMetadata } from '@metaplex-foundation/js'
 import { useSpring, animated, useSpringValue } from '@react-spring/web'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
-import { atom, useAtom, useAtomValue } from 'jotai'
+import { useAtomValue } from 'jotai'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { usePopper } from 'react-popper'
 import { heroDisplayAtom } from './PlayerCard'
@@ -49,6 +50,7 @@ export default function HeroPortrait({
   const [hpDiff, setHpDiff] = useState({ amt: 0 })
   const [isWobbling, setIsWobbling] = useState(false)
   const [inSpotlight, setInSpotlight] = useState(false)
+  const isXNft = useAtomValue(isXNftAtom)
 
   const metaplex = useMetaplex()
   const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
@@ -189,7 +191,11 @@ export default function HeroPortrait({
               className='w-20 h-20 aspect-square object-contain rounded'
             />
           </div>
-          {!dummy && metadata ? (
+          {isXNft && metadata ? (
+            <div className='flex flex-col justify-center'>
+              <h2 className='text-3xl'>{metadata.name}</h2>
+            </div>
+          ) : !dummy && metadata ? (
             <a
               href={`https://solscan.io/token/${publicKey}?cluster=devnet`}
               target='_blank'

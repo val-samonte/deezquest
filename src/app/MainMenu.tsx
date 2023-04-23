@@ -210,50 +210,64 @@ export default function MainMenu() {
                       </Link>
                     </li>
                     <li>
-                      <ul className='text-base grid grid-cols-4 py-2'>
-                        <li className='flex items-center justify-center gap-2 font-bold'>
-                          <button type='button' onClick={() => setOpen(false)}>
-                            <BackIcon className='flex-none' />
-                          </button>
-                        </li>
-                        <li className='flex items-center justify-center gap-3'>
-                          <a
-                            href='https://twitter.com/deezquest'
-                            target='_blank'
-                            rel='noreferrer'
-                          >
+                      {!isXNft ? (
+                        <ul className='text-base grid grid-cols-4 py-2'>
+                          <li className='flex items-center justify-center gap-2 font-bold'>
+                            <button
+                              type='button'
+                              onClick={() => setOpen(false)}
+                            >
+                              <BackIcon className='flex-none' />
+                            </button>
+                          </li>
+                          <li className='flex items-center justify-center gap-3'>
+                            <a
+                              href='https://twitter.com/deezquest'
+                              target='_blank'
+                              rel='noreferrer'
+                            >
+                              <img
+                                src='/twitter.svg'
+                                className='w-6 h-6'
+                                alt='Twitter'
+                              />
+                            </a>
+                            {/* <span className='hidden md:inline'>Twitter</span> */}
+                          </li>
+                          <li className='opacity-20 flex items-center justify-center gap-3'>
                             <img
-                              src='/twitter.svg'
+                              src='/discord.svg'
                               className='w-6 h-6'
-                              alt='Twitter'
+                              alt='Discord'
                             />
-                          </a>
-                          {/* <span className='hidden md:inline'>Twitter</span> */}
-                        </li>
-                        <li className='opacity-20 flex items-center justify-center gap-3'>
-                          <img
-                            src='/discord.svg'
-                            className='w-6 h-6'
-                            alt='Discord'
-                          />
-                          {/* <span className='hidden md:inline'>Discord</span> */}
-                        </li>
-                        <li className='flex items-center justify-center gap-3 p-2'>
-                          <a
-                            href='https://github.com/val-samonte/deezquest'
-                            target='_blank'
-                            rel='noreferrer'
-                          >
-                            <img
-                              src='/github.svg'
-                              className='w-6 h-6'
-                              alt='Github'
-                            />
-                          </a>
+                            {/* <span className='hidden md:inline'>Discord</span> */}
+                          </li>
+                          <li className='flex items-center justify-center gap-3 p-2'>
+                            <a
+                              href='https://github.com/val-samonte/deezquest'
+                              target='_blank'
+                              rel='noreferrer'
+                            >
+                              <img
+                                src='/github.svg'
+                                className='w-6 h-6'
+                                alt='Github'
+                              />
+                            </a>
 
-                          {/* <span className='hidden md:inline'>Github</span> */}
-                        </li>
-                      </ul>
+                            {/* <span className='hidden md:inline'>Github</span> */}
+                          </li>
+                        </ul>
+                      ) : (
+                        <button
+                          className='flex items-center justify-center gap-2 font-bold'
+                          type='button'
+                          onClick={() => setOpen(false)}
+                        >
+                          <BackIcon className='flex-none' />
+                          Back
+                        </button>
+                      )}
                     </li>
                   </ul>
                 </Dialog.Panel>

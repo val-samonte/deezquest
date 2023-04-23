@@ -1,5 +1,6 @@
 'use client'
 
+import { isXNftAtom } from '@/atoms/isXNftAtom'
 import { useMetaplex } from '@/atoms/metaplexAtom'
 import { useUserWallet } from '@/atoms/userWalletAtom'
 import { Dialog } from '@/components/Dialog'
@@ -7,7 +8,7 @@ import WalletGuard from '@/components/WalletGuard'
 import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
-import { atom, useAtom } from 'jotai'
+import { atom, useAtom, useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { HeroCard } from './HeroCard'
@@ -36,6 +37,7 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
   const [collection, setCollection] = useAtom(userNftCollectionAtom)
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
+  const isXNft = useAtomValue(isXNftAtom)
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
@@ -175,24 +177,26 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
               I am a mercenary of the highest caliber, and my blade is at your
               service.
             </q>
-            <div className='flex items-center justify-between'>
-              <a
-                target='_blank'
-                rel='noreferrer'
-                className='underline'
-                href={`https://solscan.io/token/${newMintParams.address}?cluster=devnet`}
-              >
-                View Explorer
-              </a>
-              <a
-                target='_blank'
-                rel='noreferrer'
-                className='underline'
-                href={`https://solscan.io/tx/${newMintParams.tx}?cluster=devnet`}
-              >
-                View Transaction
-              </a>
-            </div>
+            {!isXNft && (
+              <div className='flex items-center justify-between'>
+                <a
+                  target='_blank'
+                  rel='noreferrer'
+                  className='underline'
+                  href={`https://solscan.io/token/${newMintParams.address}?cluster=devnet`}
+                >
+                  View Explorer
+                </a>
+                <a
+                  target='_blank'
+                  rel='noreferrer'
+                  className='underline'
+                  href={`https://solscan.io/tx/${newMintParams.tx}?cluster=devnet`}
+                >
+                  View Transaction
+                </a>
+              </div>
+            )}
             <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5 px-5'>
               <button
                 type='button'
