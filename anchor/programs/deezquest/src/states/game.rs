@@ -976,7 +976,7 @@ pub fn executable_commands(
 //     if (!hasMatch(tiles)) {
 //         break
 //     }
-//     hash = getNextHash([hash])
+//     hash = hashv([hash])
 //     }
 
 //     gameState = {
@@ -1037,7 +1037,7 @@ pub fn swap_node() {
     //       duration: 450,
     //     })
 
-    //     hash = getNextHash([
+    //     hash = hashv([
     //       Buffer.from('SWAP'),
     //       hash,
     //       Buffer.from(action.data.origin),
@@ -1251,7 +1251,7 @@ pub fn swap_node() {
     //       const { tiles, gravity } = applyGravity(newTiles, depths)
     //       newTiles = tiles
 
-    //       hash = getNextHash([Buffer.from('REFILL'), hash])
+    //       hash = hashv([Buffer.from('REFILL'), hash])
 
     //       const fillers = hashToTiles(hash)
 

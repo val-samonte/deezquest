@@ -1,5 +1,5 @@
 import { burnerKeypairAtom } from '@/app/BurnerAccountManager'
-import { getNextHash } from '@/utils/getNextHash'
+import { hashv } from '@/utils/hashv'
 import { atom } from 'jotai'
 import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
 import bs58 from 'bs58'
@@ -16,7 +16,7 @@ export const peerIdAtom = atom((get) => {
   const kp = get(burnerKeypairAtom)
   const nonce = get(peerNonceAtom)
   return kp && nonce
-    ? bs58.encode(getNextHash([kp.publicKey.toBytes(), bs58.decode(nonce)]))
+    ? bs58.encode(hashv([kp.publicKey.toBytes(), bs58.decode(nonce)]))
     : null
 })
 

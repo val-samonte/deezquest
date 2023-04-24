@@ -20,7 +20,7 @@ import {
 import { TargetHero } from '@/enums/TargetHero'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
-import { getNextHash } from '@/utils/getNextHash'
+import { hashv } from '@/utils/hashv'
 import { matchAtom } from './matchAtom'
 import { MatchTypes } from '@/enums/MatchTypes'
 
@@ -107,7 +107,7 @@ export const gameFunctions = atom(
         if (!hasMatch(tiles)) {
           break
         }
-        hash = getNextHash([hash])
+        hash = hashv([hash])
       }
 
       gameState = {
@@ -228,7 +228,7 @@ export const gameFunctions = atom(
           duration: 450,
         })
 
-        hash = getNextHash([
+        hash = hashv([
           Buffer.from('SWAP'),
           hash,
           Buffer.from(action.data.origin),
@@ -431,7 +431,7 @@ export const gameFunctions = atom(
           const { tiles, gravity } = applyGravity(newTiles, depths)
           newTiles = tiles
 
-          hash = getNextHash([Buffer.from('REFILL'), hash])
+          hash = hashv([Buffer.from('REFILL'), hash])
 
           const fillers = hashToTiles(hash)
 

@@ -7,7 +7,7 @@ import {
   OperationArguments,
   parseSkillInstructionCode,
 } from './parseSkillInstructionCode'
-import { getNextHash } from './getNextHash'
+import { hashv } from './hashv'
 import { getOperationsFromCode, innateSkills } from './innateSkills'
 
 let playerKeypair: Keypair
@@ -849,7 +849,7 @@ describe('Grizzlython Old Special Skills', () => {
       gameHash: Uint8Array,
       opponent: Hero,
     ) => {
-      const newHash = getNextHash([Buffer.from('SHUFFLE'), gameHash])
+      const newHash = hashv([Buffer.from('SHUFFLE'), gameHash])
       const newTiles = hashToTiles(newHash) as (number | null)[]
       let count = 0
       for (let i = 0; i < tiles.length; i++) {

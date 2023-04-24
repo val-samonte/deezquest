@@ -1,6 +1,6 @@
 import { SkillTypes } from '@/enums/SkillTypes'
 import { hashToTiles, Hero } from './gameFunctions'
-import { getNextHash } from './getNextHash'
+import { hashv } from './hashv'
 import crypto from 'crypto'
 
 export interface OperationArguments {
