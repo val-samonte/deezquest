@@ -17,6 +17,15 @@ let preMutOpponent: Hero
 let hash: Buffer
 let args: OperationArguments
 
+const heroRandomInitValues = (hero: Hero, preMutHero: Hero) => {
+  hero.fireMp = preMutHero.fireMp = Math.floor(Math.random() * 10)
+  hero.windMp = preMutHero.windMp = Math.floor(Math.random() * 10)
+  hero.watrMp = preMutHero.watrMp = Math.floor(Math.random() * 10)
+  hero.eartMp = preMutHero.eartMp = Math.floor(Math.random() * 10)
+  hero.armor = preMutHero.armor = Math.floor(Math.random() * 10)
+  hero.shell = preMutHero.shell = Math.floor(Math.random() * 10)
+}
+
 const applyDamage = (hero: Hero, physical = 0, magical = 0) => {
   if (hero.armor < physical) {
     physical -= hero.armor
@@ -82,13 +91,9 @@ beforeEach(() => {
 
   preMutPlayer.turnTime = args.player.turnTime
   preMutOpponent.turnTime = args.opponent.turnTime
-  args.player.fireMp = preMutPlayer.fireMp = Math.floor(Math.random() * 10)
-  args.player.windMp = preMutPlayer.windMp = Math.floor(Math.random() * 10)
-  args.player.watrMp = preMutPlayer.watrMp = Math.floor(Math.random() * 10)
-  args.player.eartMp = preMutPlayer.eartMp = Math.floor(Math.random() * 10)
-  args.opponent.armor = preMutOpponent.armor = Math.floor(Math.random() * 10)
-  args.opponent.shell = preMutOpponent.shell = Math.floor(Math.random() * 10)
-  args.opponent.fireMp = preMutOpponent.fireMp = Math.floor(Math.random() * 10)
+
+  heroRandomInitValues(args.player, preMutPlayer)
+  heroRandomInitValues(args.opponent, preMutOpponent)
 })
 
 ////////////////////////////////////////////////////////////

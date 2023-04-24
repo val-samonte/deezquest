@@ -1,7 +1,6 @@
 import { SkillTypes } from '@/enums/SkillTypes'
 import { hashToTiles, Hero } from './gameFunctions'
 import { hashv } from './hashv'
-import crypto from 'crypto'
 
 export interface OperationArguments {
   commandLevel: number
@@ -574,21 +573,12 @@ export const ops: {
       // shuffle's the board
       switch (context.current!.operationVersion) {
         case 1: {
-          state.args.gameHash = crypto
-            .createHash('sha256')
-            .update(
-              Buffer.concat([Buffer.from('SHUFFLE'), state.args.gameHash]),
-            )
-            .digest()
+          state.args.gameHash = hashv([
+            Buffer.from('SHUFFLE'),
+            state.args.gameHash,
+          ])
 
-          const tiles = new Array(64)
-
-          for (let i = 0; i < 32; i++) {
-            const byte = state.args.gameHash[i]
-            tiles[i] = (byte & 0xf) % 7
-            tiles[i + 32] = ((byte >> 4) & 0xf) % 7
-          }
-          state.args.tiles = tiles
+          state.args.tiles = hashToTiles(state.args.gameHash)
           break
         }
       }

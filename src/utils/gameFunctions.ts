@@ -1,3 +1,4 @@
+import { HeroAttributes, HeroAttributesData } from '@/enums/HeroAttributes'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
 import { InnateSkill, innateSkills } from './innateSkills'
@@ -77,19 +78,21 @@ export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
   }
 
   const [int, spd, vit, str] = getHeroAttributes(publicKey)
-  const hp = 80 + vit * 3 + Math.floor((vit - 1) / 3) * 5
+  const hp = HeroAttributesData[HeroAttributes.VIT].compute(vit).totalHp
+  const { baseDmg, carryCap } =
+    HeroAttributesData[HeroAttributes.STR].compute(str)
   const bytes = publicKey.toBytes()
 
   return {
     hp,
     maxHp: hp,
-    maxMp: 10 + int,
+    maxMp: HeroAttributesData[HeroAttributes.INT].compute(int).totalMp,
     armor: 0,
     shell: 0,
     turnTime: 0,
-    baseDmg: str,
+    baseDmg,
     weight: 0,
-    carryCap: str,
+    carryCap,
     fireMp: 0,
     windMp: 0,
     watrMp: 0,
@@ -115,7 +118,7 @@ export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
     xTrance: 0,
     offensiveSkill: bytes[0] % 4,
     supportiveSkill: (bytes[1] % 4) + 4,
-    specialSkill: (bytes[2] % 4) + 8,
+    specialSkill: 8, // always shuffle
   }
 }
 
@@ -295,11 +298,11 @@ export const executableCommands = (
   if (absorbedCommands[2] > 3) {
     const costs = Array.from(specialSkill.code.slice(0, 4))
     if (isExecutable(hero, costs)) {
-      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         skill: specialSkill,
       })
+      hero = deductMana(hero, costs)
       flags[2] = true
     }
   }
@@ -307,12 +310,12 @@ export const executableCommands = (
   if (absorbedCommands[1] > 2) {
     const costs = Array.from(supportiveSkill.code.slice(0, 4))
     if (isExecutable(hero, costs)) {
-      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         lvl: absorbedCommands[1] > 4 ? 3 : absorbedCommands[1] === 4 ? 2 : 1,
         skill: supportiveSkill,
       })
+      hero = deductMana(hero, costs)
       flags[1] = true
     } else {
       queue.push({
@@ -325,12 +328,12 @@ export const executableCommands = (
   if (absorbedCommands[0] > 2) {
     const costs = Array.from(supportiveSkill.code.slice(0, 4))
     if (isExecutable(hero, costs)) {
-      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         lvl: absorbedCommands[0] > 4 ? 3 : absorbedCommands[0] === 4 ? 2 : 1,
         skill: offensiveSkill,
       })
+      hero = deductMana(hero, costs)
       flags[0] = true
     } else {
       queue.push({
