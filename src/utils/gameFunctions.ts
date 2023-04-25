@@ -299,11 +299,11 @@ export const executableCommands = (
   if (absorbedCommands[2] > 3) {
     const costs = Array.from(specialSkill.code.slice(0, 4))
     if (isExecutable(hero, costs)) {
+      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         skill: specialSkill,
       })
-      hero = deductMana(hero, costs)
       flags[2] = true
     }
   }
@@ -311,12 +311,12 @@ export const executableCommands = (
   if (absorbedCommands[1] > 2) {
     const costs = Array.from(supportiveSkill.code.slice(0, 4))
     if (isExecutable(hero, costs)) {
+      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         lvl: absorbedCommands[1] > 4 ? 3 : absorbedCommands[1] === 4 ? 2 : 1,
         skill: supportiveSkill,
       })
-      hero = deductMana(hero, costs)
       flags[1] = true
     } else {
       queue.push({
@@ -329,12 +329,12 @@ export const executableCommands = (
   if (absorbedCommands[0] > 2) {
     const costs = Array.from(supportiveSkill.code.slice(0, 4))
     if (isExecutable(hero, costs)) {
+      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         lvl: absorbedCommands[0] > 4 ? 3 : absorbedCommands[0] === 4 ? 2 : 1,
         skill: offensiveSkill,
       })
-      hero = deductMana(hero, costs)
       flags[0] = true
     } else {
       queue.push({

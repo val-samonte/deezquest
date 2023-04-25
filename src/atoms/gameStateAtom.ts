@@ -401,7 +401,7 @@ export const gameFunctions = atom(
               //   command.skill.target === TargetHero.BOTH
               // ) {
               //   spotlight.push(gameState!.currentTurn)
-              //   heroes[gameState!.currentTurn] = { ...playerHero }
+              heroes[gameState!.currentTurn] = { ...playerHero }
 
               //   if (command.skill.type === SkillTypes.SUPPORT) {
               //     type = GameTransitions.BUFF_SPELL
@@ -412,7 +412,7 @@ export const gameFunctions = atom(
               //   command.skill.target === TargetHero.BOTH
               // ) {
               //   spotlight.push(opponentPubkey)
-              //   heroes[opponentPubkey] = { ...opponentHero }
+              heroes[opponentPubkey] = { ...opponentHero }
               // }
 
               queue.push({

@@ -16,7 +16,7 @@ interface MiniSkillDisplay {
     maxUseCount: number
     useCountPerElement: (number | undefined)[]
     maxUseCountPerElement: (number | undefined)[]
-    ratio: (number | undefined)[]
+    ratio: number[][]
   }
 }
 
