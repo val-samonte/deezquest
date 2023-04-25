@@ -36,7 +36,7 @@ export default function AttributeDescription({
     case HeroAttributes.STR:
       return (
         <>
-          Affects the <span className='italic font-bold'>Base Damage</span> and
+          Affects the <span className='italic font-bold'>Base Damage</span> and{' '}
           <span className='italic font-bold'>Carrying Capacity</span> of the
           hero. Base Damage is added to the total AtkDmg; has initial value of
           1/2/3 for level 4/7/10 of STR.

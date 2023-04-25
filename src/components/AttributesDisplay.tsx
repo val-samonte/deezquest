@@ -5,9 +5,17 @@ import classNames from 'classnames'
 import AttributeDescription from './AttributeDescription'
 import AttributeTile from './AttributeTile'
 
-export default function AttributesDisplay({ hero }: { hero: Hero }) {
+export default function AttributesDisplay({
+  hero,
+  className,
+}: {
+  hero: Hero
+  className?: string
+}) {
   return (
-    <div className='grid grid-cols-4 gap-2 px-5 my-5'>
+    <div
+      className={classNames(className ?? 'grid grid-cols-4 gap-2 px-5 my-5')}
+    >
       <AttributeTile attrName={HeroAttributes.INT} value={hero.int}>
         <div className='font-bold mb-2 flex pb-1 border-b border-b-white/5'>
           <span className='flex-auto'>Intelligence</span>

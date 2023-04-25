@@ -22,6 +22,10 @@ import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { hashv } from '@/utils/hashv'
 import { matchAtom } from './matchAtom'
 import { MatchTypes } from '@/enums/MatchTypes'
+import {
+  OperationArguments,
+  parseSkillInstructionCode,
+} from '@/utils/parseSkillInstructionCode'
 
 export interface GameState {
   hashes: string[]
@@ -305,12 +309,10 @@ export const gameFunctions = atom(
                 duration: 100,
               })
             } else if (command.skill) {
-              const preCommandHero = { ...playerHero }
-              const preCommandOpponent = { ...opponentHero }
-              playerHero.fireMp = command.hero.fireMp
-              playerHero.windMp = command.hero.windMp
-              playerHero.watrMp = command.hero.watrMp
-              playerHero.eartMp = command.hero.eartMp
+              // playerHero.fireMp = command.hero.fireMp
+              // playerHero.windMp = command.hero.windMp
+              // playerHero.watrMp = command.hero.watrMp
+              // playerHero.eartMp = command.hero.eartMp
 
               queue.push({
                 type: GameTransitions.CAST,
@@ -335,21 +337,21 @@ export const gameFunctions = atom(
                 duration: 1500,
               })
 
-              const postCommand = command.skill.fn({
+              const args: OperationArguments = {
                 commandLevel: command.lvl ?? 1,
-                player: playerHero,
-                preCommandHero,
-                opponent: opponentHero,
-                tiles: newTiles,
+                skillType: command.skill.type,
+                depths,
                 gameHash: hash,
-              })
+                opponent: opponentHero,
+                player: playerHero,
+                tiles: newTiles,
+              }
 
-              playerHero = postCommand.player
-              opponentHero = postCommand.opponent
+              parseSkillInstructionCode(args, command.skill.code)
 
               // do shuffle check
-              if (newTiles !== postCommand.tiles) {
-                const updateAll = hash !== postCommand.gameHash
+              if (newTiles !== args.tiles) {
+                const updateAll = hash !== args.gameHash
 
                 queue.push({
                   type: GameTransitions.NODE_OUT,
@@ -357,7 +359,7 @@ export const gameFunctions = atom(
                   nodes: newTiles.reduce((acc: any, cur, i) => {
                     if (
                       cur !== null &&
-                      (updateAll || cur !== postCommand.tiles?.[i])
+                      (updateAll || cur !== args.tiles?.[i])
                     ) {
                       const x = i % 8
                       const y = Math.floor(i / 8)
@@ -372,26 +374,23 @@ export const gameFunctions = atom(
 
                 queue.push({
                   type: GameTransitions.NODE_IN,
-                  tiles: [...(postCommand.tiles ?? newTiles)],
-                  nodes: (postCommand.tiles ?? []).reduce(
-                    (acc: any, cur, i) => {
-                      if (cur !== null && (updateAll || cur !== newTiles[i])) {
-                        const x = i % 8
-                        const y = Math.floor(i / 8)
-                        acc[i] = {
-                          delay: (x + y) * 50,
-                        }
+                  tiles: [...(args.tiles ?? newTiles)],
+                  nodes: (args.tiles ?? []).reduce((acc: any, cur, i) => {
+                    if (cur !== null && (updateAll || cur !== newTiles[i])) {
+                      const x = i % 8
+                      const y = Math.floor(i / 8)
+                      acc[i] = {
+                        delay: (x + y) * 50,
                       }
-                      return acc
-                    },
-                    {},
-                  ),
+                    }
+                    return acc
+                  }, {}),
                   duration: 400,
                 })
               }
 
-              hash = postCommand.gameHash ?? hash
-              newTiles = postCommand.tiles ?? newTiles
+              hash = args.gameHash ?? hash
+              newTiles = args.tiles ?? newTiles
 
               const spotlight: any = []
               const heroes: any = {}

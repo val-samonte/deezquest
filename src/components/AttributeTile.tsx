@@ -29,9 +29,9 @@ export default function AttributeTile({
       >
         <img
           src={`/stat_${attrName.toLowerCase()}.svg`}
-          className='w-10 h-10 aspect-square object-contain'
+          className='w-6 h-6 xl:w-10 xl:h-10 aspect-square object-contain'
         />
-        <div className='flex justify-center gap-2 items-center'>
+        <div className='flex justify-center gap-2 items-center text-sm'>
           <span className='opacity-50 uppercase'>{attrName}</span>{' '}
           <span className='font-bold'>{value}</span>
         </div>

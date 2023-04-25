@@ -1,9 +1,8 @@
+import AttributesDisplay from '@/components/AttributesDisplay'
 import SkillView from '@/components/SkillView'
 import { SkillTypes } from '@/enums/SkillTypes'
-import {
-  heroFromPublicKey,
-  skills as skillsLookup,
-} from '@/utils/gameFunctions'
+import { heroFromPublicKey } from '@/utils/gameFunctions'
+import { innateSkills } from '@/utils/innateSkills'
 import { PublicKey } from '@solana/web3.js'
 import { ReactNode, useMemo } from 'react'
 
@@ -24,14 +23,14 @@ export default function HeroRollDisplay({
   const skills = useMemo(() => {
     if (!hero) return null
     return {
-      [SkillTypes.ATTACK]: skillsLookup[hero.offensiveSkill],
-      [SkillTypes.SUPPORT]: skillsLookup[hero.supportiveSkill],
-      [SkillTypes.SPECIAL]: skillsLookup[hero.specialSkill],
+      [SkillTypes.ATTACK]: innateSkills[hero.offensiveSkill],
+      [SkillTypes.SUPPORT]: innateSkills[hero.supportiveSkill],
+      [SkillTypes.SPECIAL]: innateSkills[hero.specialSkill],
     }
   }, [hero])
 
   return (
-    <div className='flex gap-5 portrait:flex-col'>
+    <div className='flex gap-5 portrait:flex-col mb-5'>
       <div className='flex flex-col gap-5 flex-none'>
         <div className='bg-black/20 w-60 h-60 mx-auto portrait:h-auto aspect-square relative overflow-hidden'>
           {children}
@@ -45,7 +44,10 @@ export default function HeroRollDisplay({
           </span>
         </div>
         <div className='flex flex-col'>
-          <ul className='grid grid-cols-1 portrait:sm:grid-cols-2 gap-y-3 gap-x-10 text-lg mb-5'>
+          {hero && (
+            <AttributesDisplay hero={hero} className='grid grid-cols-4 gap-2' />
+          )}
+          {/* <ul className='grid grid-cols-1 portrait:sm:grid-cols-2 gap-y-3 gap-x-10 text-lg mb-5'>
             <li className='flex items-center justify-center gap-2'>
               <img src='/stat_int.svg' className='w-8 h-8' />
               Intelligence
@@ -74,7 +76,7 @@ export default function HeroRollDisplay({
                 {hero?.str}
               </span>
             </li>
-          </ul>
+          </ul> */}
         </div>
       </div>
       <div className='border-r border-r-white/5 portrait:hidden'></div>

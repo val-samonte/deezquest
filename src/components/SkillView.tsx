@@ -1,7 +1,7 @@
 'use client'
 
 import { SkillTypes } from '@/enums/SkillTypes'
-import { Skill } from '@/utils/gameFunctions'
+import { Skill } from '@/types/Skill'
 import { Popover } from '@headlessui/react'
 import classNames from 'classnames'
 import { useMemo, useState } from 'react'
@@ -85,6 +85,20 @@ export default function SkillView({
             >
               <div className='min-w-[200px] flex flex-col'>
                 <span>{skill.desc}</span>
+                {skill.type !== SkillTypes.SPECIAL && (
+                  <div className='flex flex-col mt-2'>
+                    {skill.cmdLvls.map((cmdLevelDesc, i) => (
+                      <div className='flex'>
+                        <div>
+                          {Array.from(Array(3)).map((_, j) => (
+                            <span key={j}>{i >= j ? <>★</> : <>☆</>}</span>
+                          ))}
+                        </div>
+                        <div className='ml-2'>{cmdLevelDesc}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {skill.type === SkillTypes.SPECIAL && (
                   <span className='mt-2 pt-2 italic opacity-50'>
                     A Special Skill needs 4 or more amulet matches to be used.
@@ -96,45 +110,20 @@ export default function SkillView({
         )}
         <p
           className={classNames(
-            'flex items-center gap-3 font-bold',
+            'flex items-center gap-1 font-bold',
             useDetails?.useCount === 0 && 'opacity-20',
           )}
         >
-          {typeof skill.cost.fire === 'number' && (
-            <span className='flex items-center xl:gap-2'>
-              <img
-                src='/elem_fire.svg'
-                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
-              />
-              {skill.cost.fire === 0 ? 'ALL' : skill.cost.fire}
-            </span>
-          )}
-          {typeof skill.cost.wind === 'number' && (
-            <span className='flex items-center xl:gap-2'>
-              <img
-                src='/elem_wind.svg'
-                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
-              />
-              {skill.cost.wind === 0 ? 'ALL' : skill.cost.wind}
-            </span>
-          )}
-          {typeof skill.cost.water === 'number' && (
-            <span className='flex items-center xl:gap-2'>
-              <img
-                src='/elem_water.svg'
-                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
-              />
-              {skill.cost.water === 0 ? 'ALL' : skill.cost.water}
-            </span>
-          )}
-          {typeof skill.cost.earth === 'number' && (
-            <span className='flex items-center xl:gap-2'>
-              <img
-                src='/elem_earth.svg'
-                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
-              />
-              {skill.cost.earth === 0 ? 'ALL' : skill.cost.earth}
-            </span>
+          {['fire', 'wind', 'water', 'earth'].map((elem, i) =>
+            skill.code[i] !== 0 ? (
+              <span className='flex items-center'>
+                <img
+                  src={`/elem_${elem}.svg`}
+                  className='w-4 h-4 lg:w-5 lg:h-5 2xl:w-7 2xl:h-7 opacity-25'
+                />
+                {skill.code[i] === 255 ? 'ALL' : skill.code[i]}
+              </span>
+            ) : null,
           )}
         </p>
       </div>
@@ -157,6 +146,20 @@ export default function SkillView({
       {!hideDesc && (
         <p className='text-sm text-neutral-300 flex flex-col'>
           <span>{skill.desc}</span>
+          {skill.type !== SkillTypes.SPECIAL && (
+            <div className='flex flex-col mt-2'>
+              {skill.cmdLvls.map((cmdLevelDesc, i) => (
+                <div className='flex'>
+                  <div>
+                    {Array.from(Array(3)).map((_, j) => (
+                      <span key={j}>{i >= j ? <>★</> : <>☆</>}</span>
+                    ))}
+                  </div>
+                  <div className='ml-2'>{cmdLevelDesc}</div>
+                </div>
+              ))}
+            </div>
+          )}
           {skill.type === SkillTypes.SPECIAL && (
             <span className='mt-2 pt-2 italic opacity-50'>
               A Special Skill needs 4 or more amulet matches to be used.

@@ -1,7 +1,7 @@
 import { HeroAttributes } from '../enums/HeroAttributes'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
-import { InnateSkill, innateSkills } from './innateSkills'
+import { Skill, innateSkills } from './innateSkills'
 import { computeAttribute } from './computeAttribute'
 
 export interface Hero {
@@ -287,7 +287,7 @@ export const executableCommands = (
   const queue: {
     hero: Hero
     lvl?: number
-    skill?: InnateSkill
+    skill?: Skill
     attack?: number
     armor?: number
   }[] = []

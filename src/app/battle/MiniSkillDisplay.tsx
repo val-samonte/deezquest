@@ -2,7 +2,7 @@
 
 import StatCounter from '@/components/StatCounter'
 import { SkillTypes } from '@/enums/SkillTypes'
-import { Skill } from '@/utils/gameFunctions'
+import { Skill } from '@/types/Skill'
 import { Popover } from '@headlessui/react'
 import classNames from 'classnames'
 import { useState } from 'react'
@@ -57,29 +57,16 @@ export default function MiniSkillDisplay({
         <div className='font-bold mb-2 flex pb-1 border-b border-b-white/5'>
           <span className='flex-auto'>{skill.name}</span>
           <div className={classNames('flex items-center gap-3 font-bold')}>
-            {typeof skill.cost.fire === 'number' && (
-              <span className='flex items-center xl:gap-2'>
-                <img src='/elem_fire.svg' className='w-4 h-4 lg:w-6 lg:h-6' />
-                {skill.cost.fire === 0 ? 'ALL' : skill.cost.fire}
-              </span>
-            )}
-            {typeof skill.cost.wind === 'number' && (
-              <span className='flex items-center xl:gap-2'>
-                <img src='/elem_wind.svg' className='w-4 h-4 lg:w-6 lg:h-6' />
-                {skill.cost.wind === 0 ? 'ALL' : skill.cost.wind}
-              </span>
-            )}
-            {typeof skill.cost.water === 'number' && (
-              <span className='flex items-center xl:gap-2'>
-                <img src='/elem_water.svg' className='w-4 h-4 lg:w-6 lg:h-6' />
-                {skill.cost.water === 0 ? 'ALL' : skill.cost.water}
-              </span>
-            )}
-            {typeof skill.cost.earth === 'number' && (
-              <span className='flex items-center xl:gap-2'>
-                <img src='/elem_earth.svg' className='w-4 h-4 lg:w-6 lg:h-6' />
-                {skill.cost.earth === 0 ? 'ALL' : skill.cost.earth}
-              </span>
+            {['fire', 'wind', 'water', 'earth'].map((elem, i) =>
+              skill.code[i] !== 0 ? (
+                <span className='flex items-center xl:gap-2' key={elem}>
+                  <img
+                    src={`/elem_${elem}.svg`}
+                    className='w-4 h-4 lg:w-6 lg:h-6'
+                  />
+                  {skill.code[i] === 255 ? 'ALL' : skill.code[i]}
+                </span>
+              ) : null,
             )}
           </div>
         </div>

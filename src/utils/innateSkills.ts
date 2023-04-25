@@ -1,18 +1,5 @@
+import { Skill } from '@/types/Skill'
 import { SkillTypes } from '../enums/SkillTypes'
-
-export type InnateSkill = (
-  | {
-      type: SkillTypes.ATTACK | SkillTypes.SUPPORT
-      cmdLvls: string[]
-    }
-  | {
-      type: SkillTypes.SPECIAL
-    }
-) & {
-  name: string
-  desc: string
-  code: Uint8Array
-}
 
 export const getOperationsFromCode = (codeStr: string) => {
   return new Uint8Array(codeStr.split(' ').map((n) => parseInt(n, 16)))
@@ -21,7 +8,7 @@ export const getOperationsFromCode = (codeStr: string) => {
 /**
  * Innate skills are the default skills derived from the mint address of the NFT
  */
-export const innateSkills: InnateSkill[] = [
+export const innateSkills: Skill[] = [
   {
     name: 'Burning Punch',
     desc: 'Imbues bare fist with flames to incinerate enemies, enhancing base attack damage.',
@@ -142,7 +129,7 @@ export const innateSkills: InnateSkill[] = [
   },
   {
     name: 'Shuffle',
-    desc: 'Masterful manipulation of elemental mana shuffles the board, potentially setting up powerful combos.',
+    desc: 'Masterful manipulation of elemental mana disrupts the battle field, shuffling the board.',
     type: SkillTypes.SPECIAL,
     code: getOperationsFromCode(
       '02 02 02 02 ' + // mana

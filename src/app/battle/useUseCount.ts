@@ -1,27 +1,28 @@
-import { Hero, skillCountPerMana, skills } from '@/utils/gameFunctions'
+import { Hero, skillCountPerMana } from '@/utils/gameFunctions'
+import { innateSkills } from '@/utils/innateSkills'
 import { useMemo } from 'react'
 
 export default function useUseCount(hero: Hero) {
   return useMemo(() => {
     return [
-      skills[hero.offensiveSkill],
-      skills[hero.supportiveSkill],
-      skills[hero.specialSkill],
+      innateSkills[hero.offensiveSkill],
+      innateSkills[hero.supportiveSkill],
+      innateSkills[hero.specialSkill],
     ].map((skill) => {
+      const cost = Array.from(skill.code).slice(0, 4)
+
       const useCountPerElement = skillCountPerMana(
         [hero.fireMp, hero.windMp, hero.watrMp, hero.eartMp],
-        skill.cost,
+        cost,
       )
 
       const maxUseCountPerElement = skillCountPerMana(
         [hero.maxMp, hero.maxMp, hero.maxMp, hero.maxMp],
-        skill.cost,
+        cost,
       ).map((e) => e && Math.floor(e))
 
-      const { fire, wind, water, earth } = skill.cost
-      const elem = [fire, wind, water, earth]
-      const elemSum = (fire ?? 0) + (wind ?? 0) + (water ?? 0) + (earth ?? 0)
-      const ratio = elem.map((e) => {
+      const elemSum = cost.reduce((sum, cur) => sum + cur, 0)
+      const ratio = cost.map((e) => {
         if (typeof e === 'undefined') return undefined
         if (e === 0) return 1
         if (elemSum === 0) return 0
