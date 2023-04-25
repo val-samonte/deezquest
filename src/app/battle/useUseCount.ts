@@ -16,33 +16,50 @@ export default function useUseCount(hero: Hero) {
         cost,
       )
 
+      const useCount = Math.min(
+        ...useCountPerElement
+          .filter((n) => typeof n === 'number')
+          .map((n) => Math.floor(n ?? 0)),
+      )
+
+      // how many bars to display?
       const maxUseCountPerElement = skillCountPerMana(
         [hero.maxMp, hero.maxMp, hero.maxMp, hero.maxMp],
         cost,
       ).map((e) => e && Math.floor(e))
+      const maxUseCount = Math.min(
+        ...maxUseCountPerElement
+          .filter((n) => typeof n === 'number')
+          .map((n) => n ?? 0),
+      )
 
-      const elemSum = cost.reduce((sum, cur) => sum + cur, 0)
-      const ratio = cost.map((e) => {
-        if (typeof e === 'undefined') return undefined
-        if (e === 0) return 1
-        if (elemSum === 0) return 0
-        return e / elemSum
-      })
+      // how many partitions in a bar?
+      const partitions = Math.max(
+        cost.reduce((acc, cur) => (cur > 0 ? acc + 1 : acc), 0),
+        0,
+      )
+
+      // what is the ratio of element per bar?
+      const ratio = Array.from(Array(maxUseCount)).map((_, i) =>
+        useCountPerElement.map((elem) => {
+          const val = (elem ?? 0) - i
+          if (val >= 1) {
+            return 1 / partitions
+          }
+          if (val <= 0) {
+            return 0
+          }
+          return val / partitions
+        }),
+      )
 
       return {
-        useCount: Math.min(
-          ...useCountPerElement
-            .filter((n) => typeof n === 'number')
-            .map((n) => Math.floor(n ?? 0)),
-        ),
-        maxUseCount: Math.min(
-          ...maxUseCountPerElement
-            .filter((n) => typeof n === 'number')
-            .map((n) => n ?? 0),
-        ),
+        useCount,
+        maxUseCount,
         useCountPerElement,
         maxUseCountPerElement,
         ratio,
+        partitions,
       }
     })
   }, [

@@ -15,9 +15,19 @@ interface SkillViewProps {
     maxUseCount: number
     useCountPerElement: (number | undefined)[]
     maxUseCountPerElement: (number | undefined)[]
-    ratio: (number | undefined)[]
+    ratio: number[][]
+    partitions: number
   }
 }
+
+const colors = [
+  'rgb(246,0,0)',
+  'rgb(35,220,31)',
+  'rgb(19,113,255)',
+  'rgb(253,169,10)',
+]
+
+const mpRef = ['fireMp', 'windMp', 'watrMp', 'eartMp']
 
 export default function SkillView({
   skill,
@@ -28,26 +38,21 @@ export default function SkillView({
   let [popperElement, setPopperElement] = useState()
   let { styles, attributes } = usePopper(referenceElement, popperElement)
 
-  const emptyBars = useMemo(() => {
-    if (!useDetails) return 0
-    return useDetails.maxUseCount - useDetails.useCount
-  }, [useDetails])
+  // const emptyBars = useMemo(() => {
+  //   if (!useDetails) return 0
+  //   return useDetails.maxUseCount - useDetails.useCount
+  // }, [useDetails])
 
-  const bars = useMemo(() => {
-    if (!useDetails) return { count: 0, color: null }
-    const colors = [
-      'rgb(246,0,0)',
-      'rgb(35,220,31)',
-      'rgb(19,113,255)',
-      'rgb(253,169,10)',
-    ]
-    const dominant = useDetails.ratio.findIndex((i) => typeof i === 'number')
+  // const bars = useMemo(() => {
+  //   if (!useDetails) return { count: 0, color: null }
 
-    return {
-      count: useDetails.useCount,
-      color: colors[dominant],
-    }
-  }, [useDetails])
+  //   const dominant = useDetails.ratio.findIndex((i) => typeof i === 'number')
+
+  //   return {
+  //     count: useDetails.useCount,
+  //     color: colors[dominant],
+  //   }
+  // }, [useDetails])
 
   return (
     <div
@@ -88,7 +93,7 @@ export default function SkillView({
                 {skill.type !== SkillTypes.SPECIAL && (
                   <div className='flex flex-col mt-2'>
                     {skill.cmdLvls.map((cmdLevelDesc, i) => (
-                      <div className='flex'>
+                      <div className='flex' key={i}>
                         <div>
                           {Array.from(Array(3)).map((_, j) => (
                             <span key={j}>{i >= j ? <>★</> : <>☆</>}</span>
@@ -116,12 +121,12 @@ export default function SkillView({
         >
           {['fire', 'wind', 'water', 'earth'].map((elem, i) =>
             skill.code[i] !== 0 ? (
-              <span className='flex items-center'>
+              <span className='flex items-center' key={i}>
                 <img
                   src={`/elem_${elem}.svg`}
                   className='w-4 h-4 lg:w-5 lg:h-5 2xl:w-7 2xl:h-7 opacity-25'
                 />
-                {skill.code[i] === 255 ? 'ALL' : skill.code[i]}
+                {skill.code[i] === 255 ? 'A' : skill.code[i]}
               </span>
             ) : null,
           )}
@@ -129,7 +134,37 @@ export default function SkillView({
       </div>
       {useDetails && (
         <>
-          <div className='flex gap-2 mb-2'>
+          <div className='flex gap-1 mb-2 pr-2 -skew-x-[45deg]'>
+            {useDetails.ratio.map((bar, i) => (
+              <div
+                key={i}
+                className={classNames(
+                  i + 1 > useDetails.useCount && 'opacity-20',
+                  'h-[0.75vw] w-full flex-auto flex bg-black flex-col justify-end',
+                )}
+              >
+                {bar.map((elem, j) => (
+                  <div
+                    className='flex-none'
+                    key={j}
+                    style={{
+                      backgroundColor: colors[j],
+                      height: elem * 100 + '%',
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
+
+            {/* {bars.color} {bars.count} {emptyBars} */}
+            {/* 
+            <div className='h-[0.5vw] w-full flex-auto bg-red-600 '></div>
+            <div className='h-[0.5vw] w-full flex-auto bg-red-600 '></div>
+            <div className='h-[0.5vw] w-full flex-auto bg-red-600 '></div>
+            <div className='h-[0.5vw] w-full flex-auto bg-red-600 '></div> */}
+
+            {/* <div className='h-[1vw] flex-auto bg-neutral-800 opacity-20'></div> */}
+            {/* 
             {Array.from(Array(bars.count)).map((_, i) => (
               <div
                 className='h-2 flex-auto'
@@ -140,6 +175,7 @@ export default function SkillView({
             {Array.from(Array(emptyBars)).map((_, i) => (
               <div className='h-2 bg-black/20 flex-auto' key={`key_${i}`} />
             ))}
+             */}
           </div>
         </>
       )}
@@ -149,7 +185,7 @@ export default function SkillView({
           {skill.type !== SkillTypes.SPECIAL && (
             <div className='flex flex-col mt-2'>
               {skill.cmdLvls.map((cmdLevelDesc, i) => (
-                <div className='flex'>
+                <div className='flex' key={i}>
                   <div>
                     {Array.from(Array(3)).map((_, j) => (
                       <span key={j}>{i >= j ? <>★</> : <>☆</>}</span>

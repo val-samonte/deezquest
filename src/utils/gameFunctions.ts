@@ -1,8 +1,9 @@
 import { HeroAttributes } from '../enums/HeroAttributes'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
-import { Skill, innateSkills } from './innateSkills'
+import { innateSkills } from './innateSkills'
 import { computeAttribute } from './computeAttribute'
+import { Skill } from '@/types/Skill'
 
 export interface Hero {
   hp: number
@@ -241,13 +242,13 @@ export const getNextTurn = (
 
 export const skillCountPerMana = (mana: number[], costs: number[]) => {
   return mana.map((mp, i) => {
-    if (typeof costs[i] === 'undefined') return undefined
+    if (costs[i] === 0) return undefined
 
-    if (costs[i] === 0) {
+    if (costs[i] === 255) {
       return mp >= 1 ? 1 : 0
     }
 
-    return mp / costs[i]!
+    return mp / costs[i]
   })
 }
 
@@ -267,10 +268,10 @@ export const isExecutable = (hero: Hero, costs: number[]) => {
 
 export const deductMana = (hero: Hero, cost: number[]) => {
   const [fire, wind, water, earth] = cost
-  hero.fireMp -= fire === 0 ? hero.fireMp : fire ?? 0
-  hero.windMp -= wind === 0 ? hero.windMp : wind ?? 0
-  hero.watrMp -= water === 0 ? hero.watrMp : water ?? 0
-  hero.eartMp -= earth === 0 ? hero.eartMp : earth ?? 0
+  hero.fireMp -= fire === 255 ? hero.fireMp : fire ?? 0
+  hero.windMp -= wind === 255 ? hero.windMp : wind ?? 0
+  hero.watrMp -= water === 255 ? hero.watrMp : water ?? 0
+  hero.eartMp -= earth === 255 ? hero.eartMp : earth ?? 0
 
   return hero
 }

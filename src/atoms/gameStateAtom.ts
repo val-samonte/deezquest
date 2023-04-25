@@ -309,10 +309,10 @@ export const gameFunctions = atom(
                 duration: 100,
               })
             } else if (command.skill) {
-              // playerHero.fireMp = command.hero.fireMp
-              // playerHero.windMp = command.hero.windMp
-              // playerHero.watrMp = command.hero.watrMp
-              // playerHero.eartMp = command.hero.eartMp
+              playerHero.fireMp = command.hero.fireMp
+              playerHero.windMp = command.hero.windMp
+              playerHero.watrMp = command.hero.watrMp
+              playerHero.eartMp = command.hero.eartMp
 
               queue.push({
                 type: GameTransitions.CAST,
