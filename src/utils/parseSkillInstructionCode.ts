@@ -1,4 +1,5 @@
 import { SkillTypes } from '@/enums/SkillTypes'
+import { clamp } from './clamp'
 import { hashToTiles, Hero } from './gameFunctions'
 import { hashv } from './hashv'
 
@@ -208,10 +209,7 @@ export const ops: {
       // add
       // VAR1 = VAR2 + VAR3, Note max value is 255
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(Math.min(state.get(args[1]) + state.get(args[2]), 255), 0),
-      )
+      state.set(args[0], clamp(state.get(args[1]) + state.get(args[2]), 0, 255))
     },
   },
   [49]: {
@@ -220,10 +218,7 @@ export const ops: {
       // subtract
       // VAR1 = VAR2 - VAR3, Note it cannot go down below 0
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(Math.min(state.get(args[1]) - state.get(args[2]), 255), 0),
-      )
+      state.set(args[0], clamp(state.get(args[1]) - state.get(args[2]), 0, 255))
     },
   },
   [50]: {
@@ -232,13 +227,7 @@ export const ops: {
       // multiply
       // VAR1 = VAR2 * VAR3, Note max value is 255
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[1]) * state.get(args[2])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[1]) * state.get(args[2]), 0, 255))
     },
   },
   [51]: {
@@ -254,13 +243,7 @@ export const ops: {
         return
       }
 
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[1]) / state.get(args[2])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[1]) / state.get(args[2]), 0, 255))
     },
   },
   [52]: {
@@ -269,13 +252,7 @@ export const ops: {
       // modulo
       // VAR1 = VAR2 % VAR3
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[1]) % state.get(args[2])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[1]) % state.get(args[2]), 0, 255))
     },
   },
   [53]: {
@@ -284,10 +261,7 @@ export const ops: {
       // add (assign)
       // VAR1 += VAR2, Note max value is 255
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(Math.min(state.get(args[0]) + state.get(args[1]), 255), 0),
-      )
+      state.set(args[0], clamp(state.get(args[0]) + state.get(args[1]), 0, 255))
     },
   },
   [54]: {
@@ -296,10 +270,7 @@ export const ops: {
       // subtract (assign)
       // VAR1 -= VAR2, Note it cannot go down below 0
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(Math.min(state.get(args[0]) - state.get(args[1]), 255), 0),
-      )
+      state.set(args[0], clamp(state.get(args[0]) - state.get(args[1]), 0, 255))
     },
   },
   [55]: {
@@ -308,13 +279,7 @@ export const ops: {
       // multiply (assign)
       // VAR1 *= VAR2, Note max value is 255
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[0]) * state.get(args[1])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[0]) * state.get(args[1]), 0, 255))
     },
   },
   [56]: {
@@ -330,13 +295,7 @@ export const ops: {
         return
       }
 
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[0]) / state.get(args[1])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[0]) / state.get(args[1]), 0, 255))
     },
   },
   [57]: {
@@ -345,13 +304,7 @@ export const ops: {
       // modulo (assign)
       // VAR1 %= VAR2
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[0]) % state.get(args[1])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[0]) % state.get(args[1]), 0, 255))
     },
   },
   [64]: {
@@ -421,7 +374,7 @@ export const ops: {
           }
 
           state.set(args[1], shield)
-          state.set(args[0], Math.min(Math.max(hp - damage, 0), 255))
+          state.set(args[0], clamp(hp - damage, 0, 255))
 
           break
         }
@@ -438,9 +391,10 @@ export const ops: {
         case 1: {
           state.set(
             args[0],
-            Math.min(
+            clamp(
               state.get(args[0]) + state.get(args[1]),
-              state.get(args[0] + 1), // always the max hp
+              0,
+              Math.min(255, state.get(args[0] + 1)),
             ),
           )
           break

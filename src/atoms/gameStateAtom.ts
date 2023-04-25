@@ -17,7 +17,6 @@ import {
   heroFromPublicKey,
   subtract,
 } from '@/utils/gameFunctions'
-import { TargetHero } from '@/enums/TargetHero'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { hashv } from '@/utils/hashv'
@@ -151,6 +150,8 @@ export const gameFunctions = atom(
 
         const isMe = player.nft === gameState?.currentTurn
 
+        // TODO: doesn't work
+        // TODO: move to check winner
         if (gameState.hashes.length >= 0) {
           if (playerHero.hp > 0 && opponentHero.hp <= 0) {
             queue.push({

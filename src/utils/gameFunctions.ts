@@ -1,4 +1,4 @@
-import { HeroAttributes, HeroAttributesData } from '@/enums/HeroAttributes'
+import { HeroAttributes, HeroAttributesData } from '../enums/HeroAttributes'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
 import { InnateSkill, innateSkills } from './innateSkills'
@@ -45,10 +45,10 @@ export interface Hero {
 
 export const getHeroAttributes = (pubkey: PublicKey) => {
   let attribs = [
-    1, // INT - Mana cap increase
-    1, // SPD - More likely to get a turn
-    1, // VIT - Flat HP increase
-    1, // STR - Able to carry heavier equipment
+    1, // INT - Max MP increase
+    1, // SPD - More likely to get additional turn
+    1, // VIT - Max HP increase
+    1, // STR - BaseDmg & Carry Cap
   ]
   let cursor = 0
   let remaining = 17
@@ -182,8 +182,12 @@ export const getNextTurn = (
   pubkey2: Uint8Array,
   gameHash: Uint8Array,
 ) => {
-  const turnPt1 = Math.min(hero1.spd + 15, 50)
-  const turnPt2 = Math.min(hero2.spd + 15, 50)
+  const turnPt1 = HeroAttributesData[HeroAttributes.SPD].compute(
+    hero1.spd,
+  ).turnPoints
+  const turnPt2 = HeroAttributesData[HeroAttributes.SPD].compute(
+    hero2.spd,
+  ).turnPoints
 
   while (hero1.turnTime < 200 && hero2.turnTime < 200) {
     hero1.turnTime += turnPt1
