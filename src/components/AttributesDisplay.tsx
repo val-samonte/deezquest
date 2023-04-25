@@ -1,6 +1,7 @@
-import { HeroAttributes, HeroAttributesData } from '@/enums/HeroAttributes'
+import { computeAttribute, HeroAttributes } from '@/enums/HeroAttributes'
 import { Hero } from '@/utils/gameFunctions'
 import classNames from 'classnames'
+import AttributeDescription from './AttributeDescription'
 import AttributeTile from './AttributeTile'
 
 export default function AttributesDisplay({ hero }: { hero: Hero }) {
@@ -24,15 +25,12 @@ export default function AttributesDisplay({ hero }: { hero: Hero }) {
           <span>
             <span className='text-neutral-300'>Absorb MP: </span>
             <span className='font-bold text-lime-600'>
-              {
-                HeroAttributesData[HeroAttributes.INT].compute(hero.int)
-                  .absorbMp
-              }
+              {computeAttribute(HeroAttributes.INT, hero.int).absorbMp}
             </span>
           </span>
         </div>
         <div className='text-xs'>
-          {HeroAttributesData[HeroAttributes.INT].desc}
+          <AttributeDescription attr={HeroAttributes.INT} />
         </div>
       </AttributeTile>
       <AttributeTile attrName={HeroAttributes.SPD} value={hero.spd}>
@@ -49,15 +47,12 @@ export default function AttributesDisplay({ hero }: { hero: Hero }) {
           <span>
             <span className='text-neutral-300'>Turn Points: </span>
             <span className='font-bold text-lime-600'>
-              {
-                HeroAttributesData[HeroAttributes.SPD].compute(hero.spd)
-                  .turnPoints
-              }
+              {computeAttribute(HeroAttributes.SPD, hero.spd).turnPoints}
             </span>
           </span>
         </div>
         <div className='text-xs'>
-          {HeroAttributesData[HeroAttributes.SPD].desc}
+          <AttributeDescription attr={HeroAttributes.SPD} />
         </div>
       </AttributeTile>
       <AttributeTile attrName={HeroAttributes.VIT} value={hero.vit}>
@@ -77,7 +72,7 @@ export default function AttributesDisplay({ hero }: { hero: Hero }) {
           </span>
         </div>
         <div className='text-xs'>
-          {HeroAttributesData[HeroAttributes.VIT].desc}
+          <AttributeDescription attr={HeroAttributes.VIT} />
         </div>
       </AttributeTile>
       <AttributeTile attrName={HeroAttributes.STR} value={hero.str}>
@@ -101,7 +96,7 @@ export default function AttributesDisplay({ hero }: { hero: Hero }) {
           </span>
         </div>
         <div className='text-xs'>
-          {HeroAttributesData[HeroAttributes.STR].desc}
+          <AttributeDescription attr={HeroAttributes.STR} />
         </div>
       </AttributeTile>
     </div>

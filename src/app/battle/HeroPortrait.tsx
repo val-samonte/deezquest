@@ -1,20 +1,17 @@
 'use client'
 
-import { gameStateAtom } from '@/atoms/gameStateAtom'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
 import { useMetaplex } from '@/atoms/metaplexAtom'
 import AttributesDisplay from '@/components/AttributesDisplay'
 import { Dialog } from '@/components/Dialog'
-import { HeroAttributes, HeroAttributesData } from '@/enums/HeroAttributes'
+import { computeAttribute, HeroAttributes } from '@/enums/HeroAttributes'
 import { trimAddress } from '@/utils/trimAddress'
-import { Popover } from '@headlessui/react'
 import { JsonMetadata } from '@metaplex-foundation/js'
 import { useSpring, animated, useSpringValue } from '@react-spring/web'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { usePopper } from 'react-popper'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { heroDisplayAtom } from './PlayerCard'
 
 interface HeroPortraitProps {
@@ -224,10 +221,7 @@ export default function HeroPortrait({
           <span className='flex items-center'>
             <span className='text-neutral-300 flex-auto'>Turn Points: </span>
             <span className='font-bold text-lime-600'>
-              {
-                HeroAttributesData[HeroAttributes.SPD].compute(hero.spd)
-                  .turnPoints
-              }
+              {computeAttribute(HeroAttributes.SPD, hero.spd).turnPoints}
             </span>
           </span>
           <span className='flex items-center'>
@@ -237,10 +231,7 @@ export default function HeroPortrait({
           <span className='flex items-center'>
             <span className='text-neutral-300 flex-auto'>Absorb MP: </span>
             <span className='font-bold text-lime-600'>
-              {
-                HeroAttributesData[HeroAttributes.INT].compute(hero.int)
-                  .absorbMp
-              }
+              {computeAttribute(HeroAttributes.INT, hero.int).absorbMp}
             </span>
           </span>
           <span className='flex items-center'>

@@ -397,24 +397,24 @@ export const gameFunctions = atom(
               const heroes: any = {}
               let type = GameTransitions.ATTACK_SPELL
 
-              if (
-                command.skill.target === TargetHero.SELF ||
-                command.skill.target === TargetHero.BOTH
-              ) {
-                spotlight.push(gameState!.currentTurn)
-                heroes[gameState!.currentTurn] = { ...playerHero }
+              // if (
+              //   command.skill.target === TargetHero.SELF ||
+              //   command.skill.target === TargetHero.BOTH
+              // ) {
+              //   spotlight.push(gameState!.currentTurn)
+              //   heroes[gameState!.currentTurn] = { ...playerHero }
 
-                if (command.skill.type === SkillTypes.SUPPORT) {
-                  type = GameTransitions.BUFF_SPELL
-                }
-              }
-              if (
-                command.skill.target === TargetHero.ENEMY ||
-                command.skill.target === TargetHero.BOTH
-              ) {
-                spotlight.push(opponentPubkey)
-                heroes[opponentPubkey] = { ...opponentHero }
-              }
+              //   if (command.skill.type === SkillTypes.SUPPORT) {
+              //     type = GameTransitions.BUFF_SPELL
+              //   }
+              // }
+              // if (
+              //   command.skill.target === TargetHero.ENEMY ||
+              //   command.skill.target === TargetHero.BOTH
+              // ) {
+              //   spotlight.push(opponentPubkey)
+              //   heroes[opponentPubkey] = { ...opponentHero }
+              // }
 
               queue.push({
                 type,

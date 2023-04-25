@@ -1,4 +1,4 @@
-import { HeroAttributes, HeroAttributesData } from '../enums/HeroAttributes'
+import { computeAttribute, HeroAttributes } from '../enums/HeroAttributes'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
 import { InnateSkill, innateSkills } from './innateSkills'
@@ -78,21 +78,20 @@ export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
   }
 
   const [int, spd, vit, str] = getHeroAttributes(publicKey)
-  const hp = HeroAttributesData[HeroAttributes.VIT].compute(vit).totalHp
-  const { baseDmg, carryCap } =
-    HeroAttributesData[HeroAttributes.STR].compute(str)
+  const hp = computeAttribute(HeroAttributes.VIT, vit).totalHp!
+  const { baseDmg, carryCap } = computeAttribute(HeroAttributes.STR, str)
   const bytes = publicKey.toBytes()
 
   return {
     hp,
     maxHp: hp,
-    maxMp: HeroAttributesData[HeroAttributes.INT].compute(int).totalMp,
+    maxMp: computeAttribute(HeroAttributes.INT, int).totalMp!,
     armor: 0,
     shell: 0,
     turnTime: 0,
-    baseDmg,
+    baseDmg: baseDmg!,
     weight: 0,
-    carryCap,
+    carryCap: carryCap!,
     fireMp: 0,
     windMp: 0,
     watrMp: 0,
@@ -182,12 +181,8 @@ export const getNextTurn = (
   pubkey2: Uint8Array,
   gameHash: Uint8Array,
 ) => {
-  const turnPt1 = HeroAttributesData[HeroAttributes.SPD].compute(
-    hero1.spd,
-  ).turnPoints
-  const turnPt2 = HeroAttributesData[HeroAttributes.SPD].compute(
-    hero2.spd,
-  ).turnPoints
+  const turnPt1 = computeAttribute(HeroAttributes.SPD, hero1.spd).turnPoints!
+  const turnPt2 = computeAttribute(HeroAttributes.SPD, hero2.spd).turnPoints!
 
   while (hero1.turnTime < 200 && hero2.turnTime < 200) {
     hero1.turnTime += turnPt1
