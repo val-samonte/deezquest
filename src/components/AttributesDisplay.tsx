@@ -1,4 +1,5 @@
-import { computeAttribute, HeroAttributes } from '@/enums/HeroAttributes'
+import { HeroAttributes } from '@/enums/HeroAttributes'
+import { computeAttribute } from '@/utils/computeAttribute'
 import { Hero } from '@/utils/gameFunctions'
 import classNames from 'classnames'
 import AttributeDescription from './AttributeDescription'

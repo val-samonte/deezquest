@@ -1,7 +1,8 @@
-import { computeAttribute, HeroAttributes } from '../enums/HeroAttributes'
+import { HeroAttributes } from '../enums/HeroAttributes'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
 import { InnateSkill, innateSkills } from './innateSkills'
+import { computeAttribute } from './computeAttribute'
 
 export interface Hero {
   hp: number
