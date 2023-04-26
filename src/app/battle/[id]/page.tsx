@@ -578,7 +578,7 @@ function BotMatchManager({ match }: { match: BotMatch }) {
             (acc, curr) => {
               curr.ratio.forEach((value, elem) => {
                 if (typeof value !== 'undefined') {
-                  acc[elem] += value
+                  acc[elem] += value[elem]
                 }
               })
               return acc
