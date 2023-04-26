@@ -14,9 +14,9 @@ export const innateSkills: Skill[] = [
     desc: 'Imbues bare fist with flames to incinerate enemies, enhancing base attack damage.',
     type: SkillTypes.ATTACK,
     cmdLvls: [
-      '8 MagDmg + BaseDmg',
-      '16 MagDmg + BaseDmg',
-      '24 MagDmg + BaseDmg',
+      '8 Magic Damage + Base Damage',
+      '16 Magic Damage + Base Damage',
+      '24 Magic Damage + Base Damage',
     ],
     code: getOperationsFromCode(
       '03 00 00 00 ' + // mana
@@ -32,9 +32,9 @@ export const innateSkills: Skill[] = [
     desc: 'Enhances hand strikes with cutting winds, dealing minor damage and delays the enemy.',
     type: SkillTypes.ATTACK,
     cmdLvls: [
-      '6 MagDmg, -60 Turn Time',
-      '8 MagDmg, -80 Turn Time',
-      '10 MagDmg, -100 Turn Time',
+      '6 Magic Damage, -60 Turn Time',
+      '8 Magic Damage, -80 Turn Time',
+      '10 Magic Damage, -100 Turn Time',
     ],
     code: getOperationsFromCode(
       '00 03 00 00 ' + //   mana
@@ -53,7 +53,7 @@ export const innateSkills: Skill[] = [
     name: 'Whip Kick',
     desc: 'Generates a powerful wave with a swift kick, dealing heavy magic damage.',
     type: SkillTypes.ATTACK,
-    cmdLvls: ['10 MagDmg', '20 MagDmg', '30 MagDmg'],
+    cmdLvls: ['10 Magic Damage', '20 Magic Damage', '30 Magic Damage'],
     code: getOperationsFromCode(
       '00 00 04 00 ' + // mana
         '43 01 00 ' + //  version
@@ -66,7 +66,11 @@ export const innateSkills: Skill[] = [
     name: 'Crushing Blow',
     desc: 'Deals a devastating strike, dealing damage based on earth mana of the hero.',
     type: SkillTypes.ATTACK,
-    cmdLvls: ['1 MagDmg × EarthMP', '2 MagDmg × EarthMP', '3 MagDmg × EarthMP'],
+    cmdLvls: [
+      '1 Magic Damage × EarthMP',
+      '2 Magic Damage × EarthMP',
+      '3 Magic Damage × EarthMP',
+    ],
     code: getOperationsFromCode(
       '00 00 00 FF ' + //   mana
         '43 01 00 ' + //    version
@@ -78,11 +82,11 @@ export const innateSkills: Skill[] = [
     name: 'Focus',
     desc: 'Unleashes inner strength, increasing attack damage.',
     type: SkillTypes.SUPPORT,
-    cmdLvls: ['+1 BaseDmg', '+2 BaseDmg', '+3 BaseDmg'],
+    cmdLvls: ['+1 Base Damage', '+2 Base Damage', '+3 Base Damage'],
     code: getOperationsFromCode(
       '04 00 00 00 ' + // mana
         '00 ' + //        version
-        '35 07 42', //    baseDmg += command level
+        '35 07 42', //    Base Damage += command level
     ),
   },
   {
@@ -115,7 +119,11 @@ export const innateSkills: Skill[] = [
     name: 'Harden',
     desc: 'Fortifies the hero with the strength of the earth, increasing defense.',
     type: SkillTypes.SUPPORT,
-    cmdLvls: ['+2 Armor, +3 Shell', '+3 Armor, +4 Shell', '+4 Armor, +5 Shell'],
+    cmdLvls: [
+      '+2 Armor, +3 Magic Barrier',
+      '+3 Armor, +4 Magic Barrier',
+      '+4 Armor, +5 Magic Barrier',
+    ],
     code: getOperationsFromCode(
       '00 00 00 03 ' + // mana
         '00 ' + //        version
@@ -124,7 +132,7 @@ export const innateSkills: Skill[] = [
         '35 D0 42 ' + //  D0 += command level
         '35 D1 42 ' + //  D1 += command level
         '35 04 D0 ' + //  player.armor += D0
-        '35 05 D1', //    player.shell += D1
+        '35 05 D1', //    player.Magic Barrier += D1
     ),
   },
   {
