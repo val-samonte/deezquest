@@ -102,11 +102,6 @@ export default function MiniSkillDisplay({
         <div className='min-w-[200px] flex flex-col'>
           <span>{skill.desc}</span>
           <CommandLevelsDescription skill={skill} />
-          {skill.type === SkillTypes.SPECIAL && (
-            <span className='mt-2 pt-2 italic opacity-50'>
-              A Special Skill needs 4 or more amulet matches to be used.
-            </span>
-          )}
         </div>
       </Popover.Panel>
     </Popover>

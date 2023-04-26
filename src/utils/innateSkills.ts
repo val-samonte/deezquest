@@ -144,5 +144,6 @@ export const innateSkills: Skill[] = [
         '46 01 00 ' + //  version
         '46', //          shuffle
     ),
+    cmdLvls: [undefined, 'Shuffle'],
   },
 ]
