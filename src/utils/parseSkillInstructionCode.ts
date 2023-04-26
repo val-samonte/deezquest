@@ -532,7 +532,10 @@ export const ops: {
             state.args.gameHash,
           ])
 
-          state.args.tiles = hashToTiles(state.args.gameHash)
+          state.args.tiles = hashToTiles(state.args.gameHash).map((node, i) => {
+            if (state.args.tiles[i] !== null) return node
+            return null
+          })
           break
         }
       }
