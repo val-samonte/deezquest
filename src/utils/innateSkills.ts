@@ -129,7 +129,7 @@ export const innateSkills: Skill[] = [
   },
   {
     name: 'Shuffle',
-    desc: 'Masterful manipulation of elemental mana disrupts the battle field, shuffling the board.',
+    desc: 'Masterful manipulation of elemental mana disrupts the battle field, potentially setting up powerful combos.',
     type: SkillTypes.SPECIAL,
     code: getOperationsFromCode(
       '02 02 02 02 ' + // mana

@@ -35,48 +35,16 @@ export default function HeroRollDisplay({
         <div className='bg-black/20 w-60 h-60 mx-auto portrait:h-auto aspect-square relative overflow-hidden'>
           {children}
         </div>
-        <div className='flex gap-5 text-2xl items-center justify-center'>
+        {/* <div className='flex gap-5 text-2xl items-center justify-center'>
           <span>
             HP: <span className='font-bold'>{hero?.hp}</span>
           </span>
           <span>
             MP: <span className='font-bold'>{hero?.maxMp}</span>
           </span>
-        </div>
+        </div> */}
         <div className='flex flex-col'>
-          {hero && (
-            <AttributesDisplay hero={hero} className='grid grid-cols-4 gap-2' />
-          )}
-          {/* <ul className='grid grid-cols-1 portrait:sm:grid-cols-2 gap-y-3 gap-x-10 text-lg mb-5'>
-            <li className='flex items-center justify-center gap-2'>
-              <img src='/stat_int.svg' className='w-8 h-8' />
-              Intelligence
-              <span className='flex-auto text-right font-bold'>
-                {hero?.int}
-              </span>
-            </li>
-            <li className='flex items-center justify-center gap-2'>
-              <img src='/stat_spd.svg' className='w-8 h-8' />
-              Speed
-              <span className='flex-auto text-right font-bold'>
-                {hero?.spd}
-              </span>
-            </li>
-            <li className='flex items-center justify-center gap-2'>
-              <img src='/stat_vit.svg' className='w-8 h-8' />
-              Vitality
-              <span className='flex-auto text-right font-bold'>
-                {hero?.vit}
-              </span>
-            </li>
-            <li className='flex items-center justify-center gap-2'>
-              <img src='/stat_str.svg' className='w-8 h-8' />
-              Strength
-              <span className='flex-auto text-right font-bold'>
-                {hero?.str}
-              </span>
-            </li>
-          </ul> */}
+          {hero && <AttributesDisplay hero={hero} />}
         </div>
       </div>
       <div className='border-r border-r-white/5 portrait:hidden'></div>

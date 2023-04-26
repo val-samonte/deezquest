@@ -23,13 +23,13 @@ export default function AttributeTile({
     <Popover className='relative flex-auto'>
       <Popover.Button
         className={classNames(
-          'outline-none w-full flex flex-col items-center justify-center p-2 rounded bg-black/20',
+          'aspect-square outline-none w-full flex flex-col items-center justify-center p-2 rounded bg-black/20 overflow-hidden',
         )}
         ref={setReferenceElement as any}
       >
         <img
           src={`/stat_${attrName.toLowerCase()}.svg`}
-          className='w-6 h-6 xl:w-10 xl:h-10 aspect-square object-contain'
+          className='w-6 h-6 xl:w-8 xl:h-8 aspect-square object-contain'
         />
         <div className='flex justify-center gap-2 items-center text-sm'>
           <span className='opacity-50 uppercase'>{attrName}</span>{' '}

@@ -213,37 +213,8 @@ export default function HeroPortrait({
             </div>
           )}
         </div>
-        <AttributesDisplay hero={hero} />
-        <div className='grid grid-cols-2 px-5 gap-x-5 gap-y-2 mb-5'>
-          <span className='flex items-center'>
-            <span className='text-neutral-300 flex-auto'>Total HP: </span>
-            <span className='font-bold text-lime-600'>{hero.maxHp}</span>
-          </span>
-          <span className='flex items-center'>
-            <span className='text-neutral-300 flex-auto'>Turn Points: </span>
-            <span className='font-bold text-lime-600'>
-              {computeAttribute(HeroAttributes.SPD, hero.spd).turnPoints}
-            </span>
-          </span>
-          <span className='flex items-center'>
-            <span className='text-neutral-300 flex-auto'>Total MP: </span>
-            <span className='font-bold text-lime-600'>{hero.maxMp}</span>
-          </span>
-          <span className='flex items-center'>
-            <span className='text-neutral-300 flex-auto'>Absorb MP: </span>
-            <span className='font-bold text-lime-600'>
-              {computeAttribute(HeroAttributes.INT, hero.int).absorbMp}
-            </span>
-          </span>
-          <span className='flex items-center'>
-            <span className='text-neutral-300 flex-auto'>Base DMG: </span>
-            <span className='font-bold text-lime-600'>{hero.baseDmg}</span>
-          </span>
-          <span className='flex items-center'>
-            <span className='text-neutral-300 flex-auto'>Carry Cap: </span>
-            <span className='font-bold text-lime-600'>{hero.str}</span>
-          </span>
-        </div>
+        <AttributesDisplay hero={hero} className='px-5 my-5' />
+
         <div className='flex-auto h-10' />
         <button
           type='button'

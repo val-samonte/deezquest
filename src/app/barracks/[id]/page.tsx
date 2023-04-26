@@ -112,7 +112,7 @@ export default function HeroDetailsPage({
           </div>
           <div className='flex flex-col gap-3 xl:gap-5'>
             <h2 className='text-xl font-bold'>Attributes</h2>
-            <AttributesDisplay hero={hero} className='grid grid-cols-4 gap-2' />
+            <AttributesDisplay hero={hero} />
             {/* <ul className='grid grid-cols-1 2xl:grid-cols-2 gap-y-2 lg:gap-y-3 gap-x-10 text-sm portrait:text-base md:text-base 2xl:text-lg'>
               <li className='flex items-center justify-center gap-2'>
                 <img src='/stat_int.svg' className='w-8 h-8' />
