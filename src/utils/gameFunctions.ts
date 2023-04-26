@@ -268,6 +268,7 @@ export const isExecutable = (hero: Hero, costs: number[]) => {
 
 export const deductMana = (hero: Hero, cost: number[]) => {
   const [fire, wind, water, earth] = cost
+  console.log(cost)
   hero.fireMp -= fire === 255 ? hero.fireMp : fire ?? 0
   hero.windMp -= wind === 255 ? hero.windMp : wind ?? 0
   hero.watrMp -= water === 255 ? hero.watrMp : water ?? 0
@@ -327,7 +328,7 @@ export const executableCommands = (
   }
 
   if (absorbedCommands[0] > 2) {
-    const costs = Array.from(supportiveSkill.code.slice(0, 4))
+    const costs = Array.from(offensiveSkill.code.slice(0, 4))
     if (isExecutable(hero, costs)) {
       hero = deductMana(hero, costs)
       queue.push({

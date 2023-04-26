@@ -244,7 +244,7 @@ export const gameFunctions = atom(
           const { matches, depths, count } = getMatches(newTiles)
 
           // count: [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-          playerHero = absorbMana(playerHero, count.slice(3)) // TODO: implement mana overflow
+          playerHero = absorbMana(playerHero, count.slice(3))
           const { flags, queue: commandsQueues } = executableCommands(
             { ...playerHero },
             count.slice(0, 3),
@@ -309,11 +309,6 @@ export const gameFunctions = atom(
                 duration: 100,
               })
             } else if (command.skill) {
-              playerHero.fireMp = command.hero.fireMp
-              playerHero.windMp = command.hero.windMp
-              playerHero.watrMp = command.hero.watrMp
-              playerHero.eartMp = command.hero.eartMp
-
               queue.push({
                 type: GameTransitions.CAST,
                 turn: gameState!.currentTurn,
@@ -348,6 +343,11 @@ export const gameFunctions = atom(
               }
 
               parseSkillInstructionCode(args, command.skill.code)
+
+              playerHero.fireMp = command.hero.fireMp
+              playerHero.windMp = command.hero.windMp
+              playerHero.watrMp = command.hero.watrMp
+              playerHero.eartMp = command.hero.eartMp
 
               // do shuffle check
               if (newTiles !== args.tiles) {
