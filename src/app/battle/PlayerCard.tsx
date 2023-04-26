@@ -5,7 +5,8 @@ import { Player } from '@/atoms/matchAtom'
 import AnimatedCounter from '@/components/AnimatedCounter'
 import SkillView from '@/components/SkillView'
 import StatCounter from '@/components/StatCounter'
-import { Hero, heroFromPublicKey, skills } from '@/utils/gameFunctions'
+import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
+import { innateSkills } from '@/utils/innateSkills'
 import classNames from 'classnames'
 import { atom, useAtomValue } from 'jotai'
 import { atomFamily } from 'jotai/utils'
@@ -339,17 +340,17 @@ export default function PlayerCard({
             <MiniSkillDisplay
               iconSrc='/cmd_attack.svg'
               useDetails={offensive}
-              skill={skills[hero.offensiveSkill]}
+              skill={innateSkills[hero.offensiveSkill]}
             />
             <MiniSkillDisplay
               iconSrc='/cmd_support.svg'
               useDetails={supportive}
-              skill={skills[hero.supportiveSkill]}
+              skill={innateSkills[hero.supportiveSkill]}
             />
             <MiniSkillDisplay
               iconSrc='/cmd_special.svg'
               useDetails={special}
-              skill={skills[hero.specialSkill]}
+              skill={innateSkills[hero.specialSkill]}
             />
           </div>
         </div>
@@ -364,7 +365,7 @@ export default function PlayerCard({
               )}
             />
             <SkillView
-              skill={skills[hero.offensiveSkill]}
+              skill={innateSkills[hero.offensiveSkill]}
               hideDesc
               useDetails={offensive}
             />
@@ -378,7 +379,7 @@ export default function PlayerCard({
               )}
             />
             <SkillView
-              skill={skills[hero.supportiveSkill]}
+              skill={innateSkills[hero.supportiveSkill]}
               hideDesc
               useDetails={supportive}
             />
@@ -392,7 +393,7 @@ export default function PlayerCard({
               )}
             />
             <SkillView
-              skill={skills[hero.specialSkill]}
+              skill={innateSkills[hero.specialSkill]}
               hideDesc
               useDetails={special}
             />

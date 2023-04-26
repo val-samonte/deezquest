@@ -1,8 +1,7 @@
 import { SkillTypes } from '@/enums/SkillTypes'
 import { clusterApiUrl, Connection, Keypair, PublicKey } from '@solana/web3.js'
-import SkillView from '@/components/SkillView'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getHeroAttributes, skills } from '@/utils/gameFunctions'
+import { getHeroAttributes } from '@/utils/gameFunctions'
 import { useMetaplex } from '@/atoms/metaplexAtom'
 import { nftCollections } from './nft_collections'
 import { JsonMetadata, Metaplex } from '@metaplex-foundation/js'
@@ -10,6 +9,7 @@ import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import classNames from 'classnames'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import HeroRollDisplay from './HeroRollDisplay'
+import { innateSkills } from '@/utils/innateSkills'
 
 interface HeroSelectProps {
   onMint: (params: { address: string; tx: string; image: string }) => void
@@ -27,9 +27,9 @@ export default function HeroSelect({ onMint }: HeroSelectProps) {
     const attribs = getHeroAttributes(mintKeypair.publicKey)
     const bytes = mintKeypair.publicKey.toBytes()
     const availableSkills = {
-      [SkillTypes.ATTACK]: skills[bytes[0] % 4],
-      [SkillTypes.SUPPORT]: skills[(bytes[1] % 4) + 4],
-      [SkillTypes.SPECIAL]: skills[(bytes[2] % 4) + 8],
+      [SkillTypes.ATTACK]: innateSkills[bytes[0] % 4],
+      [SkillTypes.SUPPORT]: innateSkills[(bytes[1] % 4) + 4],
+      [SkillTypes.SPECIAL]: 8,
     }
 
     return {

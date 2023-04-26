@@ -1,7 +1,7 @@
 'use client'
 
 import { PeerErrorType, PeerInstance, usePeer } from '@/atoms/peerAtom'
-import { getNextHash } from '@/utils/getNextHash'
+import { hashv } from '@/utils/hashv'
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 import { burnerKeypairAtom } from './BurnerAccountManager'

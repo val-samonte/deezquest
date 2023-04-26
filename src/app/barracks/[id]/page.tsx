@@ -1,13 +1,12 @@
 'use client'
 
 import { useMetaplex } from '@/atoms/metaplexAtom'
+import AttributesDisplay from '@/components/AttributesDisplay'
 import SkillView from '@/components/SkillView'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import { SkillTypes } from '@/enums/SkillTypes'
-import {
-  heroFromPublicKey,
-  skills as skillsLookup,
-} from '@/utils/gameFunctions'
+import { heroFromPublicKey } from '@/utils/gameFunctions'
+import { innateSkills } from '@/utils/innateSkills'
 import { JsonMetadata } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import { useEffect, useMemo, useState } from 'react'
@@ -28,9 +27,9 @@ export default function HeroDetailsPage({
   const skills = useMemo(() => {
     if (!hero) return null
     return {
-      [SkillTypes.ATTACK]: skillsLookup[hero.offensiveSkill],
-      [SkillTypes.SUPPORT]: skillsLookup[hero.supportiveSkill],
-      [SkillTypes.SPECIAL]: skillsLookup[hero.specialSkill],
+      [SkillTypes.ATTACK]: innateSkills[hero.offensiveSkill],
+      [SkillTypes.SUPPORT]: innateSkills[hero.supportiveSkill],
+      [SkillTypes.SPECIAL]: innateSkills[hero.specialSkill],
     }
   }, [hero])
 
@@ -113,7 +112,8 @@ export default function HeroDetailsPage({
           </div>
           <div className='flex flex-col gap-3 xl:gap-5'>
             <h2 className='text-xl font-bold'>Attributes</h2>
-            <ul className='grid grid-cols-1 2xl:grid-cols-2 gap-y-2 lg:gap-y-3 gap-x-10 text-sm portrait:text-base md:text-base 2xl:text-lg'>
+            <AttributesDisplay hero={hero} />
+            {/* <ul className='grid grid-cols-1 2xl:grid-cols-2 gap-y-2 lg:gap-y-3 gap-x-10 text-sm portrait:text-base md:text-base 2xl:text-lg'>
               <li className='flex items-center justify-center gap-2'>
                 <img src='/stat_int.svg' className='w-8 h-8' />
                 Intelligence
@@ -142,7 +142,7 @@ export default function HeroDetailsPage({
                   {hero.str}
                 </span>
               </li>
-            </ul>
+            </ul> */}
           </div>
           <div className='flex flex-col gap-3 xl:gap-5'>
             <h2 className='text-xl font-bold mb-3'>Skills</h2>

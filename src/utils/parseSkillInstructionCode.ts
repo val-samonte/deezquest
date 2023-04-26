@@ -1,7 +1,7 @@
 import { SkillTypes } from '@/enums/SkillTypes'
+import { clamp } from './clamp'
 import { hashToTiles, Hero } from './gameFunctions'
-import { getNextHash } from './getNextHash'
-import crypto from 'crypto'
+import { hashv } from './hashv'
 
 export interface OperationArguments {
   commandLevel: number
@@ -114,11 +114,9 @@ export const ops: {
     len: 2,
     fn: (state: VariableMapper, context: OperationContext) => {
       // skip
-      // If VAR1 is truthy, skip the next OP
+      // skip count = VAR1, skip # of operators
       const args = context.current!.args
-      if (args[0] !== 0) {
-        context.skip += 1
-      }
+      context.skip += state.get(args[0])
     },
   },
   [3]: {
@@ -211,10 +209,7 @@ export const ops: {
       // add
       // VAR1 = VAR2 + VAR3, Note max value is 255
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(Math.min(state.get(args[1]) + state.get(args[2]), 255), 0),
-      )
+      state.set(args[0], clamp(state.get(args[1]) + state.get(args[2]), 0, 255))
     },
   },
   [49]: {
@@ -223,10 +218,7 @@ export const ops: {
       // subtract
       // VAR1 = VAR2 - VAR3, Note it cannot go down below 0
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(Math.min(state.get(args[1]) - state.get(args[2]), 255), 0),
-      )
+      state.set(args[0], clamp(state.get(args[1]) - state.get(args[2]), 0, 255))
     },
   },
   [50]: {
@@ -235,13 +227,7 @@ export const ops: {
       // multiply
       // VAR1 = VAR2 * VAR3, Note max value is 255
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[1]) * state.get(args[2])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[1]) * state.get(args[2]), 0, 255))
     },
   },
   [51]: {
@@ -257,13 +243,7 @@ export const ops: {
         return
       }
 
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[1]) / state.get(args[2])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[1]) / state.get(args[2]), 0, 255))
     },
   },
   [52]: {
@@ -272,13 +252,7 @@ export const ops: {
       // modulo
       // VAR1 = VAR2 % VAR3
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[1]) % state.get(args[2])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[1]) % state.get(args[2]), 0, 255))
     },
   },
   [53]: {
@@ -287,10 +261,7 @@ export const ops: {
       // add (assign)
       // VAR1 += VAR2, Note max value is 255
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(Math.min(state.get(args[0]) + state.get(args[1]), 255), 0),
-      )
+      state.set(args[0], clamp(state.get(args[0]) + state.get(args[1]), 0, 255))
     },
   },
   [54]: {
@@ -299,10 +270,7 @@ export const ops: {
       // subtract (assign)
       // VAR1 -= VAR2, Note it cannot go down below 0
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(Math.min(state.get(args[0]) - state.get(args[1]), 255), 0),
-      )
+      state.set(args[0], clamp(state.get(args[0]) - state.get(args[1]), 0, 255))
     },
   },
   [55]: {
@@ -311,13 +279,7 @@ export const ops: {
       // multiply (assign)
       // VAR1 *= VAR2, Note max value is 255
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[0]) * state.get(args[1])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[0]) * state.get(args[1]), 0, 255))
     },
   },
   [56]: {
@@ -333,13 +295,7 @@ export const ops: {
         return
       }
 
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[0]) / state.get(args[1])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[0]) / state.get(args[1]), 0, 255))
     },
   },
   [57]: {
@@ -348,24 +304,22 @@ export const ops: {
       // modulo (assign)
       // VAR1 %= VAR2
       const args = context.current!.args
-      state.set(
-        args[0],
-        Math.max(
-          Math.min(Math.floor(state.get(args[0]) % state.get(args[1])), 255),
-          0,
-        ),
-      )
+      state.set(args[0], clamp(state.get(args[0]) % state.get(args[1]), 0, 255))
     },
   },
   [64]: {
-    len: 3,
+    len: 4,
     fn: (state: VariableMapper, context: OperationContext) => {
-      // absolute
-      // VAR1 = abs(VAR2)
+      // gap
+      // VAR1 = abs(VAR2 - VAR3)
       const args = context.current!.args
       switch (context.current!.operationVersion) {
         case 1: {
-          state.set(args[0], Math.abs(state.get(args[1])))
+          if (state.get(args[1]) > state.get(args[2])) {
+            state.set(args[0], state.get(args[1]) - state.get(args[2]))
+          } else {
+            state.set(args[0], state.get(args[2]) - state.get(args[1]))
+          }
           break
         }
       }
@@ -400,33 +354,27 @@ export const ops: {
     },
   },
   [67]: {
-    len: 5,
+    len: 4,
     fn: (state: VariableMapper, context: OperationContext) => {
       // damage
-      // dmg(VAR1: hp, VAR2: shield, VAR3: damage amount, BOOL: is piercing)
+      // dmg(VAR1: hp, VAR2: shield, VAR3: damage amount)
       const args = context.current!.args
       switch (context.current!.operationVersion) {
         case 1: {
-          if (args[3] === 0) {
-            if (state.get(args[1]) < state.get(args[2])) {
-              state.set(
-                args[2],
-                Math.max(state.get(args[2]) - state.get(args[1]), 0),
-              )
-              state.set(args[1], 0)
-            } else {
-              state.set(
-                args[1],
-                Math.max(state.get(args[1]) - state.get(args[2]), 0),
-              )
-              state.set(args[2], 0)
-            }
+          const hp = state.get(args[0])
+          let shield = state.get(args[1])
+          let damage = state.get(args[2])
+
+          if (shield < damage) {
+            damage -= shield
+            shield = 0
+          } else {
+            shield -= damage
+            damage = 0
           }
 
-          state.set(
-            args[0],
-            Math.max(state.get(args[0]) - state.get(args[2]), 0),
-          )
+          state.set(args[1], shield)
+          state.set(args[0], clamp(hp - damage, 0, 255))
 
           break
         }
@@ -443,9 +391,10 @@ export const ops: {
         case 1: {
           state.set(
             args[0],
-            Math.min(
+            clamp(
               state.get(args[0]) + state.get(args[1]),
-              state.get(args[0] + 1), // always the max hp
+              0,
+              Math.min(255, state.get(args[0] + 1)),
             ),
           )
           break
@@ -578,21 +527,15 @@ export const ops: {
       // shuffle's the board
       switch (context.current!.operationVersion) {
         case 1: {
-          state.args.gameHash = crypto
-            .createHash('sha256')
-            .update(
-              Buffer.concat([Buffer.from('SHUFFLE'), state.args.gameHash]),
-            )
-            .digest()
+          state.args.gameHash = hashv([
+            Buffer.from('SHUFFLE'),
+            state.args.gameHash,
+          ])
 
-          const tiles = new Array(64)
-
-          for (let i = 0; i < 32; i++) {
-            const byte = state.args.gameHash[i]
-            tiles[i] = (byte & 0xf) % 7
-            tiles[i + 32] = ((byte >> 4) & 0xf) % 7
-          }
-          state.args.tiles = tiles
+          state.args.tiles = hashToTiles(state.args.gameHash).map((node, i) => {
+            if (state.args.tiles[i] !== null) return node
+            return null
+          })
           break
         }
       }
@@ -706,9 +649,6 @@ export function parseSkillInstructionCode(
   args: OperationArguments,
   code: Uint8Array,
 ) {
-  // [MANA     ] [O.V]    [OPERATIONS                             ]
-  // 03 00 00 00 43 01 00 01 D0 03 37 D0 42 35 D0 07 43 21 25 D0 00
-
   // shortest code is 8 bytes
   if (code.length < 8) {
     throw new Error('Code size is invalid')
@@ -776,6 +716,9 @@ export function parseSkillInstructionCode(
         opStartIndex + context.cursor + opLen,
       ),
     }
+
+    // console.log(context.current)
+    // console.log(opId, map.get(0xd0))
 
     if (context.skip > 0) {
       context.skip -= 1

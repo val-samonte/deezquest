@@ -23,7 +23,7 @@ import { burnerKeypairAtom } from '../BurnerAccountManager'
 import { usePathname, useRouter } from 'next/navigation'
 import { Keypair, PublicKey } from '@solana/web3.js'
 import bs58 from 'bs58'
-import { getNextHash } from '@/utils/getNextHash'
+import { hashv } from '@/utils/hashv'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { FriendlyMatch, matchAtom } from '@/atoms/matchAtom'
 import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
@@ -90,7 +90,7 @@ export default function FriendlyMatchDialog({
             ) as string
 
             const opponentPeerId = bs58.encode(
-              getNextHash([
+              hashv([
                 new PublicKey(message.data.publicKey).toBytes(),
                 Buffer.from(bs58.decode(message.data.peerNonce)),
               ]),
@@ -295,10 +295,7 @@ function AsJoiner(props: Parts) {
 
         // derive peer id using opponentPubkey and peerNonce
         const opponentPeerId = bs58.encode(
-          getNextHash([
-            opponentPubkey.toBytes(),
-            Buffer.from(bs58.decode(parts[1])),
-          ]),
+          hashv([opponentPubkey.toBytes(), Buffer.from(bs58.decode(parts[1]))]),
         )
 
         const playerPublicKey = props.burner.publicKey.toBase58()

@@ -17,12 +17,15 @@ import {
   heroFromPublicKey,
   subtract,
 } from '@/utils/gameFunctions'
-import { TargetHero } from '@/enums/TargetHero'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
-import { getNextHash } from '@/utils/getNextHash'
+import { hashv } from '@/utils/hashv'
 import { matchAtom } from './matchAtom'
 import { MatchTypes } from '@/enums/MatchTypes'
+import {
+  OperationArguments,
+  parseSkillInstructionCode,
+} from '@/utils/parseSkillInstructionCode'
 
 export interface GameState {
   hashes: string[]
@@ -107,7 +110,7 @@ export const gameFunctions = atom(
         if (!hasMatch(tiles)) {
           break
         }
-        hash = getNextHash([hash])
+        hash = hashv([hash])
       }
 
       gameState = {
@@ -151,6 +154,8 @@ export const gameFunctions = atom(
 
         const isMe = player.nft === gameState?.currentTurn
 
+        // TODO: doesn't work
+        // TODO: move to check winner
         if (gameState.hashes.length >= 0) {
           if (playerHero.hp > 0 && opponentHero.hp <= 0) {
             queue.push({
@@ -228,7 +233,7 @@ export const gameFunctions = atom(
           duration: 450,
         })
 
-        hash = getNextHash([
+        hash = hashv([
           Buffer.from('SWAP'),
           hash,
           Buffer.from(action.data.origin),
@@ -239,7 +244,7 @@ export const gameFunctions = atom(
           const { matches, depths, count } = getMatches(newTiles)
 
           // count: [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-          playerHero = absorbMana(playerHero, count.slice(3)) // TODO: implement mana overflow
+          playerHero = absorbMana(playerHero, count.slice(3))
           const { flags, queue: commandsQueues } = executableCommands(
             { ...playerHero },
             count.slice(0, 3),
@@ -304,13 +309,6 @@ export const gameFunctions = atom(
                 duration: 100,
               })
             } else if (command.skill) {
-              const preCommandHero = { ...playerHero }
-              const preCommandOpponent = { ...opponentHero }
-              playerHero.fireMp = command.hero.fireMp
-              playerHero.windMp = command.hero.windMp
-              playerHero.watrMp = command.hero.watrMp
-              playerHero.eartMp = command.hero.eartMp
-
               queue.push({
                 type: GameTransitions.CAST,
                 turn: gameState!.currentTurn,
@@ -334,21 +332,26 @@ export const gameFunctions = atom(
                 duration: 1500,
               })
 
-              const postCommand = command.skill.fn({
+              const args: OperationArguments = {
                 commandLevel: command.lvl ?? 1,
-                player: playerHero,
-                preCommandHero,
-                opponent: opponentHero,
-                tiles: newTiles,
+                skillType: command.skill.type,
+                depths,
                 gameHash: hash,
-              })
+                opponent: opponentHero,
+                player: playerHero,
+                tiles: newTiles,
+              }
 
-              playerHero = postCommand.player
-              opponentHero = postCommand.opponent
+              parseSkillInstructionCode(args, command.skill.code)
+
+              playerHero.fireMp = command.hero.fireMp
+              playerHero.windMp = command.hero.windMp
+              playerHero.watrMp = command.hero.watrMp
+              playerHero.eartMp = command.hero.eartMp
 
               // do shuffle check
-              if (newTiles !== postCommand.tiles) {
-                const updateAll = hash !== postCommand.gameHash
+              if (newTiles !== args.tiles) {
+                const updateAll = hash !== args.gameHash
 
                 queue.push({
                   type: GameTransitions.NODE_OUT,
@@ -356,7 +359,7 @@ export const gameFunctions = atom(
                   nodes: newTiles.reduce((acc: any, cur, i) => {
                     if (
                       cur !== null &&
-                      (updateAll || cur !== postCommand.tiles?.[i])
+                      (updateAll || cur !== args.tiles?.[i])
                     ) {
                       const x = i % 8
                       const y = Math.floor(i / 8)
@@ -371,49 +374,46 @@ export const gameFunctions = atom(
 
                 queue.push({
                   type: GameTransitions.NODE_IN,
-                  tiles: [...(postCommand.tiles ?? newTiles)],
-                  nodes: (postCommand.tiles ?? []).reduce(
-                    (acc: any, cur, i) => {
-                      if (cur !== null && (updateAll || cur !== newTiles[i])) {
-                        const x = i % 8
-                        const y = Math.floor(i / 8)
-                        acc[i] = {
-                          delay: (x + y) * 50,
-                        }
+                  tiles: [...(args.tiles ?? newTiles)],
+                  nodes: (args.tiles ?? []).reduce((acc: any, cur, i) => {
+                    if (cur !== null && (updateAll || cur !== newTiles[i])) {
+                      const x = i % 8
+                      const y = Math.floor(i / 8)
+                      acc[i] = {
+                        delay: (x + y) * 50,
                       }
-                      return acc
-                    },
-                    {},
-                  ),
+                    }
+                    return acc
+                  }, {}),
                   duration: 400,
                 })
               }
 
-              hash = postCommand.gameHash ?? hash
-              newTiles = postCommand.tiles ?? newTiles
+              hash = args.gameHash ?? hash
+              newTiles = args.tiles ?? newTiles
 
               const spotlight: any = []
               const heroes: any = {}
               let type = GameTransitions.ATTACK_SPELL
 
-              if (
-                command.skill.target === TargetHero.SELF ||
-                command.skill.target === TargetHero.BOTH
-              ) {
-                spotlight.push(gameState!.currentTurn)
-                heroes[gameState!.currentTurn] = { ...playerHero }
+              // if (
+              //   command.skill.target === TargetHero.SELF ||
+              //   command.skill.target === TargetHero.BOTH
+              // ) {
+              //   spotlight.push(gameState!.currentTurn)
+              heroes[gameState!.currentTurn] = { ...playerHero }
 
-                if (command.skill.type === SkillTypes.SUPPORT) {
-                  type = GameTransitions.BUFF_SPELL
-                }
-              }
-              if (
-                command.skill.target === TargetHero.ENEMY ||
-                command.skill.target === TargetHero.BOTH
-              ) {
-                spotlight.push(opponentPubkey)
-                heroes[opponentPubkey] = { ...opponentHero }
-              }
+              //   if (command.skill.type === SkillTypes.SUPPORT) {
+              //     type = GameTransitions.BUFF_SPELL
+              //   }
+              // }
+              // if (
+              //   command.skill.target === TargetHero.ENEMY ||
+              //   command.skill.target === TargetHero.BOTH
+              // ) {
+              //   spotlight.push(opponentPubkey)
+              heroes[opponentPubkey] = { ...opponentHero }
+              // }
 
               queue.push({
                 type,
@@ -431,7 +431,7 @@ export const gameFunctions = atom(
           const { tiles, gravity } = applyGravity(newTiles, depths)
           newTiles = tiles
 
-          hash = getNextHash([Buffer.from('REFILL'), hash])
+          hash = hashv([Buffer.from('REFILL'), hash])
 
           const fillers = hashToTiles(hash)
 

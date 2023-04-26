@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import bs58 from 'bs58'
 import { Dialog } from '@/components/Dialog'
 import classNames from 'classnames'
-import { getNextHash } from '@/utils/getNextHash'
+import { hashv } from '@/utils/hashv'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
 
 // Backend (Dapp) Seed:
@@ -123,7 +123,7 @@ export default function BurnerAccountManager() {
         Buffer.from(`Please sign to retrieve your game account`, 'utf8'),
       )
 
-      const hash = getNextHash([appSeed, signedMessage.slice(0, 16)])
+      const hash = hashv([appSeed, signedMessage.slice(0, 16)])
       const kp = Keypair.fromSeed(hash)
 
       setBurner(kp)

@@ -1,7 +1,8 @@
 'use client'
 
+import { elementColors } from '@/enums/ElementColors'
 import { SkillTypes } from '@/enums/SkillTypes'
-import { Skill } from '@/utils/gameFunctions'
+import { Skill } from '@/types/Skill'
 import { Popover } from '@headlessui/react'
 import classNames from 'classnames'
 import { useMemo, useState } from 'react'
@@ -15,9 +16,12 @@ interface SkillViewProps {
     maxUseCount: number
     useCountPerElement: (number | undefined)[]
     maxUseCountPerElement: (number | undefined)[]
-    ratio: (number | undefined)[]
+    ratio: number[][]
+    partitions: number
   }
 }
+
+// const mpRef = ['fireMp', 'windMp', 'watrMp', 'eartMp']
 
 export default function SkillView({
   skill,
@@ -27,27 +31,6 @@ export default function SkillView({
   let [referenceElement, setReferenceElement] = useState()
   let [popperElement, setPopperElement] = useState()
   let { styles, attributes } = usePopper(referenceElement, popperElement)
-
-  const emptyBars = useMemo(() => {
-    if (!useDetails) return 0
-    return useDetails.maxUseCount - useDetails.useCount
-  }, [useDetails])
-
-  const bars = useMemo(() => {
-    if (!useDetails) return { count: 0, color: null }
-    const colors = [
-      'rgb(246,0,0)',
-      'rgb(35,220,31)',
-      'rgb(19,113,255)',
-      'rgb(253,169,10)',
-    ]
-    const dominant = useDetails.ratio.findIndex((i) => typeof i === 'number')
-
-    return {
-      count: useDetails.useCount,
-      color: colors[dominant],
-    }
-  }, [useDetails])
 
   return (
     <div
@@ -83,8 +66,22 @@ export default function SkillView({
               style={styles.popper}
               {...attributes.popper}
             >
-              <div className='min-w-[200px] flex flex-col'>
+              <div className='min-w-[250px] flex flex-col'>
                 <span>{skill.desc}</span>
+                {skill.type !== SkillTypes.SPECIAL && (
+                  <div className='flex flex-col mt-2'>
+                    {skill.cmdLvls.map((cmdLevelDesc, i) => (
+                      <div className='flex' key={i}>
+                        <div>
+                          {Array.from(Array(3)).map((_, j) => (
+                            <span key={j}>{i >= j ? <>★</> : <>☆</>}</span>
+                          ))}
+                        </div>
+                        <div className='ml-2'>{cmdLevelDesc}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {skill.type === SkillTypes.SPECIAL && (
                   <span className='mt-2 pt-2 italic opacity-50'>
                     A Special Skill needs 4 or more amulet matches to be used.
@@ -96,60 +93,45 @@ export default function SkillView({
         )}
         <p
           className={classNames(
-            'flex items-center gap-3 font-bold',
+            'flex items-center gap-1 font-bold',
             useDetails?.useCount === 0 && 'opacity-20',
           )}
         >
-          {typeof skill.cost.fire === 'number' && (
-            <span className='flex items-center xl:gap-2'>
-              <img
-                src='/elem_fire.svg'
-                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
-              />
-              {skill.cost.fire === 0 ? 'ALL' : skill.cost.fire}
-            </span>
-          )}
-          {typeof skill.cost.wind === 'number' && (
-            <span className='flex items-center xl:gap-2'>
-              <img
-                src='/elem_wind.svg'
-                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
-              />
-              {skill.cost.wind === 0 ? 'ALL' : skill.cost.wind}
-            </span>
-          )}
-          {typeof skill.cost.water === 'number' && (
-            <span className='flex items-center xl:gap-2'>
-              <img
-                src='/elem_water.svg'
-                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
-              />
-              {skill.cost.water === 0 ? 'ALL' : skill.cost.water}
-            </span>
-          )}
-          {typeof skill.cost.earth === 'number' && (
-            <span className='flex items-center xl:gap-2'>
-              <img
-                src='/elem_earth.svg'
-                className='w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 2xl:w-8 2xl:h-8'
-              />
-              {skill.cost.earth === 0 ? 'ALL' : skill.cost.earth}
-            </span>
+          {['fire', 'wind', 'water', 'earth'].map((elem, i) =>
+            skill.code[i] !== 0 ? (
+              <span className='flex items-center' key={i}>
+                <img
+                  src={`/elem_${elem}.svg`}
+                  className='w-4 h-4 lg:w-5 lg:h-5 2xl:w-7 2xl:h-7 opacity-25'
+                />
+                {skill.code[i] === 255 ? 'A' : skill.code[i]}
+              </span>
+            ) : null,
           )}
         </p>
       </div>
       {useDetails && (
         <>
-          <div className='flex gap-2 mb-2'>
-            {Array.from(Array(bars.count)).map((_, i) => (
+          <div className='flex gap-1 mb-2 pr-2 -skew-x-[45deg]'>
+            {useDetails.ratio.map((bar, i) => (
               <div
-                className='h-2 flex-auto'
-                key={`key_${i}`}
-                style={{ backgroundColor: bars.color ?? '' }}
-              />
-            ))}
-            {Array.from(Array(emptyBars)).map((_, i) => (
-              <div className='h-2 bg-black/20 flex-auto' key={`key_${i}`} />
+                key={i}
+                className={classNames(
+                  i + 1 > useDetails.useCount && 'opacity-20',
+                  'h-[0.75vw] w-full flex-auto flex bg-black flex-col justify-end',
+                )}
+              >
+                {bar.map((elem, j) => (
+                  <div
+                    className='flex-none'
+                    key={j}
+                    style={{
+                      backgroundColor: elementColors[j],
+                      height: elem * 100 + '%',
+                    }}
+                  />
+                ))}
+              </div>
             ))}
           </div>
         </>
@@ -157,6 +139,20 @@ export default function SkillView({
       {!hideDesc && (
         <p className='text-sm text-neutral-300 flex flex-col'>
           <span>{skill.desc}</span>
+          {skill.type !== SkillTypes.SPECIAL && (
+            <div className='flex flex-col mt-2'>
+              {skill.cmdLvls.map((cmdLevelDesc, i) => (
+                <div className='flex' key={i}>
+                  <div>
+                    {Array.from(Array(3)).map((_, j) => (
+                      <span key={j}>{i >= j ? <>★</> : <>☆</>}</span>
+                    ))}
+                  </div>
+                  <div className='ml-2'>{cmdLevelDesc}</div>
+                </div>
+              ))}
+            </div>
+          )}
           {skill.type === SkillTypes.SPECIAL && (
             <span className='mt-2 pt-2 italic opacity-50'>
               A Special Skill needs 4 or more amulet matches to be used.

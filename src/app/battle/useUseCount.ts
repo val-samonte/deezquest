@@ -1,47 +1,65 @@
-import { Hero, skillCountPerMana, skills } from '@/utils/gameFunctions'
+import { Hero, skillCountPerMana } from '@/utils/gameFunctions'
+import { innateSkills } from '@/utils/innateSkills'
 import { useMemo } from 'react'
 
 export default function useUseCount(hero: Hero) {
   return useMemo(() => {
     return [
-      skills[hero.offensiveSkill],
-      skills[hero.supportiveSkill],
-      skills[hero.specialSkill],
+      innateSkills[hero.offensiveSkill],
+      innateSkills[hero.supportiveSkill],
+      innateSkills[hero.specialSkill],
     ].map((skill) => {
+      const cost = Array.from(skill.code).slice(0, 4)
+
       const useCountPerElement = skillCountPerMana(
         [hero.fireMp, hero.windMp, hero.watrMp, hero.eartMp],
-        skill.cost,
+        cost,
       )
 
+      const useCount = Math.min(
+        ...useCountPerElement
+          .filter((n) => typeof n === 'number')
+          .map((n) => Math.floor(n ?? 0)),
+      )
+
+      // how many bars to display?
       const maxUseCountPerElement = skillCountPerMana(
         [hero.maxMp, hero.maxMp, hero.maxMp, hero.maxMp],
-        skill.cost,
+        cost,
       ).map((e) => e && Math.floor(e))
+      const maxUseCount = Math.min(
+        ...maxUseCountPerElement
+          .filter((n) => typeof n === 'number')
+          .map((n) => n ?? 0),
+      )
 
-      const { fire, wind, water, earth } = skill.cost
-      const elem = [fire, wind, water, earth]
-      const elemSum = (fire ?? 0) + (wind ?? 0) + (water ?? 0) + (earth ?? 0)
-      const ratio = elem.map((e) => {
-        if (typeof e === 'undefined') return undefined
-        if (e === 0) return 1
-        if (elemSum === 0) return 0
-        return e / elemSum
-      })
+      // how many partitions in a bar?
+      const partitions = Math.max(
+        cost.reduce((acc, cur) => (cur > 0 ? acc + 1 : acc), 0),
+        0,
+      )
+
+      // what is the ratio of element per bar?
+      const ratio = Array.from(Array(maxUseCount)).map((_, i) =>
+        useCountPerElement.map((elem) => {
+          const val = (elem ?? 0) - i
+          if (val >= 1) {
+            return 1 / partitions
+          }
+          if (val <= 0) {
+            return 0
+          }
+          return val / partitions
+        }),
+      )
 
       return {
-        useCount: Math.min(
-          ...useCountPerElement
-            .filter((n) => typeof n === 'number')
-            .map((n) => Math.floor(n ?? 0)),
-        ),
-        maxUseCount: Math.min(
-          ...maxUseCountPerElement
-            .filter((n) => typeof n === 'number')
-            .map((n) => n ?? 0),
-        ),
+        useCount,
+        maxUseCount,
         useCountPerElement,
         maxUseCountPerElement,
         ratio,
+        partitions,
       }
     })
   }, [

@@ -589,7 +589,7 @@ pub fn is_executable(hero: &mut Hero, costs: &[Option<u8>; 4]) -> bool {
 }
 
 pub fn deduct_mana(hero: &mut Hero, costs: &[Option<u8>; 4]) -> Hero {
-    // NOTE: 0 cost means ALL mana. None means literally no cost.
+    // NOTE: 255 cost means ALL mana. 0 means literally no cost.
     let mut mana = [hero.fire_mp, hero.wind_mp, hero.watr_mp, hero.eart_mp];
     let mut i = 0;
     while i < 4 {
@@ -976,7 +976,7 @@ pub fn executable_commands(
 //     if (!hasMatch(tiles)) {
 //         break
 //     }
-//     hash = getNextHash([hash])
+//     hash = hashv([hash])
 //     }
 
 //     gameState = {
@@ -1037,7 +1037,7 @@ pub fn swap_node() {
     //       duration: 450,
     //     })
 
-    //     hash = getNextHash([
+    //     hash = hashv([
     //       Buffer.from('SWAP'),
     //       hash,
     //       Buffer.from(action.data.origin),
@@ -1251,7 +1251,7 @@ pub fn swap_node() {
     //       const { tiles, gravity } = applyGravity(newTiles, depths)
     //       newTiles = tiles
 
-    //       hash = getNextHash([Buffer.from('REFILL'), hash])
+    //       hash = hashv([Buffer.from('REFILL'), hash])
 
     //       const fillers = hashToTiles(hash)
 

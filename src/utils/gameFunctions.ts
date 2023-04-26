@@ -1,8 +1,9 @@
-import { SkillTypes } from '../enums/SkillTypes'
-import { TargetHero } from '../enums/TargetHero'
+import { HeroAttributes } from '../enums/HeroAttributes'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
-import { getNextHash } from './getNextHash'
+import { innateSkills } from './innateSkills'
+import { computeAttribute } from './computeAttribute'
+import { Skill } from '@/types/Skill'
 
 export interface Hero {
   hp: number
@@ -46,10 +47,10 @@ export interface Hero {
 
 export const getHeroAttributes = (pubkey: PublicKey) => {
   let attribs = [
-    1, // INT - Mana cap increase
-    1, // SPD - More likely to get a turn
-    1, // VIT - Flat HP increase
-    1, // STR - Able to carry heavier equipment
+    1, // INT - Max MP increase
+    1, // SPD - More likely to get additional turn
+    1, // VIT - Max HP increase
+    1, // STR - BaseDmg & Carry Cap
   ]
   let cursor = 0
   let remaining = 17
@@ -79,19 +80,20 @@ export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
   }
 
   const [int, spd, vit, str] = getHeroAttributes(publicKey)
-  const hp = 80 + vit * 3 + Math.floor((vit - 1) / 3) * 5
+  const hp = computeAttribute(HeroAttributes.VIT, vit).totalHp!
+  const { baseDmg, carryCap } = computeAttribute(HeroAttributes.STR, str)
   const bytes = publicKey.toBytes()
 
   return {
     hp,
     maxHp: hp,
-    maxMp: 10 + int,
+    maxMp: computeAttribute(HeroAttributes.INT, int).totalMp!,
     armor: 0,
     shell: 0,
     turnTime: 0,
-    baseDmg: str,
+    baseDmg: baseDmg!,
     weight: 0,
-    carryCap: str,
+    carryCap: carryCap!,
     fireMp: 0,
     windMp: 0,
     watrMp: 0,
@@ -117,7 +119,7 @@ export const heroFromPublicKey = (publicKey: string | PublicKey): Hero => {
     xTrance: 0,
     offensiveSkill: bytes[0] % 4,
     supportiveSkill: (bytes[1] % 4) + 4,
-    specialSkill: (bytes[2] % 4) + 8,
+    specialSkill: 8, // always shuffle
   }
 }
 
@@ -181,8 +183,8 @@ export const getNextTurn = (
   pubkey2: Uint8Array,
   gameHash: Uint8Array,
 ) => {
-  const turnPt1 = Math.min(hero1.spd + 15, 50)
-  const turnPt2 = Math.min(hero2.spd + 15, 50)
+  const turnPt1 = computeAttribute(HeroAttributes.SPD, hero1.spd).turnPoints!
+  const turnPt2 = computeAttribute(HeroAttributes.SPD, hero2.spd).turnPoints!
 
   while (hero1.turnTime < 200 && hero2.turnTime < 200) {
     hero1.turnTime += turnPt1
@@ -238,446 +240,22 @@ export const getNextTurn = (
   return { hero: hero2, pubkey: pubkey2 }
 }
 
-interface SkillFnParams {
-  commandLevel: number
-  player: Hero
-  opponent: Hero
-  tiles?: (number | null)[]
-  gameHash?: Uint8Array
-  preCommandHero?: Hero
-  depths?: number[]
-}
-
-export type SkillFn = (params: SkillFnParams) => {
-  player: Hero
-  opponent: Hero
-  tiles?: (number | null)[]
-  gameHash?: Uint8Array
-  depths?: number[]
-}
-
-export const burningPunch: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-  preCommandHero,
-}) => {
-  // Deals x2 of ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.
-  // LVL 3 deals x2 of the mana gap instead.
-
-  const atk = (player.baseDmg + commandLevel) * 2
-  const mag = Math.abs((preCommandHero?.fireMp ?? 0) - opponent.fireMp)
-  opponent = applyDamage(opponent, atk, mag * (commandLevel === 3 ? 2 : 1))
-
-  return { player, opponent, tiles, gameHash }
-}
-
-export const knifehandStrike: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Deals 6|8|10 MAGIC DMG and 60|80|100 Turn Time reduction.
-  // Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.
-
-  let mag = [6, 8, 10][commandLevel - 1]
-  if (commandLevel === 3) {
-    mag += player.spd > opponent.spd ? player.spd - opponent.spd : 0
-  }
-  opponent = applyDamage(opponent, 0, mag)
-  const turnTimeReduction = commandLevel * 20 + 40
-  opponent.turnTime =
-    opponent.turnTime < turnTimeReduction
-      ? 0
-      : opponent.turnTime - turnTimeReduction
-
-  return { player, opponent, tiles, gameHash }
-}
-
-export const aquaShot: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Deals 4|12|16 MAGIC DMG.
-  // Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes.
-  // LVL 3 pierces through SHELL.
-
-  let mag = [4, 12, 16][commandLevel - 1]
-  if (commandLevel === 3) {
-    mag += player.vit > opponent.vit ? player.vit - opponent.vit : 0
-  }
-  opponent = applyDamage(opponent, 0, mag, false, commandLevel === 3)
-
-  return { player, opponent, tiles, gameHash }
-}
-
-export const crushingBlow: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-  preCommandHero,
-}) => {
-  // Deals 2 MAGIC DMG per EARTH MANA of the hero.
-  // LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5.
-  // LVL 3 destroys ARMOR after damage is applied.
-
-  let mag = (preCommandHero?.eartMp ?? 1) * 2
-  let atk = 0
-  if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
-    atk = player.str
-  }
-  opponent = applyDamage(opponent, atk, mag)
-  if (commandLevel === 3) {
-    opponent.armor = 0
-  }
-
-  return { player, opponent, tiles, gameHash }
-}
-
-export const empower: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Adds 3|6|9 to ATTACK DMG during the match, stacks indefinitely.
-
-  player.baseDmg += commandLevel * 3
-  return { player: { ...player }, opponent, tiles, gameHash }
-}
-
-export const tailwind: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Adds 3|6|9 to SPD during the match, stacks indefinitely.
-
-  player.spd += commandLevel
-  return { player, opponent, tiles, gameHash }
-}
-
-export const healing: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Recover 6|8|10 HP.
-  // LVL 3 adds x2 value of VIT as HP.
-
-  let heal = [6, 8, 10][commandLevel - 1]
-
-  if (commandLevel === 3) {
-    heal += player.vit * 2
-  }
-  player = addHp(player, heal)
-  return { player, opponent, tiles, gameHash }
-}
-
-export const manaWall: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-  preCommandHero,
-}) => {
-  // Converts all EARTH MANA into SHELL.
-  // Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.
-
-  player.shell += preCommandHero?.eartMp ?? 1
-  if (commandLevel > 1 && (preCommandHero?.eartMp ?? 0) >= 5) {
-    player.armor += player.str
-  }
-
-  return { player, opponent, tiles, gameHash }
-}
-
-export const combustion: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Converts all WATER MANA in the board into FIRE MANA, deals x2 MAGIC DMG per each converted WATER MANA.
-  if (!tiles) return { player, opponent, tiles, gameHash }
-
-  let count = 0
-  let newTiles = [...tiles]
-  for (let i = 0; i < tiles.length; i++) {
-    // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-    if (tiles[i] === 5) {
-      count++
-      newTiles[i] = 3
-    }
-  }
-
-  if (count === 0) return { player, opponent, tiles, gameHash }
-
-  let mag = count * 2
-  opponent = applyDamage(opponent, undefined, mag)
-
-  return { player, opponent, tiles: newTiles, gameHash }
-}
-
-export const tornado: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Shuffles the board, deals MAGIC DMG based on how many WIND + EARTH MANA appear after the shuffle.
-  if (!gameHash || !tiles) return { player, opponent, tiles, gameHash }
-
-  const newHash = getNextHash([Buffer.from('SHUFFLE'), gameHash])
-  const newTiles = hashToTiles(newHash) as (number | null)[]
-
-  let count = 0
-  for (let i = 0; i < tiles.length; i++) {
-    if (tiles[i] === null) {
-      newTiles[i] = null
-    } else if (tiles[i] === 4 || tiles[i] === 6) {
-      // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-      count++
-    }
-  }
-
-  opponent = applyDamage(opponent, undefined, count)
-
-  return { player, opponent, tiles: newTiles, gameHash: newHash }
-}
-
-export const extinguish: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Converts all FIRE MANA in the board into WATER MANA, recover 2 HP per each converted FIRE MANA.
-  if (!tiles) return { player, opponent, tiles, gameHash }
-
-  let count = 0
-  let newTiles = [...tiles]
-  for (let i = 0; i < tiles.length; i++) {
-    // [SWRD, SHLD, SPEC, FIRE, WIND, WATR, EART]
-    if (tiles[i] === 3) {
-      count++
-      newTiles[i] = 5
-    }
-  }
-
-  if (count === 0) return { player, opponent, tiles, gameHash }
-
-  let restoredHp = count * 2
-  player = addHp(player, restoredHp)
-
-  return { player, opponent, tiles: newTiles, gameHash }
-}
-
-export const quake: SkillFn = ({
-  commandLevel,
-  player,
-  opponent,
-  tiles,
-  gameHash,
-}) => {
-  // Deals 30 MAGIC DMG on both players. Damage is reduced based on each respective heroes' WIND MANA.
-
-  const playerDmg = Math.max(30 - player.windMp, 0)
-  const opponentDmg = Math.max(30 - opponent.windMp, 0)
-
-  player = applyDamage(player, undefined, playerDmg)
-  opponent = applyDamage(opponent, undefined, opponentDmg)
-
-  return { player, opponent, tiles, gameHash }
-}
-
-export interface SkillCost {
-  fire?: number
-  wind?: number
-  water?: number
-  earth?: number
-}
-
-export interface Skill {
-  name: string
-  desc: string
-  type: SkillTypes
-  cost: SkillCost
-  target: TargetHero
-  fn: SkillFn
-}
-
-export const skills: Skill[] = [
-  {
-    name: 'Burning Punch',
-    desc:
-      'Deals x2 of ATTACK DMG plus additional MAGIC DMG based on the gap of FIRE MANA between the heroes.\n' +
-      'LVL 3 deals x2 of the mana gap instead.',
-    type: SkillTypes.ATTACK,
-    target: TargetHero.ENEMY,
-    cost: {
-      fire: 5,
-    },
-    fn: burningPunch,
-  },
-  {
-    name: 'Knifehand Strike',
-    desc:
-      'Deals 6|8|10 MAGIC DMG and 60|80|100 Turn Time reduction\n' +
-      'Gains additional MAGIC DMG on LVL 3 based on the difference of SPD between the heroes.\n',
-    type: SkillTypes.ATTACK,
-    target: TargetHero.ENEMY,
-    cost: {
-      wind: 3,
-    },
-    fn: knifehandStrike,
-  },
-  {
-    name: 'Aquashot',
-    desc:
-      'Deals 4|12|16 MAGIC DMG.\n' +
-      'Gains additional MAGIC DMG on LVL 3 based on the difference of VIT between the heroes.\n' +
-      'LVL 3 pierces through SHELL.',
-    type: SkillTypes.ATTACK,
-    target: TargetHero.ENEMY,
-    cost: {
-      water: 4,
-    },
-    fn: aquaShot,
-  },
-  {
-    name: 'Crushing Blow',
-    desc:
-      'Deals 2 MAGIC DMG per EARTH MANA of the hero.\n' +
-      'LVL 2|3 deals current value of STR as additional ATTACK DMG if EARTH MANA converted is greater than 5.\n' +
-      'LVL 3 destroys ARMOR after damage is applied.',
-    type: SkillTypes.ATTACK,
-    target: TargetHero.ENEMY,
-    cost: {
-      earth: 0,
-    },
-    fn: crushingBlow,
-  },
-  {
-    name: 'Empower',
-    desc: 'Adds 3|6|9 to ATTACK DMG during the match, stacks indefinitely.',
-    type: SkillTypes.SUPPORT,
-    target: TargetHero.SELF,
-    cost: {
-      fire: 5,
-    },
-    fn: empower,
-  },
-  {
-    name: 'Tailwind',
-    desc: 'Adds 1|2|3 to SPD during the match, stacks indefinitely.',
-    type: SkillTypes.SUPPORT,
-    target: TargetHero.SELF,
-    cost: {
-      wind: 3,
-    },
-    fn: tailwind,
-  },
-  {
-    name: 'Healing',
-    desc: 'Recover 6|8|10 HP.\n' + 'LVL 3 adds x2 value of VIT as HP.',
-    type: SkillTypes.SUPPORT,
-    target: TargetHero.SELF,
-    cost: {
-      water: 4,
-    },
-    fn: healing,
-  },
-  {
-    name: 'Manawall',
-    desc:
-      'Converts all EARTH MANA into SHELL.\n' +
-      'Gain ARMOR based on STR at LVL 2|3 if EARTH MANA converted is greater than 5.',
-    type: SkillTypes.SUPPORT,
-    target: TargetHero.SELF,
-    cost: {
-      earth: 0,
-    },
-    fn: manaWall,
-  },
-  {
-    name: 'Combustion',
-    desc: 'Converts all WATER MANA in the board into FIRE MANA, deals x2 MAGIC DMG per each converted WATER MANA.',
-    type: SkillTypes.SPECIAL,
-    target: TargetHero.ENEMY,
-    cost: {
-      fire: 8,
-    },
-    fn: combustion,
-  },
-  {
-    name: 'Tornado',
-    desc: 'Shuffles the board, deals MAGIC DMG based on how many WIND + EARTH MANA appear after the shuffle.',
-    type: SkillTypes.SPECIAL,
-    target: TargetHero.ENEMY,
-    cost: {
-      wind: 10,
-    },
-    fn: tornado,
-  },
-  {
-    name: 'Extinguish',
-    desc: 'Converts all FIRE MANA in the board into WATER MANA, recover 2 HP per each converted FIRE MANA.',
-    type: SkillTypes.SPECIAL,
-    target: TargetHero.SELF,
-    cost: {
-      water: 6,
-    },
-    fn: extinguish,
-  },
-  {
-    name: 'Quake',
-    desc: "Deals 30 MAGIC DMG on both players. Damage is reduced based on each respective heroes' WIND MANA.",
-    type: SkillTypes.SPECIAL,
-    target: TargetHero.BOTH,
-    cost: {
-      earth: 10,
-    },
-    fn: quake,
-  },
-]
-
-export const skillCountPerMana = (mana: number[], cost: SkillCost) => {
-  const costs = [cost.fire, cost.wind, cost.water, cost.earth]
-
+export const skillCountPerMana = (mana: number[], costs: number[]) => {
   return mana.map((mp, i) => {
-    if (typeof costs[i] === 'undefined') return undefined
+    if (costs[i] === 0) return undefined
 
-    if (costs[i] === 0) {
+    if (costs[i] === 255) {
       return mp >= 1 ? 1 : 0
     }
 
-    return mp / costs[i]!
+    return mp / costs[i]
   })
 }
 
-export const isExecutable = (hero: Hero, cost: SkillCost) => {
+export const isExecutable = (hero: Hero, costs: number[]) => {
   const count = skillCountPerMana(
     [hero.fireMp, hero.windMp, hero.watrMp, hero.eartMp],
-    cost,
+    costs,
   )
 
   return count.every((n) => {
@@ -688,11 +266,13 @@ export const isExecutable = (hero: Hero, cost: SkillCost) => {
   })
 }
 
-export const deductMana = (hero: Hero, cost: SkillCost) => {
-  hero.fireMp -= cost.fire === 0 ? hero.fireMp : cost.fire ?? 0
-  hero.windMp -= cost.wind === 0 ? hero.windMp : cost.wind ?? 0
-  hero.watrMp -= cost.water === 0 ? hero.watrMp : cost.water ?? 0
-  hero.eartMp -= cost.earth === 0 ? hero.eartMp : cost.earth ?? 0
+export const deductMana = (hero: Hero, cost: number[]) => {
+  const [fire, wind, water, earth] = cost
+  console.log(cost)
+  hero.fireMp -= fire === 255 ? hero.fireMp : fire ?? 0
+  hero.windMp -= wind === 255 ? hero.windMp : wind ?? 0
+  hero.watrMp -= water === 255 ? hero.watrMp : water ?? 0
+  hero.eartMp -= earth === 255 ? hero.eartMp : earth ?? 0
 
   return hero
 }
@@ -703,9 +283,9 @@ export const executableCommands = (
 ) => {
   let hero = { ...originalHero } as Hero
   const flags = [false, false, false]
-  const offensiveSkill = skills[hero.offensiveSkill]
-  const supportiveSkill = skills[hero.supportiveSkill]
-  const specialSkill = skills[hero.specialSkill]
+  const offensiveSkill = innateSkills[hero.offensiveSkill]
+  const supportiveSkill = innateSkills[hero.supportiveSkill]
+  const specialSkill = innateSkills[hero.specialSkill]
   const queue: {
     hero: Hero
     lvl?: number
@@ -718,8 +298,9 @@ export const executableCommands = (
 
   // Special Skill requires to have 4 or more amulets to be executed
   if (absorbedCommands[2] > 3) {
-    if (isExecutable(hero, specialSkill.cost)) {
-      hero = deductMana(hero, specialSkill.cost)
+    const costs = Array.from(specialSkill.code.slice(0, 4))
+    if (isExecutable(hero, costs)) {
+      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         skill: specialSkill,
@@ -729,8 +310,9 @@ export const executableCommands = (
   }
 
   if (absorbedCommands[1] > 2) {
-    if (isExecutable(hero, supportiveSkill.cost)) {
-      hero = deductMana(hero, supportiveSkill.cost)
+    const costs = Array.from(supportiveSkill.code.slice(0, 4))
+    if (isExecutable(hero, costs)) {
+      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         lvl: absorbedCommands[1] > 4 ? 3 : absorbedCommands[1] === 4 ? 2 : 1,
@@ -746,8 +328,9 @@ export const executableCommands = (
   }
 
   if (absorbedCommands[0] > 2) {
-    if (isExecutable(hero, offensiveSkill.cost)) {
-      hero = deductMana(hero, offensiveSkill.cost)
+    const costs = Array.from(offensiveSkill.code.slice(0, 4))
+    if (isExecutable(hero, costs)) {
+      hero = deductMana(hero, costs)
       queue.push({
         hero: { ...hero },
         lvl: absorbedCommands[0] > 4 ? 3 : absorbedCommands[0] === 4 ? 2 : 1,
