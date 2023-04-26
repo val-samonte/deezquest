@@ -117,7 +117,7 @@ export const innateSkills: Skill[] = [
   },
   {
     name: 'Harden',
-    desc: 'Fortifies the hero with the strength of the earth, increasing defense.',
+    desc: 'Fortifies the hero with the strength of the earth, increasing both physical and magical defense.',
     type: SkillTypes.SUPPORT,
     cmdLvls: [
       '+2 Armor, +3 Magic Barrier',
@@ -127,8 +127,8 @@ export const innateSkills: Skill[] = [
     code: getOperationsFromCode(
       '00 00 00 03 ' + // mana
         '00 ' + //        version
-        '01 D0 01 ' + //  D0 = 1
-        '01 D1 02 ' + //  D1 = 2
+        '01 D0 03 ' + //  D0 = 3
+        '01 D1 04 ' + //  D1 = 4
         '35 D0 42 ' + //  D0 += command level
         '35 D1 42 ' + //  D1 += command level
         '35 04 D0 ' + //  player.armor += D0

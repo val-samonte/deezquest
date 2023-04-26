@@ -1,11 +1,11 @@
 import { HeroAttributes } from '../enums/HeroAttributes'
+import { GameTransitions } from '../enums/GameTransitions'
 import { PublicKey } from '@solana/web3.js'
 import crypto from 'crypto'
 import { innateSkills } from './innateSkills'
 import { computeAttribute } from './computeAttribute'
-import { Skill } from '@/types/Skill'
-import { GameState } from '@/atoms/gameStateAtom'
-import { GameTransitions } from '@/enums/GameTransitions'
+import { Skill } from '../types/Skill'
+import { GameState } from '../atoms/gameStateAtom'
 
 export interface Hero {
   hp: number
