@@ -1,5 +1,6 @@
 'use client'
 
+import CommandLevelsDescription from '@/components/CommandLevelsDescription'
 import StatCounter from '@/components/StatCounter'
 import { elementColors } from '@/enums/ElementColors'
 import { SkillTypes } from '@/enums/SkillTypes'
@@ -100,27 +101,7 @@ export default function MiniSkillDisplay({
         )}
         <div className='min-w-[200px] flex flex-col'>
           <span>{skill.desc}</span>
-          {skill.type !== SkillTypes.SPECIAL && (
-            <div className='flex flex-col mt-2 gap-2'>
-              {skill.cmdLvls.map((cmdLevelDesc, i) => (
-                <div className='flex' key={i}>
-                  <div className='flex-none'>
-                    {Array.from(Array(5)).map((_, j) => (
-                      <span
-                        key={j}
-                        className={classNames(
-                          `${i + 2 >= j ? '' : 'opacity-20'}`,
-                        )}
-                      >
-                        {skill.type === SkillTypes.ATTACK ? '🗡️' : '🛡️'}
-                      </span>
-                    ))}
-                  </div>
-                  <div className='ml-2'>{cmdLevelDesc}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          <CommandLevelsDescription skill={skill} />
           {skill.type === SkillTypes.SPECIAL && (
             <span className='mt-2 pt-2 italic opacity-50'>
               A Special Skill needs 4 or more amulet matches to be used.
