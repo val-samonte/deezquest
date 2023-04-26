@@ -30,8 +30,8 @@ export default function HeroRollDisplay({
   }, [hero])
 
   return (
-    <div className='flex gap-5 portrait:flex-col mb-5'>
-      <div className='flex flex-col gap-5 flex-none'>
+    <div className='flex gap-10 portrait:flex-col'>
+      <div className='flex flex-col gap-5 flex-none landscape:max-w-min'>
         <div className='bg-black/20 w-60 h-60 mx-auto portrait:h-auto aspect-square relative overflow-hidden'>
           {children}
         </div>
@@ -47,7 +47,7 @@ export default function HeroRollDisplay({
           {hero && <AttributesDisplay hero={hero} />}
         </div>
       </div>
-      <div className='border-r border-r-white/5 portrait:hidden'></div>
+      {/* <div className='flex-none border-r border-r-white/5 portrait:hidden'></div> */}
       {skills && (
         <div className='flex flex-auto flex-col gap-5'>
           <div className='flex flex-col'>

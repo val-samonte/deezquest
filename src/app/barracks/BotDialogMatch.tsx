@@ -73,24 +73,24 @@ export default function BotMatchDialog({ show, onClose }: BotMatchProps) {
             className='w-full h-full object-contain'
           />
         </HeroRollDisplay>
-      </div>
-      <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5 px-5'>
-        <button
-          type='button'
-          className='px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded'
-          onClick={() => {
-            setKeypair(Keypair.generate())
-          }}
-        >
-          Reroll
-        </button>
-        <button
-          type='button'
-          className='portrait:flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded flex items-center justify-center'
-          onClick={() => startMatch()}
-        >
-          Start Practice Match
-        </button>
+        <div className='flex gap-3 justify-center pt-5 px-5'>
+          <button
+            type='button'
+            className='px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded'
+            onClick={() => {
+              setKeypair(Keypair.generate())
+            }}
+          >
+            Reroll
+          </button>
+          <button
+            type='button'
+            className='portrait:flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded flex items-center justify-center'
+            onClick={() => startMatch()}
+          >
+            Start Practice Match
+          </button>
+        </div>
       </div>
     </Dialog>
   )

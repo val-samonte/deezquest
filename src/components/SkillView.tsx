@@ -129,7 +129,7 @@ export default function SkillView({
         </>
       )}
       {!hideDesc && (
-        <p className='text-sm text-neutral-300 flex flex-col'>
+        <div className='text-sm text-neutral-300 flex flex-col'>
           <span>{skill.desc}</span>
           <CommandLevelsDescription skill={skill} />
           {skill.type === SkillTypes.SPECIAL && (
@@ -137,7 +137,7 @@ export default function SkillView({
               A Special Skill needs 4 or more amulet matches to be used.
             </span>
           )}
-        </p>
+        </div>
       )}
     </div>
   )
