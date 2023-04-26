@@ -73,11 +73,11 @@ export default function SkillView({
                     {skill.cmdLvls.map((cmdLevelDesc, i) => (
                       <div className='flex' key={i}>
                         <div className='flex-none'>
-                          {Array.from(Array(3)).map((_, j) => (
+                          {Array.from(Array(5)).map((_, j) => (
                             <span
                               key={j}
                               className={classNames(
-                                `${i >= j ? '' : 'opacity-20'}`,
+                                `${i + 2 >= j ? '' : 'opacity-20'}`,
                               )}
                             >
                               {skill.type === SkillTypes.ATTACK ? '🗡️' : '🛡️'}
