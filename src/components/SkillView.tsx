@@ -1,5 +1,6 @@
 'use client'
 
+import { elementColors } from '@/enums/ElementColors'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { Skill } from '@/types/Skill'
 import { Popover } from '@headlessui/react'
@@ -20,14 +21,7 @@ interface SkillViewProps {
   }
 }
 
-const colors = [
-  'rgb(246,0,0)',
-  'rgb(35,220,31)',
-  'rgb(19,113,255)',
-  'rgb(253,169,10)',
-]
-
-const mpRef = ['fireMp', 'windMp', 'watrMp', 'eartMp']
+// const mpRef = ['fireMp', 'windMp', 'watrMp', 'eartMp']
 
 export default function SkillView({
   skill,
@@ -37,22 +31,6 @@ export default function SkillView({
   let [referenceElement, setReferenceElement] = useState()
   let [popperElement, setPopperElement] = useState()
   let { styles, attributes } = usePopper(referenceElement, popperElement)
-
-  // const emptyBars = useMemo(() => {
-  //   if (!useDetails) return 0
-  //   return useDetails.maxUseCount - useDetails.useCount
-  // }, [useDetails])
-
-  // const bars = useMemo(() => {
-  //   if (!useDetails) return { count: 0, color: null }
-
-  //   const dominant = useDetails.ratio.findIndex((i) => typeof i === 'number')
-
-  //   return {
-  //     count: useDetails.useCount,
-  //     color: colors[dominant],
-  //   }
-  // }, [useDetails])
 
   return (
     <div
@@ -88,7 +66,7 @@ export default function SkillView({
               style={styles.popper}
               {...attributes.popper}
             >
-              <div className='min-w-[200px] flex flex-col'>
+              <div className='min-w-[250px] flex flex-col'>
                 <span>{skill.desc}</span>
                 {skill.type !== SkillTypes.SPECIAL && (
                   <div className='flex flex-col mt-2'>
@@ -148,34 +126,13 @@ export default function SkillView({
                     className='flex-none'
                     key={j}
                     style={{
-                      backgroundColor: colors[j],
+                      backgroundColor: elementColors[j],
                       height: elem * 100 + '%',
                     }}
                   />
                 ))}
               </div>
             ))}
-
-            {/* {bars.color} {bars.count} {emptyBars} */}
-            {/* 
-            <div className='h-[0.5vw] w-full flex-auto bg-red-600 '></div>
-            <div className='h-[0.5vw] w-full flex-auto bg-red-600 '></div>
-            <div className='h-[0.5vw] w-full flex-auto bg-red-600 '></div>
-            <div className='h-[0.5vw] w-full flex-auto bg-red-600 '></div> */}
-
-            {/* <div className='h-[1vw] flex-auto bg-neutral-800 opacity-20'></div> */}
-            {/* 
-            {Array.from(Array(bars.count)).map((_, i) => (
-              <div
-                className='h-2 flex-auto'
-                key={`key_${i}`}
-                style={{ backgroundColor: bars.color ?? '' }}
-              />
-            ))}
-            {Array.from(Array(emptyBars)).map((_, i) => (
-              <div className='h-2 bg-black/20 flex-auto' key={`key_${i}`} />
-            ))}
-             */}
           </div>
         </>
       )}

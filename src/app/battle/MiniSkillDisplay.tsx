@@ -1,6 +1,7 @@
 'use client'
 
 import StatCounter from '@/components/StatCounter'
+import { elementColors } from '@/enums/ElementColors'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { Skill } from '@/types/Skill'
 import { Popover } from '@headlessui/react'
@@ -17,6 +18,7 @@ interface MiniSkillDisplay {
     useCountPerElement: (number | undefined)[]
     maxUseCountPerElement: (number | undefined)[]
     ratio: number[][]
+    partitions: number
   }
 }
 
@@ -54,9 +56,9 @@ export default function MiniSkillDisplay({
         style={styles.popper}
         {...attributes.popper}
       >
-        <div className='font-bold mb-2 flex pb-1 border-b border-b-white/5'>
+        <div className='font-bold flex mb-2'>
           <span className='flex-auto'>{skill.name}</span>
-          <div className={classNames('flex items-center gap-3 font-bold')}>
+          <div className={classNames('flex items-center gap-1 font-bold')}>
             {['fire', 'wind', 'water', 'earth'].map((elem, i) =>
               skill.code[i] !== 0 ? (
                 <span className='flex items-center xl:gap-2' key={elem}>
@@ -70,8 +72,48 @@ export default function MiniSkillDisplay({
             )}
           </div>
         </div>
+        {useDetails && (
+          <>
+            <div className='flex gap-1 mb-3 -skew-x-[45deg]'>
+              {useDetails.ratio.map((bar, i) => (
+                <div
+                  key={i}
+                  className={classNames(
+                    i + 1 > useDetails.useCount && 'opacity-20',
+                    'h-[0.5rem] w-full flex-auto flex bg-black flex-col justify-end',
+                  )}
+                >
+                  {bar.map((elem, j) => (
+                    <div
+                      className='flex-none'
+                      key={j}
+                      style={{
+                        backgroundColor: elementColors[j],
+                        height: elem * 100 + '%',
+                      }}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
         <div className='min-w-[200px] flex flex-col'>
           <span>{skill.desc}</span>
+          {skill.type !== SkillTypes.SPECIAL && (
+            <div className='flex flex-col mt-2'>
+              {skill.cmdLvls.map((cmdLevelDesc, i) => (
+                <div className='flex' key={i}>
+                  <div>
+                    {Array.from(Array(3)).map((_, j) => (
+                      <span key={j}>{i >= j ? <>★</> : <>☆</>}</span>
+                    ))}
+                  </div>
+                  <div className='ml-2'>{cmdLevelDesc}</div>
+                </div>
+              ))}
+            </div>
+          )}
           {skill.type === SkillTypes.SPECIAL && (
             <span className='mt-2 pt-2 italic opacity-50'>
               A Special Skill needs 4 or more amulet matches to be used.
