@@ -101,7 +101,7 @@ export default function MiniSkillDisplay({
         <div className='min-w-[200px] flex flex-col'>
           <span>{skill.desc}</span>
           {skill.type !== SkillTypes.SPECIAL && (
-            <div className='flex flex-col mt-2'>
+            <div className='flex flex-col mt-2 gap-2'>
               {skill.cmdLvls.map((cmdLevelDesc, i) => (
                 <div className='flex' key={i}>
                   <div>

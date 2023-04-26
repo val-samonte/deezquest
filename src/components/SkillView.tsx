@@ -71,7 +71,7 @@ export default function SkillView({
                 {skill.type !== SkillTypes.SPECIAL && (
                   <div className='flex flex-col mt-2'>
                     {skill.cmdLvls.map((cmdLevelDesc, i) => (
-                      <div className='flex' key={i}>
+                      <div className='flex gap-2' key={i}>
                         <div>
                           {Array.from(Array(3)).map((_, j) => (
                             <span
@@ -149,7 +149,7 @@ export default function SkillView({
           {skill.type !== SkillTypes.SPECIAL && (
             <div className='flex flex-col mt-2'>
               {skill.cmdLvls.map((cmdLevelDesc, i) => (
-                <div className='flex' key={i}>
+                <div className='flex gap-2' key={i}>
                   <div>
                     {Array.from(Array(5)).map((_, j) => (
                       <span
