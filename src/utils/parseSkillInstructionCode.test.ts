@@ -248,7 +248,7 @@ describe('Burning Punch', () => {
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 4 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, 8 + preMutPlayer.baseDmg).hp,
     )
   })
 
@@ -256,7 +256,7 @@ describe('Burning Punch', () => {
     args.commandLevel = 2
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 8 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, 16 + preMutPlayer.baseDmg).hp,
     )
   })
 
@@ -264,7 +264,7 @@ describe('Burning Punch', () => {
     args.commandLevel = 3
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 12 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, 24 + preMutPlayer.baseDmg).hp,
     )
   })
 })

@@ -14,14 +14,14 @@ export const innateSkills: Skill[] = [
     desc: 'Imbues bare fist with flames to incinerate enemies, enhancing base attack damage.',
     type: SkillTypes.ATTACK,
     cmdLvls: [
-      '4 MagDmg + BaseDmg',
       '8 MagDmg + BaseDmg',
-      '12 MagDmg + BaseDmg',
+      '16 MagDmg + BaseDmg',
+      '24 MagDmg + BaseDmg',
     ],
     code: getOperationsFromCode(
       '03 00 00 00 ' + // mana
         '43 01 00 ' + //  version
-        '01 D0 04 ' + //  D0 = 4
+        '01 D0 08 ' + //  D0 = 8
         '37 D0 42 ' + //  D0 *= command level
         '35 D0 07 ' + //  D0 += base damage
         '43 21 25 D0', // apply damage D0
