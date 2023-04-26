@@ -105,8 +105,15 @@ export default function MiniSkillDisplay({
               {skill.cmdLvls.map((cmdLevelDesc, i) => (
                 <div className='flex' key={i}>
                   <div>
-                    {Array.from(Array(3)).map((_, j) => (
-                      <span key={j}>{i >= j ? <>★</> : <>☆</>}</span>
+                    {Array.from(Array(5)).map((_, j) => (
+                      <span
+                        key={j}
+                        className={classNames(
+                          `${i + 2 >= j ? '' : 'opacity-20'}`,
+                        )}
+                      >
+                        {skill.type === SkillTypes.ATTACK ? '🗡️' : '🛡️'}
+                      </span>
                     ))}
                   </div>
                   <div className='ml-2'>{cmdLevelDesc}</div>
