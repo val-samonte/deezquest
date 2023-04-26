@@ -120,17 +120,19 @@ export const innateSkills: Skill[] = [
     desc: 'Fortifies the hero with the strength of the earth, increasing both physical and magical defense.',
     type: SkillTypes.SUPPORT,
     cmdLvls: [
-      '+2 Armor, +3 Magic Barrier',
-      '+3 Armor, +4 Magic Barrier',
-      '+4 Armor, +5 Magic Barrier',
+      '+5 Armor, +6 Magic Barrier',
+      '+7 Armor, +8 Magic Barrier',
+      '+9 Armor, +10 Magic Barrier',
     ],
     code: getOperationsFromCode(
       '00 00 00 03 ' + // mana
         '00 ' + //        version
+        '01 C9 02 ' + //  C9 = 2
         '01 D0 03 ' + //  D0 = 3
         '01 D1 04 ' + //  D1 = 4
-        '35 D0 42 ' + //  D0 += command level
-        '35 D1 42 ' + //  D1 += command level
+        '37 C9 42 ' + //  C9 *= command level
+        '35 D0 C9 ' + //  D0 += C9
+        '35 D1 C9 ' + //  D1 += C9
         '35 04 D0 ' + //  player.armor += D0
         '35 05 D1', //    player.Magic Barrier += D1
     ),

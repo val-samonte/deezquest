@@ -418,22 +418,22 @@ describe('Harden', () => {
 
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
-    expect(args.player.armor).toBe(preMutPlayer.armor + 4)
-    expect(args.player.shell).toBe(preMutPlayer.shell + 5)
+    expect(args.player.armor).toBe(preMutPlayer.armor + 5)
+    expect(args.player.shell).toBe(preMutPlayer.shell + 6)
   })
 
   test('Command Level 2', () => {
     args.commandLevel = 2
     parseSkillInstructionCode(args, code)
-    expect(args.player.armor).toBe(preMutPlayer.armor + 5)
-    expect(args.player.shell).toBe(preMutPlayer.shell + 6)
+    expect(args.player.armor).toBe(preMutPlayer.armor + 7)
+    expect(args.player.shell).toBe(preMutPlayer.shell + 8)
   })
 
   test('Command Level 3', () => {
     args.commandLevel = 3
     parseSkillInstructionCode(args, code)
-    expect(args.player.armor).toBe(preMutPlayer.armor + 6)
-    expect(args.player.shell).toBe(preMutPlayer.shell + 7)
+    expect(args.player.armor).toBe(preMutPlayer.armor + 9)
+    expect(args.player.shell).toBe(preMutPlayer.shell + 10)
   })
 })
 
