@@ -87,7 +87,11 @@ export default function SkillView({
         >
           {['fire', 'wind', 'water', 'earth'].map((elem, i) =>
             skill.code[i] !== 0 ? (
-              <span className='flex items-center' key={i}>
+              <span
+                className='flex items-center'
+                key={i}
+                style={{ color: elementColors[i] }}
+              >
                 <img
                   src={`/elem_${elem}.svg`}
                   className='w-4 h-4 lg:w-5 lg:h-5 2xl:w-7 2xl:h-7 opacity-25'

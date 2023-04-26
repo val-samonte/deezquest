@@ -503,6 +503,7 @@ function BotMatchManager({ match }: { match: BotMatch }) {
     if (!match) return
     if (!gameState) return
     if (match.opponent.nft !== gameState.currentTurn) return
+    if (gameState.hashes.length >= 100) return
 
     const moves = findPossibleMoves([...gameState.tiles])
 
@@ -617,6 +618,8 @@ function BotMatchManager({ match }: { match: BotMatch }) {
     }
 
     gameFn(payload)
+
+    // set(gameStateAtom, {...gameState })
   }, [match, isTransitioning, hero, uses, gameState, gameFn])
 
   return null

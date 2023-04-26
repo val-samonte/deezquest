@@ -4,6 +4,8 @@ import crypto from 'crypto'
 import { innateSkills } from './innateSkills'
 import { computeAttribute } from './computeAttribute'
 import { Skill } from '@/types/Skill'
+import { GameState } from '@/atoms/gameStateAtom'
+import { GameTransitions } from '@/enums/GameTransitions'
 
 export interface Hero {
   hp: number
@@ -268,7 +270,6 @@ export const isExecutable = (hero: Hero, costs: number[]) => {
 
 export const deductMana = (hero: Hero, cost: number[]) => {
   const [fire, wind, water, earth] = cost
-  console.log(cost)
   hero.fireMp -= fire === 255 ? hero.fireMp : fire ?? 0
   hero.windMp -= wind === 255 ? hero.windMp : wind ?? 0
   hero.watrMp -= water === 255 ? hero.watrMp : water ?? 0
@@ -351,9 +352,30 @@ export const executableCommands = (
   }
 }
 
-export function checkWinner(player: Hero, opponent: Hero) {
-  // TODO: HP check after each command
-  // win, lose, draw
+export function checkWinner(
+  gameState: GameState,
+  player: Hero,
+  opponent: Hero,
+) {
+  if (gameState.hashes.length < 100) {
+    if (player.hp > 0 && opponent.hp <= 0) {
+      return GameTransitions.WIN
+    } else if (player.hp <= 0 && opponent.hp > 0) {
+      return GameTransitions.LOSE
+    } else if (player.hp <= 0 && opponent.hp <= 0) {
+      return GameTransitions.DRAW
+    }
+  } else {
+    if (player.hp === opponent.hp) {
+      return GameTransitions.DRAW
+    } else if (player.hp > opponent.hp) {
+      return GameTransitions.WIN
+    } else if (player.hp < opponent.hp) {
+      return GameTransitions.LOSE
+    }
+  }
+
+  return null
 }
 
 export function hashToTiles(hash: Uint8Array): number[] {
