@@ -69,7 +69,7 @@ export default function CastingDisplay({
       <animated.div
         key={`cast_text_${skill.name}`}
         style={textProps}
-        className='relative text-xl sm:text-3xl xl:text-4xl font-bold flex items-center gap-3 md:gap-5'
+        className='relative text-3xl sm:text-4xl xl:text-6xl font-bold flex items-center gap-3 md:gap-5'
       >
         <div className='flex items-center justify-center gap-3 md:gap-5'>
           <img

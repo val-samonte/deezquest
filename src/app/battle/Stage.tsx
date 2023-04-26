@@ -138,7 +138,7 @@ export default function Stage() {
       <div className='relative p-2 w-full h-full'>
         {match?.player && <PlayerCard heroPublicKey={match.player.nft} />}
       </div>
-      <div className='relative flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5'>
+      <div className='flex-none landscape:h-full portrait:w-full aspect-square flex items-center justify-center p-2 lg:p-5'>
         <div className='landscape:h-full portrait:w-full aspect-square overflow-hidden rounded'>
           <PixiStage options={{ backgroundAlpha: 0 }}>
             <AppContext.Consumer>
@@ -159,7 +159,6 @@ export default function Stage() {
             <StageCursor />
           </PixiStage>
         </div>
-        <CastingDisplay skill={skill} />
       </div>
       <div className='relative p-2 w-full h-full'>
         {match?.opponent && (
@@ -170,6 +169,7 @@ export default function Stage() {
           />
         )}
       </div>
+      <CastingDisplay skill={skill} />
       {gameResult && (
         <Transition
           show={true}
