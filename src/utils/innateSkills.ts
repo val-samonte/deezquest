@@ -134,7 +134,7 @@ export const innateSkills: Skill[] = [
         '35 D0 C9 ' + //  D0 += C9
         '35 D1 C9 ' + //  D1 += C9
         '35 04 D0 ' + //  player.armor += D0
-        '35 05 D1', //    player.Magic Barrier += D1
+        '35 05 D1', //    player.shell += D1
     ),
   },
   {
