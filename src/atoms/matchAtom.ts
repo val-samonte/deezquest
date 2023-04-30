@@ -24,7 +24,15 @@ export interface BotMatch {
   player: Player
 }
 
-type Match = FriendlyMatch | BotMatch
+export interface SpecialMatch {
+  matchType: MatchTypes.SPECIAL
+  ongoing: boolean
+  gameHash: string
+  opponent: Player
+  player: Player
+}
+
+type Match = FriendlyMatch | BotMatch | SpecialMatch
 
 export const matchAtom = atomWithStorage<Match | null>(
   'match',
