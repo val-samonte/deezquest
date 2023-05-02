@@ -97,7 +97,7 @@ export default function HeroActionButtons() {
                           'portrait:text-left portrait:w-full',
                           'landscape:items-center landscape:justify-center',
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
-                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded',
+                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded h-full',
                         )}
                         onClick={() => {
                           setShowRankedDialog(true)
@@ -125,7 +125,7 @@ export default function HeroActionButtons() {
                           'portrait:text-left portrait:w-full',
                           'landscape:items-center landscape:justify-center',
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
-                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded',
+                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded h-full',
                         )}
                         onClick={() => {
                           setShowRankedDialog(false)
@@ -153,7 +153,7 @@ export default function HeroActionButtons() {
                           'portrait:text-left portrait:w-full',
                           'landscape:items-center landscape:justify-center',
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
-                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded',
+                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded h-full',
                         )}
                         onClick={() => {
                           setShowRankedDialog(false)
@@ -182,7 +182,7 @@ export default function HeroActionButtons() {
                           'portrait:text-left portrait:w-full',
                           'landscape:items-center landscape:justify-center',
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
-                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded',
+                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded h-full',
                         )}
                         onClick={() => {
                           setShowRankedDialog(false)
@@ -192,16 +192,16 @@ export default function HeroActionButtons() {
                         }}
                       >
                         <img
-                          src='/evil_bunniez2.jpg'
+                          src='/evil_bunniez1.jpg'
                           className='flex-none landscape:w-full portrait:h-14 aspect-square object-contain'
                           style={{ transform: 'scaleX(-1)' }}
                         />
                         <div className='flex flex-col landscape:gap-2'>
-                          <h3 className='text-lg font-bold'>
-                            THE EVIL BUNNIEZ
+                          <h3 className='text-lg font-bold text-purple-500'>
+                            DARK BUNNIEZ
                           </h3>
                           <p className='text-sm text-neutral-300'>
-                            Special collaboration event with BUNNiEZ!
+                            A BUNNiEZ event
                           </p>
                         </div>
                       </button>

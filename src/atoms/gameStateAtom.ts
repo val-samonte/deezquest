@@ -18,7 +18,6 @@ import {
   heroFromPublicKey,
   subtract,
 } from '@/utils/gameFunctions'
-import { SkillTypes } from '@/enums/SkillTypes'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { hashv } from '@/utils/hashv'
 import { matchAtom } from './matchAtom'

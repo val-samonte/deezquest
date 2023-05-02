@@ -50,13 +50,27 @@ export default function BurnerAccountManager() {
   // Initialize burnerNonce
   useEffect(() => {
     if (!publicKey) return
-    // TODO: check PDA for existing saved nonce
     if (burnerNonce) return
 
-    const newNonce = bs58.encode(
-      window.crypto.getRandomValues(new Uint8Array(16)),
-    )
-    setBurnerNonce(newNonce)
+    const burnerNonceCheck = async () => {
+      // TODO: check PDA for existing saved nonce < higher priority
+      const nonceResponse = await fetch('/api/centralized_match/burner_nonce', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pubkey: publicKey.toBase58() }),
+      })
+      const nonce = await nonceResponse.text()
+
+      const newNonce =
+        nonce !== 'null'
+          ? nonce
+          : bs58.encode(window.crypto.getRandomValues(new Uint8Array(16)))
+
+      setBurnerNonce(newNonce)
+    }
+    burnerNonceCheck()
   }, [publicKey, burnerNonce, setBurnerNonce])
 
   // Invalidate credentials, except burnerNonce
@@ -93,7 +107,7 @@ export default function BurnerAccountManager() {
         const nonceResponse = await fetch('/api/request_nonce')
         const nonce = await nonceResponse.text()
 
-        const message = `Please sign to prove your public key ownership\n\n${publicKey?.toBase58()}:${nonce}`
+        const message = `Please sign to prove your public key ownership\n\n${publicKey?.toBase58()}:${nonce}:${burnerNonce}`
         const signature = bs58.encode(await signMessage(Buffer.from(message)))
         const payload = JSON.stringify({ message, signature })
 
@@ -120,7 +134,10 @@ export default function BurnerAccountManager() {
 
       // sign 2nd half
       const signedMessage = await signMessage(
-        Buffer.from(`Please sign to retrieve your game account`, 'utf8'),
+        Buffer.from(
+          `Please sign to retrieve your game account ${burnerNonce}`,
+          'utf8',
+        ),
       )
 
       const hash = hashv([appSeed, signedMessage.slice(0, 16)])

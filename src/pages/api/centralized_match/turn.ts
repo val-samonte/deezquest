@@ -2,13 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 import { dappKey, verifyNonce } from '@/utils/nonce'
-import kv from '@vercel/kv'
 
-// returns the first half of the burner seeds (16 bytes) in base58
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const message = req.body.message
   const signature = req.body.signature
 
@@ -21,7 +16,7 @@ export default async function handler(
   }
 
   const id = message.split('\n').pop()
-  const [pubkey, nonce, burnerNonce] = id.split(':')
+  const [pubkey, nonce] = id.split(':')
 
   let publicKey: Uint8Array
   try {
@@ -44,17 +39,33 @@ export default async function handler(
     return res.status(401).json({ error: 'Invalid message / signature' })
   }
 
-  try {
-    if (burnerNonce) {
-      const key = `burner_nonce_${pubkey}`
-      await kv.set(key, burnerNonce)
-      await kv.expire(key, 60 * 60 * 24 * 30) // set 30 days
-    }
-  } catch (e) {
-    // proceed regardless
-  }
+  // const slice = sign(publicKey, dappKey.secretKey)
 
-  const slice = sign(publicKey, dappKey.secretKey).slice(0, 16)
-
-  res.status(200).json({ data: bs58.encode(slice) })
+  // you give me
+  // - payload
+  // -- publicKey
+  // -- nonce
+  // -- match
+  // -- signature
+  //
+  // i'll verify
+  // - initial board state
+  //
+  // i'll return
+  // - gameState
+  // - canonical signed by backend gameState
+  //
+  // you give me
+  // - payload
+  // -- swap turn
+  // -- publicKey
+  // -- nonce
+  // -- match
+  // -- signature
+  // -- gameState
+  // - current payload canonical signed by backend
+  //
+  // i'll return
+  // - gameState
+  // - canonical signed by backend gameState
 }

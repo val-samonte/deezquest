@@ -7,7 +7,7 @@ import {
   gameStateAtom,
   isGameTransitioningAtom,
 } from '@/atoms/gameStateAtom'
-import { BotMatch, FriendlyMatch, matchAtom } from '@/atoms/matchAtom'
+import { Match, matchAtom } from '@/atoms/matchAtom'
 import {
   connectionListAtom,
   messagesAtom,
@@ -90,7 +90,7 @@ export default function BattleStagePage({
   )
 }
 
-function FriendlyMatchManager({ match }: { match: FriendlyMatch }) {
+function FriendlyMatchManager({ match }: { match: Match }) {
   const router = useRouter()
   const peerInstance = useAtomValue(peerAtom)
   const messages = useAtomValue(messagesAtom)
@@ -491,7 +491,7 @@ function findPossibleMoves(tiles: number[]): Move[] {
   return moves
 }
 
-function BotMatchManager({ match }: { match: BotMatch }) {
+function BotMatchManager({ match }: { match: Match }) {
   const gameFn = useSetAtom(gameFunctions)
   const gameState = useAtomValue(gameStateAtom)
   const hero = useAtomValue(heroDisplayAtom(match.opponent.nft))
