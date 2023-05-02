@@ -44,11 +44,22 @@ export default async function handler(
     return res.status(401).json({ error: 'Invalid message / signature' })
   }
 
+  let requireLinking = false
   try {
     if (burnerNonce) {
+      const expiry = 60 * 60 * 24 * 30 // set 30 days
       const key = `burner_nonce_${pubkey}`
       await kv.set(key, burnerNonce)
-      await kv.expire(key, 60 * 60 * 24 * 30) // set 30 days
+      await kv.expire(key, expiry)
+
+      // TODO: check if the burner and pubkey is already linked before adding keyref
+      const burner = await kv.hget(`burner_${pubkey}`, burnerNonce)
+      if (!burner) {
+        const key_ref = `pubkey_burner_nonce_${burnerNonce}`
+        await kv.set(key_ref, pubkey)
+        await kv.expire(key_ref, expiry)
+        requireLinking = true
+      }
     }
   } catch (e) {
     // proceed regardless
@@ -56,5 +67,5 @@ export default async function handler(
 
   const slice = sign(publicKey, dappKey.secretKey).slice(0, 16)
 
-  res.status(200).json({ data: bs58.encode(slice) })
+  res.status(200).json({ data: bs58.encode(slice), requireLinking })
 }
