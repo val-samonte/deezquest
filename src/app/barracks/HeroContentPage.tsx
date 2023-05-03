@@ -69,7 +69,7 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
 
   return (
     <>
-      {collection.length === 0 && listPreloaded ? (
+      {collection.length >= 0 && listPreloaded ? (
         <div className='absolute inset-0 flex items-center justify-center'>
           <div className='w-full max-h-full overflow-auto p-5'>
             <div className='p-5 rounded bg-neutral-900 shadow min-w-min max-w-sm w-full mx-auto  flex flex-col gap-5'>
@@ -77,6 +77,22 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
               <p className='text-stone-300'>
                 It seems that thou art a new arrival to these parts. Let us
                 employ a fresh hero in thine stead!
+              </p>
+              <p className='text-stone-500 italic text-center'>
+                Please make sure you have sufficient SOL in DEVNET.{' '}
+                {!isXNft && (
+                  <>
+                    Visit{' '}
+                    <a
+                      href='https://solfaucet.com/'
+                      rel='noopener noreferrer'
+                      className='underline'
+                    >
+                      Sol Faucet
+                    </a>{' '}
+                    to get some SOL airdrop.
+                  </>
+                )}
               </p>
               <button
                 type='button'
