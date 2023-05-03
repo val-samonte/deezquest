@@ -199,7 +199,7 @@ export const processGameCombo = (
           type: GameTransitions.ATTACK_NORMAL,
           turn: currentPublicKey,
           heroes: {
-            [currentPublicKey]: { ...opponentHero },
+            [opponentPublicKey]: { ...opponentHero },
           },
           duration: 100,
         })

@@ -132,6 +132,8 @@ export const gameFunctions = atom(
         )
 
         queue = [...queue, ...gameComboResult.queue]
+        currentHero = gameComboResult.currentHero
+        opponentHero = gameComboResult.opponentHero
 
         gameState.tiles = [...gameComboResult.tiles] as number[]
         gameState.hashes = [
