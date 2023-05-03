@@ -1,16 +1,25 @@
 import { matchAtom } from '@/atoms/matchAtom'
 import { Dialog } from '@/components/Dialog'
 import { PublicKey } from '@solana/web3.js'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { atom, useAtomValue, useSetAtom } from 'jotai'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
 import { burnerKeypairAtom } from '../BurnerAccountManager'
 import SpecialEventDisplay from './SpecialEventDisplay'
+import {
+  CentralizedMatchResponse,
+  InitCentralizedMatchPayload,
+} from '@/types/CentralizedMatch'
+import { sign } from 'tweetnacl'
+import canonicalize from 'canonicalize'
+import bs58 from 'bs58'
 
 interface BotMatchProps {
   show: boolean
   onClose?: () => void
 }
+
+export const botTurnsAtom = atom<any>([])
 
 export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
   const burner = useAtomValue(burnerKeypairAtom)
@@ -30,6 +39,7 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
   }, [pathname])
 
   const setMatch = useSetAtom(matchAtom)
+  const setBotTurns = useSetAtom(botTurnsAtom)
 
   const startMatch = useCallback(async () => {
     if (!burner?.publicKey) return
@@ -37,31 +47,46 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
 
     const player = burner.publicKey.toBase58()
 
-    // API
-    // call backend to initialize game
-    // - returns game state, sequence of turns (if bot turn first)
-    // - backend will sign everytime, user has to store the signature always
+    const nonceResponse = await fetch('/api/request_nonce')
+    const nonce = await nonceResponse.text()
 
-    // player makes turn call API
-    // - process game in the backend
-    // - return chain of moves from the bot as well
+    const payload = {
+      publicKey: player,
+      nft: nftAddress,
+      nonce,
+    }
 
-    // How to prevent rewind?
-    // firebase 1:1 current game hash
+    const signature = bs58.encode(
+      sign.detached(Buffer.from(canonicalize(payload)!), burner.secretKey),
+    )
 
-    // setMatch({
-    //   matchType: MatchTypes.SPECIAL,
-    //   gameHash: combinePublicKeysAsHash(player, opponent, true) as string,
-    //   ongoing: true,
-    //   opponent: {
-    //     nft: opponent,
-    //     publicKey: opponent,
-    //   },
-    //   player: {
-    //     nft: nftAddress,
-    //     publicKey: player,
-    //   },
-    // })
+    const initializeResponse = await fetch(
+      '/api/centralized_match/initialize',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payload,
+          signature,
+        } as InitCentralizedMatchPayload),
+      },
+    )
+
+    const initialize =
+      (await initializeResponse.json()) as CentralizedMatchResponse
+
+    const dappSignature = initialize.signature
+
+    window.localStorage.setItem('temp', JSON.stringify(initialize))
+    window.localStorage.setItem('dappSignature', dappSignature)
+
+    setMatch(initialize.response.match)
+
+    if (initialize.botTurns) {
+      setBotTurns(initialize.botTurns)
+    }
 
     router.push('/battle')
   }, [burner, nftAddress, router, setMatch])

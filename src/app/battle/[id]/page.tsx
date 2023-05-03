@@ -1,5 +1,6 @@
 'use client'
 
+import { botTurnsAtom } from '@/app/barracks/SpecialDialogMatch'
 import {
   gameFunctions,
   gameResultAtom,
@@ -19,13 +20,7 @@ import WalletGuard from '@/components/WalletGuard'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { PeerMessages } from '@/enums/PeerMessages'
-import {
-  findPossibleMoves,
-  getBotMove,
-  Move,
-  toCoord,
-  toIndex,
-} from '@/game/bot'
+import { getBotMove } from '@/game/bot'
 import { sleep } from '@/utils/sleep'
 import classNames from 'classnames'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
@@ -73,6 +68,9 @@ export default function BattleStagePage({
         <FriendlyMatchManager match={match} />
       )}
       {match?.matchType === MatchTypes.BOT && <BotMatchManager match={match} />}
+      {match?.matchType === MatchTypes.CENTRALIZED && (
+        <CentralizedMatchManager match={match} />
+      )}
       <Stage />
       {turnsLeft < 50 && (
         <div
@@ -291,6 +289,41 @@ function BotMatchManager({ match }: { match: Match }) {
 
     gameFn(getBotMove(hero, uses, match, gameState))
   }, [match, isTransitioning, hero, uses, gameState, gameFn])
+
+  return null
+}
+
+function CentralizedMatchManager({ match }: { match: Match }) {
+  const gameFn = useSetAtom(gameFunctions)
+  const gameState = useAtomValue(gameStateAtom)
+  const hero = useAtomValue(heroDisplayAtom(match.opponent.nft))
+  const uses = useUseCount(hero)
+  const transitionQueue = useAtomValue(gameTransitionQueueAtom)
+  const isTransitioning = transitionQueue.length > 0
+  const [botTurns, setBotTurns] = useAtom(botTurnsAtom)
+
+  useEffect(() => {
+    if (isTransitioning) return
+    if (!match) return
+    if (!gameState) return
+    if (match.opponent.nft !== gameState.currentTurn) return
+    if (gameState.hashes.length >= 100) return
+
+    if (botTurns.length > 0) {
+      const [current, ...next] = botTurns
+      gameFn(current)
+      setBotTurns(next)
+    }
+  }, [
+    match,
+    isTransitioning,
+    hero,
+    uses,
+    gameState,
+    botTurns,
+    gameFn,
+    setBotTurns,
+  ])
 
   return null
 }

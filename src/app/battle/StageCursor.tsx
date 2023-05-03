@@ -56,6 +56,7 @@ export default function StageCursor() {
                   type: PeerMessages.GAME_TURN,
                   data: payload,
                 })
+
               gameFn(payload)
             }
             return null

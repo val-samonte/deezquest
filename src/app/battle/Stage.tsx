@@ -159,7 +159,10 @@ export default function Stage() {
           <PlayerCard
             asOpponent
             heroPublicKey={match.opponent.nft}
-            dummy={match.matchType === MatchTypes.BOT}
+            dummy={
+              match.matchType === MatchTypes.BOT ||
+              match.matchType === MatchTypes.CENTRALIZED
+            }
           />
         )}
       </div>
@@ -238,6 +241,23 @@ export default function Stage() {
               >
                 Rematch
               </button>
+              <button
+                className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+                onClick={() => {
+                  window.sessionStorage.clear()
+                  setGameState(null)
+                  setMatch(null)
+                  setGameResult('')
+                  router.push('/barracks')
+                }}
+              >
+                Return to Barracks
+              </button>
+            </div>
+          )}
+
+          {match?.matchType === MatchTypes.CENTRALIZED && (
+            <div className='flex gap-5 mx-5'>
               <button
                 className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
                 onClick={() => {

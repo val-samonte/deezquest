@@ -27,7 +27,8 @@ export default function Battle() {
     // TODO: preload here? what about Suspense fallback?
     if (
       (match.matchType === MatchTypes.FRIENDLY ||
-        match.matchType === MatchTypes.BOT) &&
+        match.matchType === MatchTypes.BOT ||
+        match.matchType === MatchTypes.CENTRALIZED) &&
       match.gameHash
     ) {
       router.push(`/battle/${match.gameHash}`)
