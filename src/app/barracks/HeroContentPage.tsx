@@ -69,7 +69,7 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
 
   return (
     <>
-      {collection.length >= 0 && listPreloaded ? (
+      {collection.length === 0 && listPreloaded ? (
         <div className='absolute inset-0 flex items-center justify-center'>
           <div className='w-full max-h-full overflow-auto p-5'>
             <div className='p-5 rounded bg-neutral-900 shadow min-w-min max-w-sm w-full mx-auto  flex flex-col gap-5'>
