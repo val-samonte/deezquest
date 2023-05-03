@@ -82,13 +82,13 @@ export default function HeroContentPage({ basePath }: HeroContentPageProps) {
                 Please make sure you have sufficient SOL in DEVNET.{' '}
                 {!isXNft && (
                   <>
-                    Visit{' '}
+                    Visit this{' '}
                     <a
-                      href='https://solfaucet.com/'
+                      href='https://faucet.quicknode.com/solana/devnet'
                       rel='noopener noreferrer'
                       className='underline'
                     >
-                      Sol Faucet
+                      faucet
                     </a>{' '}
                     to get some SOL airdrop.
                   </>
