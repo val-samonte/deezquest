@@ -1,11 +1,11 @@
 'use client'
 
-import { gameStateAtom, isGameTransitioningAtom } from '@/atoms/gameStateAtom'
+import { gameStateAtom, gameTransitionQueueAtom } from '@/atoms/gameStateAtom'
 import { Player } from '@/atoms/matchAtom'
 import AnimatedCounter from '@/components/AnimatedCounter'
 import SkillView from '@/components/SkillView'
 import StatCounter from '@/components/StatCounter'
-import { Hero, heroFromPublicKey } from '@/utils/gameFunctions'
+import { Hero, heroFromPublicKey } from '@/game/gameFunctions'
 import { innateSkills } from '@/utils/innateSkills'
 import classNames from 'classnames'
 import { atom, useAtomValue } from 'jotai'
@@ -41,7 +41,8 @@ export default function PlayerCard({
 }) {
   const hero = useAtomValue(heroDisplayAtom(heroPublicKey))
   const gameState = useAtomValue(gameStateAtom)
-  const isTransitioning = useAtomValue(isGameTransitioningAtom)
+  const transitionQueue = useAtomValue(gameTransitionQueueAtom)
+  const isTransitioning = transitionQueue.length > 0
 
   const timeDisplay = useMemo(
     () => (hero.turnTime > 200 ? 100 : hero.turnTime - 100),

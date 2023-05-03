@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { Keypair } from '@solana/web3.js'
-import { getHeroAttributes, hashToTiles } from './gameFunctions'
+import { getHeroAttributes, hashToTiles } from '../game/gameFunctions'
 import { hashv } from './hashv'
 import canonicalize from 'canonicalize'
 

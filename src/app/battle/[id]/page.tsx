@@ -5,7 +5,7 @@ import {
   gameResultAtom,
   GameState,
   gameStateAtom,
-  isGameTransitioningAtom,
+  gameTransitionQueueAtom,
 } from '@/atoms/gameStateAtom'
 import { Match, matchAtom } from '@/atoms/matchAtom'
 import {
@@ -496,7 +496,8 @@ function BotMatchManager({ match }: { match: Match }) {
   const gameState = useAtomValue(gameStateAtom)
   const hero = useAtomValue(heroDisplayAtom(match.opponent.nft))
   const uses = useUseCount(hero)
-  const isTransitioning = useAtomValue(isGameTransitioningAtom)
+  const transitionQueue = useAtomValue(gameTransitionQueueAtom)
+  const isTransitioning = transitionQueue.length > 0
 
   useEffect(() => {
     if (isTransitioning) return

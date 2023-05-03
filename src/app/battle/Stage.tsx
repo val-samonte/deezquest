@@ -4,7 +4,6 @@ import {
   gameStateAtom,
   gameFunctions,
   gameTransitionQueueAtom,
-  isGameTransitioningAtom,
   gameResultAtom,
 } from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
@@ -36,7 +35,6 @@ export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
   const setGameState = useSetAtom(gameStateAtom)
   const updateHeroes = useSetAtom(updateHeroesAtom)
-  const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
   const [transitionQueue, setTransitionQueue] = useAtom(gameTransitionQueueAtom)
   const [tiles, setTiles] = useState<any[]>([])
   const [skill, setSkill] = useState<{
@@ -53,14 +51,11 @@ export default function Stage() {
     if (currentTransition.current) return
     ;(async () => {
       if (transitionQueue.length === 0) {
-        setIsTransitioning(false)
         return
       }
 
       const [next, ...queue] = transitionQueue
       currentTransition.current = next
-
-      setIsTransitioning(true)
 
       next.tiles &&
         setTiles(
@@ -115,7 +110,6 @@ export default function Stage() {
     transitionQueue,
     setTransitionQueue,
     updateHeroes,
-    setIsTransitioning,
     setGameResult,
     setTiles,
     setSkill,

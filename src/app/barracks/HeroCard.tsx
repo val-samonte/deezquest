@@ -1,7 +1,7 @@
 'use client'
 
 import SpinnerIcon from '@/components/SpinnerIcon'
-import { getHeroAttributes } from '@/utils/gameFunctions'
+import { getHeroAttributes } from '@/game/gameFunctions'
 import { JsonMetadata } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'

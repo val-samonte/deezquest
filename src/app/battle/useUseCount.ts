@@ -1,4 +1,4 @@
-import { Hero, skillCountPerMana } from '@/utils/gameFunctions'
+import { Hero, skillCountPerMana } from '@/game/gameFunctions'
 import { innateSkills } from '@/utils/innateSkills'
 import { useMemo } from 'react'
 

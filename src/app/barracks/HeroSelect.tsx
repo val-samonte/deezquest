@@ -1,7 +1,7 @@
 import { SkillTypes } from '@/enums/SkillTypes'
 import { clusterApiUrl, Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getHeroAttributes } from '@/utils/gameFunctions'
+import { getHeroAttributes } from '@/game/gameFunctions'
 import { useMetaplex } from '@/atoms/metaplexAtom'
 import { nftCollections } from './nft_collections'
 import { JsonMetadata, Metaplex } from '@metaplex-foundation/js'
