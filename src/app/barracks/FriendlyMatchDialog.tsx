@@ -25,7 +25,7 @@ import { Keypair, PublicKey } from '@solana/web3.js'
 import bs58 from 'bs58'
 import { hashv } from '@/utils/hashv'
 import { PeerMessages } from '@/enums/PeerMessages'
-import { FriendlyMatch, matchAtom } from '@/atoms/matchAtom'
+import { Match, matchAtom } from '@/atoms/matchAtom'
 import { combinePublicKeysAsHash } from '@/utils/combinePublicKeysAsHash'
 import { MatchTypes } from '@/enums/MatchTypes'
 
@@ -124,7 +124,7 @@ export default function FriendlyMatchDialog({
           case PeerMessages.ACCEPT_INVITATION:
             setMatch((match) => {
               if (!match) return null
-              if (message.from !== (match as FriendlyMatch).opponent.publicKey)
+              if (message.from !== (match as Match).opponent.publicKey)
                 return match
 
               return {

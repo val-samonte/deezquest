@@ -1,6 +1,7 @@
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { GameState } from '@/atoms/gameStateAtom'
 import { Match } from '@/atoms/matchAtom'
+import { GameTransitions } from '@/enums/GameTransitions'
 
 export interface BotTurns {
   type: GameStateFunctions.SWAP_NODE
@@ -16,19 +17,18 @@ export interface InitCentralizedMatchPayload {
   payload: {
     publicKey: string // burner
     nonce: string // request_nonce
+    nft: string // will not be checked
   }
   signature: string // burner signature of the payload object
 }
 
 export interface TurnCentralizedMatchPayload {
-  action: {
-    type: GameStateFunctions
-    data: any
+  payload: {
+    data: any // move data {node1, node2, origin}
     nonce: string // request_nonce
   }
   previous: {
     response: {
-      botTurns: BotTurns[]
       nonce: string // previous nonce from dappKey
       order: number // incremented for every request
       match: Match
@@ -36,12 +36,14 @@ export interface TurnCentralizedMatchPayload {
     }
     signature: string // dappKey signature of the response object
   }
-  signature: string // burner signature (of the action object above)
+  signature: string // burner signature (of the payload object above)
 }
 
 export interface CentralizedMatchResponse {
+  botTurns: BotTurns[]
+  gameResult?: GameTransitions
+  newScore?: number
   response: {
-    botTurns: BotTurns[]
     nonce: string // random value
     order: number // incremented for every request
     match: Match

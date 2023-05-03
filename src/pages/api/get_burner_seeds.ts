@@ -53,11 +53,8 @@ export default async function handler(
       await kv.expire(key, expiry)
 
       // TODO: check if the burner and pubkey is already linked before adding keyref
-      const burner = await kv.hget(`burner_${pubkey}`, burnerNonce)
+      const burner = await kv.get(`burner_${pubkey}`)
       if (!burner) {
-        const key_ref = `pubkey_burner_nonce_${burnerNonce}`
-        await kv.set(key_ref, pubkey)
-        await kv.expire(key_ref, expiry)
         requireLinking = true
       }
     }

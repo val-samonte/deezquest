@@ -1,33 +1,50 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
+import canonicalize from 'canonicalize'
 import { dappKey, verifyNonce } from '@/utils/nonce'
+import {
+  CentralizedMatchResponse,
+  TurnCentralizedMatchPayload,
+} from '@/types/CentralizedMatch'
+import kv from '@vercel/kv'
+import { hashv } from '@/utils/hashv'
+import { checkWinner } from '@/game/gameFunctions'
+import { doBotGameLoop, doMove } from '@/game/centralizedBotGame'
+import { GameTransitions } from '@/enums/GameTransitions'
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const message = req.body.message
-  const signature = req.body.signature
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const { payload, previous, signature } =
+    req.body as TurnCentralizedMatchPayload
 
-  if (!message) {
-    return res.status(400).json({ error: 'Message is missing' })
+  if (!payload) {
+    return res.status(400).json({ error: 'Payload is missing' })
+  }
+
+  if (!previous) {
+    return res.status(400).json({ error: 'Previous is missing' })
   }
 
   if (!signature) {
     return res.status(400).json({ error: 'Signature is missing' })
   }
 
-  const id = message.split('\n').pop()
-  const [pubkey, nonce] = id.split(':')
-
   let publicKey: Uint8Array
+  let burnerPubkey = previous.response.match.player.publicKey
   try {
-    publicKey = bs58.decode(pubkey)
+    publicKey = bs58.decode(burnerPubkey)
   } catch (e) {
     return res.status(401).json({ error: 'Invalid public key' })
   }
 
-  if (!nonce || !verifyNonce(nonce)) {
+  if (!payload.nonce || !verifyNonce(payload.nonce)) {
     return res.status(401).json({ error: 'Invalid nonce' })
   }
+
+  const message = canonicalize(payload)!
 
   if (
     !sign.detached.verify(
@@ -39,33 +56,123 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).json({ error: 'Invalid message / signature' })
   }
 
-  // const slice = sign(publicKey, dappKey.secretKey)
+  // verify previous signature
+  const dappSignature = sign.detached(
+    hashv([Buffer.from(canonicalize(previous.response) ?? '')]),
+    dappKey.secretKey,
+  )
 
-  // you give me
-  // - payload
-  // -- publicKey
-  // -- nonce
-  // -- match
-  // -- signature
-  //
-  // i'll verify
-  // - initial board state
-  //
-  // i'll return
-  // - gameState
-  // - canonical signed by backend gameState
-  //
-  // you give me
-  // - payload
-  // -- swap turn
-  // -- publicKey
-  // -- nonce
-  // -- match
-  // -- signature
-  // -- gameState
-  // - current payload canonical signed by backend
-  //
-  // i'll return
-  // - gameState
-  // - canonical signed by backend gameState
+  if (bs58.encode(dappSignature) !== previous.signature) {
+    return res.status(401).json({ error: 'Invalid previous signature' })
+  }
+
+  const playerNft = previous.response.match.player.nft
+  const botNft = previous.response.match.opponent.nft
+  const playerHero = previous.response.gameState.players[playerNft]
+  const botHero = previous.response.gameState.players[botNft]
+
+  if (
+    !previous.response.match.ongoing ||
+    previous.response.gameState.hashes.length >= 100
+  ) {
+    return res.status(200).json({
+      botTurns: [],
+      response: previous.response,
+      signature: previous.signature,
+      gameResult:
+        checkWinner(previous.response.gameState, playerHero, botHero) ||
+        undefined,
+    } as CentralizedMatchResponse)
+  }
+
+  // stops replay attacks, preventing kv consumptions
+  if (!verifyNonce(previous.response.nonce)) {
+    return res.status(401).json({ error: 'Invalid previous nonce' })
+  }
+
+  const currentOrder = previous.response.order + 1
+  const match = previous.response.match
+  const gameState = previous.response.gameState
+
+  doMove(payload.data, playerHero, botHero, playerNft, botNft, match, gameState)
+
+  const botTurns = doBotGameLoop(match, gameState)
+
+  let gameResult =
+    checkWinner(previous.response.gameState, playerHero, botHero) || undefined
+
+  let newScore: number | undefined = undefined
+
+  if (gameResult) {
+    const existing = await kv.get(`gamehash_${match.gameHash}`)
+    if (!existing) {
+      const burnerOwner = (await kv.get(
+        `pubkey_of_${previous.response.match.player.publicKey}`,
+      )) as string
+      const previousScore = parseInt(
+        (await kv.get(`pubkey_score_${burnerOwner}`)) ?? '0',
+      )
+      // compute score
+      const score =
+        gameResult === GameTransitions.LOSE
+          ? 100
+          : gameResult === GameTransitions.DRAW
+          ? 200
+          : 1000 + Math.floor(10000 / previous.response.gameState.hashes.length)
+
+      newScore = previousScore + score
+
+      await kv.set(`pubkey_score_${burnerOwner}`, newScore + '')
+      await kv.set(
+        `gamehash_${match.gameHash}`,
+        JSON.stringify({ score, owner: burnerOwner }),
+      )
+
+      // update leaderboard
+      let leaderboard = JSON.parse((await kv.get('leaderboard')) ?? '[]') as {
+        score: number
+        owner: string
+        date: number
+      }[]
+
+      const entry = {
+        score: newScore,
+        owner: burnerOwner,
+        date: new Date().getTime(),
+      }
+
+      for (let i = 0; i < 20; i++) {
+        if (typeof leaderboard[i] === 'undefined') {
+          leaderboard[i] = entry
+          break
+        } else if (newScore > leaderboard[i].score) {
+          leaderboard = leaderboard.splice(i, 0, entry).slice(0, 20)
+          break
+        }
+      }
+      await kv.set('leaderboard', JSON.stringify(leaderboard))
+    }
+  }
+
+  const response = {
+    nonce: bs58.encode(window.crypto.getRandomValues(new Uint8Array(8))),
+    order: currentOrder,
+    match,
+    gameState,
+  }
+
+  const newDappSignature = sign.detached(
+    hashv([Buffer.from(canonicalize(response) ?? '')]),
+    dappKey.secretKey,
+  )
+
+  const returnObj: CentralizedMatchResponse = {
+    botTurns,
+    gameResult,
+    newScore,
+    response,
+    signature: bs58.encode(newDappSignature),
+  }
+
+  res.status(200).json(returnObj)
 }

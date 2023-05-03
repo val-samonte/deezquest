@@ -172,7 +172,7 @@ export const gameFunctions = atom(
       opponentHero,
       new PublicKey(gameState.currentTurn).toBytes(),
       new PublicKey(opponentPubkey).toBytes(),
-      hash,
+      bs58.decode(gameState.hashes[gameState.hashes.length - 1]),
     )
 
     set(gameStateAtom, {

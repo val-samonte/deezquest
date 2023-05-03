@@ -69,14 +69,14 @@ export default async function handler(
   }
 
   try {
-    await kv.del(`pubkey_burner_nonce_${burnerNonce}`)
-  } catch (e) {}
-
-  try {
+    // cross store
     const expiry = 60 * 60 * 24 * 30 // set 30 days
     const key = `burner_${pubkey}`
+    const pubKey = `pubkey_of_${burnerPubkey}`
     await kv.set(key, burnerPubkey)
+    await kv.set(pubKey, pubkey)
     await kv.expire(key, expiry)
+    await kv.expire(pubKey, expiry)
   } catch (e) {}
 
   return res.status(200).json({ success: true })
