@@ -135,7 +135,7 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
     >
       <div className='flex flex-col max-w-3xl w-full gap-5 mx-auto p-5 bg-neutral-900 rounded relative'>
         <div
-          className='absolute inset-0 opacity-30'
+          className='absolute inset-0 opacity-20'
           style={{
             background: 'url("/BUNNiEZ_img.png")',
             backgroundRepeat: 'no-repeat',

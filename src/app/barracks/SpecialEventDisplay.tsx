@@ -6,6 +6,13 @@ import classNames from 'classnames'
 import { atom, useAtom } from 'jotai'
 import { ReactNode, useEffect, useState } from 'react'
 
+import { Carter_One } from 'next/font/google'
+
+const cartelOne = Carter_One({
+  weight: '400',
+  subsets: ['latin'],
+})
+
 interface PlayerStatus {
   score?: number
   energy?: number
@@ -48,23 +55,59 @@ export default function SpecialEventDisplay({
   }, [publicKey, setStatus])
 
   return (
-    <div className='flex gap-10 portrait:flex-col w-full'>
+    <div
+      className={classNames(
+        'flex gap-10 portrait:flex-col w-full',
+        cartelOne.className,
+      )}
+    >
       <div className='flex flex-col gap-5 flex-none landscape:max-w-min'>
         <div className='bg-black/50 w-60 h-60 mx-auto portrait:h-auto aspect-square relative overflow-hidden'>
           {children}
         </div>
 
         <div className='flex flex-col gap-5'>
+          <div className='flex items-center justify-center w-full'>
+            <img src='/BUNNiEZ_logo.png' className='h-24 object-contain' />
+          </div>
+          <ul className='flex gap-5 items-center justify-center'>
+            <li>
+              <a
+                href='https://twitter.com/bunniezsol'
+                className='flex items-center gap-2 font-bold'
+                rel='noopener noreferrer'
+              >
+                <img src='/twitter.svg' className='h-4 w-4' />
+                Twitter
+              </a>
+            </li>
+            <li>
+              <a
+                href='https://discord.gg/bunniez'
+                className='flex items-center gap-2 font-bold'
+                rel='noopener noreferrer'
+              >
+                <img src='/discord.svg' className='h-4 w-4' />
+                Discord
+              </a>
+            </li>
+          </ul>
+
+          <p className='text-white'>
+            Some <span className='font-bold'>Dark BUNNiEZ</span> have been
+            pestering the Rabbit Hole and delivering chaos. Defeat them, and the
+            chief will reward you mfers. Hophop!
+          </p>
           <p className='grid grid-cols-3'>
             <span className='col-span-2'>Your Score</span>
-            <span className='text-right font-mono font-bold flex items-center justify-end'>
+            <span className='text-right font-bold flex items-center justify-end'>
               {status.score ?? (
                 <span className='block bg-neutral-400 rounded h-4 w-16 animate-pulse'></span>
               )}
             </span>
             <span className='col-span-2'>
               Energy{' '}
-              <span className='text-neutral-400 italic text-xs'>
+              <span className='text-neutral-400 text-xs'>
                 (Refreshes daily)
               </span>
             </span>
@@ -75,33 +118,6 @@ export default function SpecialEventDisplay({
               )}
             </span>
           </p>
-          <p className='text-white'>
-            Some <span className='text-purple-500 font-bold'>Dark BUNNiEZ</span>{' '}
-            have been pestering the Rabbit Hole and delivering chaos. Defeat
-            them, and the chief will reward you mfers. Hophop!
-          </p>
-          <ul className='flex flex-col gap-2'>
-            <li>
-              <a
-                href='https://twitter.com/bunniezsol'
-                className='flex items-center gap-2 font-bold'
-                rel='noopener noreferrer'
-              >
-                <img src='/twitter.svg' className='h-4 w-4' />
-                BUNNiEZ Twitter
-              </a>
-            </li>
-            <li>
-              <a
-                href='https://discord.gg/bunniez'
-                className='flex items-center gap-2 font-bold'
-                rel='noopener noreferrer'
-              >
-                <img src='/discord.svg' className='h-4 w-4' />
-                BUNNiEZ Discord
-              </a>
-            </li>
-          </ul>
         </div>
       </div>
       <div className='flex flex-auto flex-col gap-5 w-full'>
@@ -114,7 +130,7 @@ export default function SpecialEventDisplay({
               <div className='col-span-2 text-right'>Score</div>
             </li>
 
-            {Array.from(new Array(10)).map((_, i) => (
+            {Array.from(new Array(15)).map((_, i) => (
               <li
                 key={`top_${i}`}
                 className={classNames(
@@ -123,13 +139,13 @@ export default function SpecialEventDisplay({
                   'w-full  h-10 grid grid-cols-8 px-5 items-center gap-5',
                 )}
               >
-                <div className='col-span-2 font-mono font-bold'>{i + 1}</div>
+                <div className='col-span-2 font-bold'>{i + 1}</div>
                 <div className='col-span-4'>
                   {leaderboard?.[i] ? (
                     <span>
                       {trimAddress(leaderboard?.[i].owner)}{' '}
                       {leaderboard?.[i].owner === publicKey?.toBase58() && (
-                        <span className='font-mono font-bold'>(You)</span>
+                        <span className='font-bold'>(You)</span>
                       )}
                     </span>
                   ) : (
@@ -138,9 +154,7 @@ export default function SpecialEventDisplay({
                 </div>
                 <div className='col-span-2 text-right'>
                   {leaderboard?.[i] ? (
-                    <span className='font-mono font-bold'>
-                      {leaderboard?.[i].score}
-                    </span>
+                    <span className='font-bold'>{leaderboard?.[i].score}</span>
                   ) : (
                     <span>--</span>
                   )}
