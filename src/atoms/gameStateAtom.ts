@@ -22,7 +22,7 @@ export const gamesStateAtom = atomFamily((matchId: string) =>
   atomWithStorage<GameState | null>(
     `games_${matchId}`,
     null,
-    createJSONStorage<GameState | null>(() => sessionStorage),
+    createJSONStorage<GameState | null>(() => localStorage),
   ),
 )
 

@@ -20,8 +20,16 @@ import { Keypair } from '@solana/web3.js'
 import { botTurnsAtom, dappSignatureAtom } from '../barracks/SpecialDialogMatch'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { burnerKeypairAtom } from '../BurnerAccountManager'
+import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 
 const cursorIcon = Texture.from(`/cursor.png`)
+
+// TODO: please move all atoms to atoms directory :D
+export const scoreAtom = atomWithStorage<number>(
+  'score',
+  0,
+  createJSONStorage<number>(() => window.localStorage),
+)
 
 export default function StageCursor() {
   const burner = useAtomValue(burnerKeypairAtom)
@@ -36,6 +44,7 @@ export default function StageCursor() {
   const gameState = useAtomValue(gameStateAtom)
   const [dappSignature, setDappSignature] = useAtom(dappSignatureAtom)
   const setBotTurns = useSetAtom(botTurnsAtom)
+  const setScore = useSetAtom(scoreAtom)
 
   const onPointerUp = useCallback(
     (e: FederatedPointerEvent) => {
@@ -87,6 +96,9 @@ export default function StageCursor() {
                   (result) => {
                     setDappSignature(result.dappSignature)
                     setBotTurns(result.botTurns ?? [])
+                    if (result.newScore) {
+                      setScore(result.newScore)
+                    }
                   },
                 )
               }
@@ -114,6 +126,7 @@ export default function StageCursor() {
       gameState,
       peerInstance,
       burner,
+      setScore,
       setDappSignature,
       setBotTurns,
     ],

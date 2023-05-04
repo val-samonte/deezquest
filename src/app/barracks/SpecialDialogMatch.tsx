@@ -54,6 +54,7 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
   const setBotTurns = useSetAtom(botTurnsAtom)
   const setDappSignature = useSetAtom(dappSignatureAtom)
   const [busy, setBusy] = useState(false)
+  const [hasEnergy, setHasEnergy] = useState<boolean>()
 
   const startMatch = useCallback(async () => {
     if (!burner?.publicKey) return
@@ -133,7 +134,12 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
           }}
         ></div>
         <div className='relative flex flex-col w-full gap-5'>
-          <SpecialEventDisplay>
+          <SpecialEventDisplay
+            onStatus={(status) =>
+              typeof status.energy === 'number' &&
+              setHasEnergy(status.energy > 0)
+            }
+          >
             <img
               src={'/evil_bunniez1.jpg'}
               className='w-full h-full object-contain'
@@ -142,7 +148,7 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
           </SpecialEventDisplay>
           <div className='flex gap-3 justify-center pt-5 px-5'>
             <button
-              disabled={busy}
+              disabled={busy || !hasEnergy}
               type='button'
               className={classNames(
                 busy && 'opacity-20',
@@ -150,7 +156,13 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
               )}
               onClick={() => startMatch()}
             >
-              {busy ? 'Hopping In...' : 'Hop Into Battle'}
+              {busy
+                ? typeof hasEnergy !== 'number'
+                  ? 'Checking Portal...'
+                  : hasEnergy > 0
+                  ? 'Hopping In...'
+                  : 'Not Enough Energy'
+                : 'Hop Into Battle'}
             </button>
           </div>
         </div>

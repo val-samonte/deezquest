@@ -16,7 +16,7 @@ import {
   Stage as PixiStage,
 } from 'react-pixi-fiber/index.js'
 import PlayerCard, { updateHeroesAtom } from './PlayerCard'
-import StageCursor from './StageCursor'
+import StageCursor, { scoreAtom } from './StageCursor'
 import Tile from './Tile'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import CastingDisplay from './CastingDisplay'
@@ -45,6 +45,7 @@ export default function Stage() {
   const [match, setMatch] = useAtom(matchAtom)
   const [gameResult, setGameResult] = useAtom(gameResultAtom)
   const peerInstance = useAtomValue(peerAtom)
+  const score = useAtomValue(scoreAtom)
 
   const currentTransition = useRef<any>(null)
   useEffect(() => {
@@ -257,20 +258,23 @@ export default function Stage() {
           )}
 
           {match?.matchType === MatchTypes.CENTRALIZED && (
-            <div className='flex gap-5 mx-5'>
-              <button
-                className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-                onClick={() => {
-                  window.sessionStorage.clear()
-                  setGameState(null)
-                  setMatch(null)
-                  setGameResult('')
-                  router.push('/barracks')
-                }}
-              >
-                Return to Barracks
-              </button>
-            </div>
+            <>
+              <div className='text-3xl font-bold'>New Score: {score}</div>
+              <div className='flex gap-5 mx-5'>
+                <button
+                  className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+                  onClick={() => {
+                    window.sessionStorage.clear()
+                    setGameState(null)
+                    setMatch(null)
+                    setGameResult('')
+                    router.push('/barracks')
+                  }}
+                >
+                  Return to Barracks
+                </button>
+              </div>
+            </>
           )}
         </Transition>
       )}

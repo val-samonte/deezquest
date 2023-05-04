@@ -1,13 +1,50 @@
-import { trimAddress } from '@/utils/trimAddress'
-import { ReactNode } from 'react'
+'use client'
 
+import { useUserWallet } from '@/atoms/userWalletAtom'
+import { trimAddress } from '@/utils/trimAddress'
+import classNames from 'classnames'
+import { ReactNode, useEffect, useState } from 'react'
+
+interface PlayerStatus {
+  score?: number
+  energy?: number
+}
 interface SpecialEventDisplayProps {
   children: ReactNode
+  onStatus: (status: PlayerStatus) => void
 }
 
 export default function SpecialEventDisplay({
   children,
+  onStatus,
 }: SpecialEventDisplayProps) {
+  const wallet = useUserWallet()
+  const [leaderboard, setLeaderboard] = useState<
+    { score: number; owner: string; date: number }[]
+  >([])
+  const [status, setStatus] = useState<PlayerStatus>({
+    score: undefined,
+    energy: undefined,
+  })
+  const publicKey = wallet?.publicKey
+
+  useEffect(() => {
+    fetch('/api/centralized_match/leaderboard')
+      .then((resp) => resp.json())
+      .then((top) => setLeaderboard(top))
+  }, [setLeaderboard])
+
+  useEffect(() => {
+    if (!publicKey) return
+    fetch(`/api/centralized_match/status?publicKey=${publicKey.toBase58()}`)
+      .then((resp) => resp.json())
+      .then((status) => setStatus(status))
+  }, [publicKey, setStatus])
+
+  useEffect(() => {
+    onStatus(status)
+  }, [status, onStatus])
+
   return (
     <div className='flex gap-10 portrait:flex-col w-full'>
       <div className='flex flex-col gap-5 flex-none landscape:max-w-min'>
@@ -16,7 +53,22 @@ export default function SpecialEventDisplay({
         </div>
 
         <div className='flex flex-col gap-5'>
-          <p>
+          <p className='grid grid-cols-3'>
+            <span className='col-span-2'>Your Score</span>
+            <span className='text-right font-mono font-bold'>
+              {status.score ?? '--'}
+            </span>
+            <span className='col-span-2'>
+              Energy{' '}
+              <span className='text-neutral-500 italic text-xs'>
+                (Refreshes daily)
+              </span>
+            </span>
+            <span className='text-right font-bold'>
+              ⚡{status.energy ?? '--'}
+            </span>
+          </p>
+          <p className='text-white'>
             Some <span className='text-purple-500 font-bold'>Dark BUNNiEZ</span>{' '}
             have been pestering the Rabbit Hole and delivering chaos. Defeat
             them, and the chief will reward you mfers. Hophop!
@@ -54,76 +106,40 @@ export default function SpecialEventDisplay({
               <div className='col-span-4'>Address</div>
               <div className='col-span-2 text-right'>Score</div>
             </li>
-            <li className='w-full bg-black/50 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>1</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/25 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>2</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/50 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>3</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/25 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>4</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/50 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>5</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/25 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>6</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/50 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>7</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/25 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>8</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/50 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>9</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
-            <li className='w-full bg-black/25 h-10 grid grid-cols-8 px-5 items-center gap-5'>
-              <div className='col-span-2'>10</div>
-              <div className='col-span-4'>
-                {trimAddress('53vUyd7iFntjgcwtmAZAhtyrWmssiRvs3AvWiUJfoXw5')}
-              </div>
-              <div className='col-span-2 text-right'>69</div>
-            </li>
+
+            {Array.from(new Array(10)).map((_, i) => (
+              <li
+                key={`top_${i}`}
+                className={classNames(
+                  i % 2 === 0 ? 'bg-black/50' : 'bg-black/25',
+                  !leaderboard[i] && 'text-neutral-500',
+                  'w-full  h-10 grid grid-cols-8 px-5 items-center gap-5',
+                )}
+              >
+                <div className='col-span-2 font-mono font-bold'>{i + 1}</div>
+                <div className='col-span-4'>
+                  {leaderboard[i] ? (
+                    <span>
+                      {trimAddress(leaderboard[i].owner)}{' '}
+                      {leaderboard[i].owner === publicKey?.toBase58() && (
+                        <span className='font-mono font-bold'>(You)</span>
+                      )}
+                    </span>
+                  ) : (
+                    <span>Vacant</span>
+                  )}
+                </div>
+                <div className='col-span-2 text-right'>
+                  {leaderboard[i] ? (
+                    <span className='font-mono font-bold'>
+                      {leaderboard[i].score}
+                    </span>
+                  ) : (
+                    <span>--</span>
+                  )}
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

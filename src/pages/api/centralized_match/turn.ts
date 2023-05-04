@@ -99,7 +99,13 @@ export default async function handler(
   const botTurns = doBotGameLoop(match, gameState)
 
   let gameResult =
-    checkWinner(previous.response.gameState, playerHero, botHero) || undefined
+    checkWinner(
+      previous.response.gameState,
+      previous.response.gameState.players[playerNft],
+      previous.response.gameState.players[botNft],
+    ) || undefined
+
+  console.log(gameResult, currentOrder)
 
   let newScore: number | undefined = undefined
 

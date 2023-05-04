@@ -1,10 +1,12 @@
 'use client'
 
 import { isXNftAtom } from '@/atoms/isXNftAtom'
+import { matchAtom } from '@/atoms/matchAtom'
 import { useMetaplex } from '@/atoms/metaplexAtom'
 import AttributesDisplay from '@/components/AttributesDisplay'
 import { Dialog } from '@/components/Dialog'
 import { HeroAttributes } from '@/enums/HeroAttributes'
+import { MatchTypes } from '@/enums/MatchTypes'
 import { computeAttribute } from '@/utils/computeAttribute'
 import { trimAddress } from '@/utils/trimAddress'
 import { JsonMetadata } from '@metaplex-foundation/js'
@@ -51,6 +53,8 @@ export default function HeroPortrait({
   const [isWobbling, setIsWobbling] = useState(false)
   const [inSpotlight, setInSpotlight] = useState(false)
   const isXNft = useAtomValue(isXNftAtom)
+  const match = useAtomValue(matchAtom)
+  const matchType = match?.matchType
 
   const metaplex = useMetaplex()
   const [metadata, setMetadata] = useState<JsonMetadata | null>(null)
@@ -100,12 +104,26 @@ export default function HeroPortrait({
       })
   }, [publicKey, dummy, metaplex])
 
+  const dominantAttr = useMemo(() => {
+    const attr = [hero.int, hero.spd, hero.vit, hero.str]
+    const dominantIndex = attr.reduce(
+      (acc, cur, i) => (cur > attr[acc] ? i : acc),
+      0,
+    )
+
+    return ['int', 'spd', 'vit', 'str'][dominantIndex]
+  }, [hero])
+
   const url = useMemo(() => {
     if (dummy) {
+      if (matchType === MatchTypes.CENTRALIZED) {
+        return `/evil_bunniez_${dominantAttr}.jpg`
+      }
+
       return 'https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png'
     }
     return metadata?.image ?? ''
-  }, [metadata, dummy])
+  }, [metadata, matchType, dominantAttr, dummy])
 
   const opacity = useSpringValue(0)
   const [textProps, api] = useSpring(() => textSpring, [])
@@ -209,7 +227,11 @@ export default function HeroPortrait({
             </a>
           ) : (
             <div className='flex flex-col justify-center'>
-              <h2 className='text-3xl'>Practice Bot</h2>
+              <h2 className='text-3xl'>
+                {match?.matchType === MatchTypes.CENTRALIZED
+                  ? 'Dark BUNNiEZ'
+                  : 'Practice Bot'}
+              </h2>
             </div>
           )}
         </div>
