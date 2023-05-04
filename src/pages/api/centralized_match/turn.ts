@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 import canonicalize from 'canonicalize'
-import { dappKey, verifyNonce } from '@/utils/nonce'
+import { createNonce, dappKey, verifyNonce } from '@/utils/nonce'
 import {
   CentralizedMatchResponse,
   TurnCentralizedMatchPayload,
@@ -86,9 +86,9 @@ export default async function handler(
   }
 
   // stops replay attacks, preventing kv consumptions
-  if (!verifyNonce(previous.response.nonce)) {
-    return res.status(401).json({ error: 'Invalid previous nonce' })
-  }
+  // if (!verifyNonce(previous.response.nonce)) {
+  //   return res.status(401).json({ error: 'Invalid previous nonce' })
+  // }
 
   const currentOrder = previous.response.order + 1
   const match = previous.response.match
@@ -155,7 +155,7 @@ export default async function handler(
   }
 
   const response = {
-    nonce: bs58.encode(window.crypto.getRandomValues(new Uint8Array(8))),
+    nonce: createNonce(),
     order: currentOrder,
     match,
     gameState,

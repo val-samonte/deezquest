@@ -311,7 +311,10 @@ function CentralizedMatchManager({ match }: { match: Match }) {
 
     if (botTurns.length > 0) {
       const [current, ...next] = botTurns
-      gameFn(current)
+      gameFn({
+        type: GameStateFunctions.SWAP_NODE,
+        data: current,
+      })
       setBotTurns(next)
     }
   }, [

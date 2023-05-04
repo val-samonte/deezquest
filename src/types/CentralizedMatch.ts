@@ -22,20 +22,22 @@ export interface InitCentralizedMatchPayload {
   signature: string // burner signature of the payload object
 }
 
+export interface TurnCentralizedMatchPayloadPrevious {
+  response: {
+    nonce: string // previous nonce from dappKey
+    order: number // incremented for every request
+    match: Match
+    gameState: GameState
+  }
+  signature: string // dappKey signature of the response object
+}
+
 export interface TurnCentralizedMatchPayload {
   payload: {
     data: any // move data {node1, node2, origin}
     nonce: string // request_nonce
   }
-  previous: {
-    response: {
-      nonce: string // previous nonce from dappKey
-      order: number // incremented for every request
-      match: Match
-      gameState: GameState
-    }
-    signature: string // dappKey signature of the response object
-  }
+  previous: TurnCentralizedMatchPayloadPrevious
   signature: string // burner signature (of the payload object above)
 }
 

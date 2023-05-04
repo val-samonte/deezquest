@@ -18,6 +18,7 @@ export function doBotGameLoop(match: Match, gameState: GameState) {
     let botHero = gameState.players[match.opponent.nft]
     let playerHero = gameState.players[match.player.nft]
     const move = getBotMove(botHero, useCount(botHero), match, gameState)
+
     botTurns.push(move.data)
 
     doMove(
@@ -48,7 +49,7 @@ export function doMove(
   let hash = bs58.decode(gameState.hashes[gameState.hashes.length - 1])
 
   const swapResult = swap(
-    move.data,
+    move,
     gameState.currentTurn,
     currentHero,
     gameState.tiles,

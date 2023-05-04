@@ -13,13 +13,25 @@ import {
 import { sign } from 'tweetnacl'
 import canonicalize from 'canonicalize'
 import bs58 from 'bs58'
+import { atomWithStorage, createJSONStorage } from 'jotai/utils'
+import classNames from 'classnames'
 
 interface BotMatchProps {
   show: boolean
   onClose?: () => void
 }
 
-export const botTurnsAtom = atom<any>([])
+export const botTurnsAtom = atomWithStorage<any[]>(
+  'botTurns',
+  [],
+  createJSONStorage<any[]>(() => window.localStorage),
+)
+
+export const dappSignatureAtom = atomWithStorage<string>(
+  'dappSignature',
+  '',
+  createJSONStorage<string>(() => window.localStorage),
+)
 
 export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
   const burner = useAtomValue(burnerKeypairAtom)
@@ -40,56 +52,67 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
 
   const setMatch = useSetAtom(matchAtom)
   const setBotTurns = useSetAtom(botTurnsAtom)
+  const setDappSignature = useSetAtom(dappSignatureAtom)
+  const [busy, setBusy] = useState(false)
 
   const startMatch = useCallback(async () => {
     if (!burner?.publicKey) return
     if (!nftAddress) return
 
     const player = burner.publicKey.toBase58()
+    setBusy(true)
+    try {
+      const nonceResponse = await fetch('/api/request_nonce')
+      const nonce = await nonceResponse.text()
 
-    const nonceResponse = await fetch('/api/request_nonce')
-    const nonce = await nonceResponse.text()
+      const payload = {
+        publicKey: player,
+        nft: nftAddress,
+        nonce,
+      }
 
-    const payload = {
-      publicKey: player,
-      nft: nftAddress,
-      nonce,
-    }
+      const signature = bs58.encode(
+        sign.detached(Buffer.from(canonicalize(payload)!), burner.secretKey),
+      )
 
-    const signature = bs58.encode(
-      sign.detached(Buffer.from(canonicalize(payload)!), burner.secretKey),
-    )
-
-    const initializeResponse = await fetch(
-      '/api/centralized_match/initialize',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const initializeResponse = await fetch(
+        '/api/centralized_match/initialize',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            payload,
+            signature,
+          } as InitCentralizedMatchPayload),
         },
-        body: JSON.stringify({
-          payload,
-          signature,
-        } as InitCentralizedMatchPayload),
-      },
-    )
+      )
 
-    const initialize =
-      (await initializeResponse.json()) as CentralizedMatchResponse
+      const initialize =
+        (await initializeResponse.json()) as CentralizedMatchResponse
 
-    const dappSignature = initialize.signature
+      window.localStorage.setItem('temp', JSON.stringify(initialize))
 
-    window.localStorage.setItem('temp', JSON.stringify(initialize))
-    window.localStorage.setItem('dappSignature', dappSignature)
+      setDappSignature(
+        [
+          initialize.response.nonce,
+          initialize.response.order,
+          initialize.signature,
+        ].join('_'),
+      )
+      setMatch(initialize.response.match)
 
-    setMatch(initialize.response.match)
+      if (initialize.botTurns) {
+        setBotTurns(initialize.botTurns)
+      }
 
-    if (initialize.botTurns) {
-      setBotTurns(initialize.botTurns)
+      router.push('/battle')
+    } catch (e) {
+      console.error(e)
+      setBusy(false)
     }
-
-    router.push('/battle')
-  }, [burner, nftAddress, router, setMatch])
+  }, [burner, nftAddress, router, setMatch, setBusy])
 
   return (
     <Dialog
@@ -119,11 +142,15 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
           </SpecialEventDisplay>
           <div className='flex gap-3 justify-center pt-5 px-5'>
             <button
+              disabled={busy}
               type='button'
-              className='portrait:flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded flex items-center justify-center'
+              className={classNames(
+                busy && 'opacity-20',
+                'portrait:flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded flex items-center justify-center',
+              )}
               onClick={() => startMatch()}
             >
-              Hop Into Battle
+              {busy ? 'Hopping In...' : 'Hop Into Battle'}
             </button>
           </div>
         </div>
