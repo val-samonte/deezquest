@@ -135,11 +135,11 @@ export default async function handler(
       )
 
       // update leaderboard
-      let leaderboard = JSON.parse((await kv.get('leaderboard')) ?? '[]') as {
+      let leaderboard: {
         score: number
         owner: string
         date: number
-      }[]
+      }[] = (await kv.get('leaderboard')) ?? []
 
       const entry = {
         score: newScore,
