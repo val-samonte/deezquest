@@ -118,6 +118,13 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
     }
   }, [burner, nftAddress, router, setMatch, setBusy])
 
+  const ctaDisplay = useMemo(() => {
+    if (typeof hasEnergy === 'undefined') return 'Checking Energy...'
+    if (hasEnergy === false) return 'Not Enough Energy'
+    if (busy) return 'Hopping In...'
+    return 'Hop Into Battle'
+  }, [busy, hasEnergy])
+
   return (
     <Dialog
       title='DARK BUNNiEZ'
@@ -149,18 +156,13 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
               disabled={busy || !hasEnergy}
               type='button'
               className={classNames(
-                busy && 'opacity-20',
+                (busy || !hasEnergy) &&
+                  'bg-purple-900 hover:bg-purple-900 text-neutral-500 brightness-50',
                 'portrait:flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded flex items-center justify-center',
               )}
               onClick={() => startMatch()}
             >
-              {busy
-                ? typeof hasEnergy !== 'number'
-                  ? 'Checking Portal...'
-                  : hasEnergy > 0
-                  ? 'Hopping In...'
-                  : 'Not Enough Energy'
-                : 'Hop Into Battle'}
+              {ctaDisplay}
             </button>
           </div>
         </div>

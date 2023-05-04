@@ -11,10 +11,12 @@ interface PlayerStatus {
   energy?: number
 }
 
-export const playerStatusAtom = atom<PlayerStatus>({
+const statusDefault = {
   score: undefined,
   energy: undefined,
-})
+}
+
+export const playerStatusAtom = atom<PlayerStatus>(statusDefault)
 
 interface SpecialEventDisplayProps {
   children: ReactNode
@@ -31,12 +33,14 @@ export default function SpecialEventDisplay({
   const publicKey = wallet?.publicKey
 
   useEffect(() => {
+    setLeaderboard([])
     fetch('/api/centralized_match/leaderboard')
       .then((resp) => resp.json())
       .then((top) => setLeaderboard(top ?? []))
   }, [setLeaderboard])
 
   useEffect(() => {
+    setStatus(statusDefault)
     if (!publicKey) return
     fetch(`/api/centralized_match/status?publicKey=${publicKey.toBase58()}`)
       .then((resp) => resp.json())
@@ -53,8 +57,10 @@ export default function SpecialEventDisplay({
         <div className='flex flex-col gap-5'>
           <p className='grid grid-cols-3'>
             <span className='col-span-2'>Your Score</span>
-            <span className='text-right font-mono font-bold'>
-              {status.score ?? '--'}
+            <span className='text-right font-mono font-bold flex items-center justify-end'>
+              {status.score ?? (
+                <span className='block bg-neutral-400 rounded h-4 w-16 animate-pulse'></span>
+              )}
             </span>
             <span className='col-span-2'>
               Energy{' '}
@@ -62,8 +68,11 @@ export default function SpecialEventDisplay({
                 (Refreshes daily)
               </span>
             </span>
-            <span className='text-right font-bold'>
-              ⚡{status.energy ?? '--'}
+            <span className='text-right font-bold flex items-center justify-end'>
+              ⚡
+              {status.energy ?? (
+                <span className='block bg-neutral-400 rounded h-4 w-8 animate-pulse'></span>
+              )}
             </span>
           </p>
           <p className='text-white'>
