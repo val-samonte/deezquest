@@ -157,8 +157,8 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
               type='button'
               className={classNames(
                 (busy || !hasEnergy) &&
-                  'bg-purple-900 hover:bg-purple-900 text-neutral-500 brightness-50',
-                'portrait:flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded flex items-center justify-center',
+                  'bg-amber-900 hover:bg-amber-900 text-neutral-500 brightness-50',
+                'portrait:flex-auto px-3 py-2 bg-amber-700 hover:bg-amber-600 rounded flex items-center justify-center',
               )}
               onClick={() => startMatch()}
             >
