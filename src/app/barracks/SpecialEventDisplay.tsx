@@ -33,7 +33,7 @@ export default function SpecialEventDisplay({
   useEffect(() => {
     fetch('/api/centralized_match/leaderboard')
       .then((resp) => resp.json())
-      .then((top) => setLeaderboard(top))
+      .then((top) => setLeaderboard(top ?? []))
   }, [setLeaderboard])
 
   useEffect(() => {
@@ -110,16 +110,16 @@ export default function SpecialEventDisplay({
                 key={`top_${i}`}
                 className={classNames(
                   i % 2 === 0 ? 'bg-black/50' : 'bg-black/25',
-                  !leaderboard[i] && 'text-neutral-500',
+                  !leaderboard?.[i] && 'text-neutral-500',
                   'w-full  h-10 grid grid-cols-8 px-5 items-center gap-5',
                 )}
               >
                 <div className='col-span-2 font-mono font-bold'>{i + 1}</div>
                 <div className='col-span-4'>
-                  {leaderboard[i] ? (
+                  {leaderboard?.[i] ? (
                     <span>
-                      {trimAddress(leaderboard[i].owner)}{' '}
-                      {leaderboard[i].owner === publicKey?.toBase58() && (
+                      {trimAddress(leaderboard?.[i].owner)}{' '}
+                      {leaderboard?.[i].owner === publicKey?.toBase58() && (
                         <span className='font-mono font-bold'>(You)</span>
                       )}
                     </span>
@@ -128,9 +128,9 @@ export default function SpecialEventDisplay({
                   )}
                 </div>
                 <div className='col-span-2 text-right'>
-                  {leaderboard[i] ? (
+                  {leaderboard?.[i] ? (
                     <span className='font-mono font-bold'>
-                      {leaderboard[i].score}
+                      {leaderboard?.[i].score}
                     </span>
                   ) : (
                     <span>--</span>
