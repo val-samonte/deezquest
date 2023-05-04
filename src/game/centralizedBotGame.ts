@@ -1,4 +1,4 @@
-import { useCount } from '@/app/battle/useUseCount'
+import { commandUseCount } from '@/app/battle/useUseCount'
 import { GameState } from '@/atoms/gameStateAtom'
 import { Match } from '@/atoms/matchAtom'
 import { getBotMove } from './bot'
@@ -17,7 +17,7 @@ export function doBotGameLoop(match: Match, gameState: GameState) {
   ) {
     let botHero = gameState.players[match.opponent.nft]
     let playerHero = gameState.players[match.player.nft]
-    const move = getBotMove(botHero, useCount(botHero), match, gameState)
+    const move = getBotMove(botHero, commandUseCount(botHero), match, gameState)
 
     botTurns.push(move.data)
 

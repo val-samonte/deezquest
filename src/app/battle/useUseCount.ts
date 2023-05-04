@@ -11,7 +11,7 @@ export interface Uses {
   partitions: number
 }
 
-export function useCount(hero: Hero) {
+export function commandUseCount(hero: Hero) {
   return [
     innateSkills[hero.offensiveSkill],
     innateSkills[hero.supportiveSkill],
@@ -74,7 +74,7 @@ export function useCount(hero: Hero) {
 
 export default function useUseCount(hero: Hero): Uses[] {
   return useMemo(() => {
-    return useCount(hero)
+    return commandUseCount(hero)
   }, [
     hero.maxMp,
     hero.fireMp,
