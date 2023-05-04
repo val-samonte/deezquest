@@ -1,6 +1,9 @@
 'use client'
 
+import { matchAtom } from '@/atoms/matchAtom'
+import { MatchTypes } from '@/enums/MatchTypes'
 import classNames from 'classnames'
+import { useAtomValue } from 'jotai'
 import { usePathname } from 'next/navigation'
 
 const commonClasses =
@@ -8,14 +11,20 @@ const commonClasses =
 
 export default function Backgrounds() {
   const pathname = usePathname()
+  const match = useAtomValue(matchAtom)
   return (
     <div className='fixed inset-0'>
       <img
-        src='/bg_arena.png'
+        src={
+          match?.matchType === MatchTypes.CENTRALIZED
+            ? '/BUNNiEZ_bg.png'
+            : '/bg_arena.png'
+        }
         className={classNames(
           commonClasses,
           pathname?.includes('/battle') ? 'opacity-100' : 'opacity-0',
-          'object-bottom brightness-75',
+          match?.matchType === MatchTypes.CENTRALIZED ? '' : 'brightness-75',
+          'object-bottom',
         )}
       />
       <img
@@ -27,11 +36,12 @@ export default function Backgrounds() {
         )}
       />
       <img
-        src='/bg_plains.png'
+        // src='/bg_plains.png'
+        src='/BUNNiEZ_bg.png'
         className={classNames(
           commonClasses,
           pathname === '/' ? 'opacity-100' : 'opacity-0',
-          'object-bottom brightness-50',
+          'object-bottom blur-none',
         )}
       />
       <img

@@ -124,18 +124,18 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
       show={show}
       onClose={onClose}
       className='max-w-3xl'
+      padVertical={false}
     >
-      <div className='flex flex-col max-w-3xl w-full gap-5 mx-auto px-5 bg-neutral-900 rounded relative'>
+      <div className='flex flex-col max-w-3xl w-full gap-5 mx-auto p-5 bg-neutral-900 rounded relative'>
         <div
-          className='absolute inset-x-0 -inset-y-5 opacity-50 brightness-50'
+          className='absolute inset-0 opacity-30'
           style={{
-            background: 'url("/bg_ruins.png")',
-            backgroundBlendMode: 'multiply',
+            background: 'url("/BUNNiEZ_img.png")',
             backgroundRepeat: 'no-repeat',
-            backgroundSize: 'cover',
             backgroundPosition: 'center',
+            backgroundSize: 'cover',
           }}
-        ></div>
+        />
         <div className='relative flex flex-col w-full gap-5'>
           <SpecialEventDisplay>
             <img

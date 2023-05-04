@@ -58,7 +58,7 @@ export default function SpecialEventDisplay({
             </span>
             <span className='col-span-2'>
               Energy{' '}
-              <span className='text-neutral-500 italic text-xs'>
+              <span className='text-neutral-400 italic text-xs'>
                 (Refreshes daily)
               </span>
             </span>
@@ -99,7 +99,7 @@ export default function SpecialEventDisplay({
         <div className='flex flex-col'>
           <h2 className='text-xl font-bold mb-3'>Leaderboard</h2>
           <ul className='flex flex-col w-full'>
-            <li className='w-full h-10 grid grid-cols-8 px-5 items-center gap-5 uppercase text-sm text-neutral-500'>
+            <li className='w-full h-10 grid grid-cols-8 px-5 items-center gap-5 uppercase text-sm text-neutral-400'>
               <div className='col-span-2'>Rank</div>
               <div className='col-span-4'>Address</div>
               <div className='col-span-2 text-right'>Score</div>
@@ -109,8 +109,8 @@ export default function SpecialEventDisplay({
               <li
                 key={`top_${i}`}
                 className={classNames(
-                  i % 2 === 0 ? 'bg-black/50' : 'bg-black/25',
-                  !leaderboard?.[i] && 'text-neutral-500',
+                  i % 2 === 0 ? 'bg-black/60' : 'bg-black/50',
+                  !leaderboard?.[i] && 'text-neutral-400',
                   'w-full  h-10 grid grid-cols-8 px-5 items-center gap-5',
                 )}
               >
