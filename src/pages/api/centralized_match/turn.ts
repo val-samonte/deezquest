@@ -147,6 +147,9 @@ export default async function handler(
         date: new Date().getTime(),
       }
 
+      // remove the player first
+      leaderboard = leaderboard.filter((t) => t.owner !== burnerOwner)
+
       for (let i = 0; i < 20; i++) {
         if (typeof leaderboard[i] === 'undefined') {
           leaderboard[i] = entry
