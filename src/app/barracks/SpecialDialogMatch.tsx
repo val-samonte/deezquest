@@ -5,7 +5,7 @@ import { atom, useAtomValue, useSetAtom } from 'jotai'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
 import { burnerKeypairAtom } from '../BurnerAccountManager'
-import SpecialEventDisplay from './SpecialEventDisplay'
+import SpecialEventDisplay, { playerStatusAtom } from './SpecialEventDisplay'
 import {
   CentralizedMatchResponse,
   InitCentralizedMatchPayload,
@@ -54,7 +54,12 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
   const setBotTurns = useSetAtom(botTurnsAtom)
   const setDappSignature = useSetAtom(dappSignatureAtom)
   const [busy, setBusy] = useState(false)
-  const [hasEnergy, setHasEnergy] = useState<boolean>()
+  const playerStatus = useAtomValue(playerStatusAtom)
+
+  const hasEnergy = useMemo(() => {
+    if (typeof playerStatus.energy !== 'number') return undefined
+    return playerStatus.energy > 0
+  }, [playerStatus])
 
   const startMatch = useCallback(async () => {
     if (!burner?.publicKey) return
@@ -93,8 +98,6 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
       const initialize =
         (await initializeResponse.json()) as CentralizedMatchResponse
 
-      window.localStorage.setItem('temp', JSON.stringify(initialize))
-
       setDappSignature(
         [
           initialize.response.nonce,
@@ -102,7 +105,7 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
           initialize.signature,
         ].join('_'),
       )
-      setMatch(initialize.response.match)
+      initialize.response.match && setMatch(initialize.response.match)
 
       if (initialize.botTurns) {
         setBotTurns(initialize.botTurns)
@@ -134,12 +137,7 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
           }}
         ></div>
         <div className='relative flex flex-col w-full gap-5'>
-          <SpecialEventDisplay
-            onStatus={(status) =>
-              typeof status.energy === 'number' &&
-              setHasEnergy(status.energy > 0)
-            }
-          >
+          <SpecialEventDisplay>
             <img
               src={'/evil_bunniez1.jpg'}
               className='w-full h-full object-contain'

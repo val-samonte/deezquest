@@ -204,11 +204,6 @@ async function centralizedMatchTurn(
 
   const turnResult = (await turnResponse.json()) as CentralizedMatchResponse
 
-  if (turnResult) {
-    console.log(turnResult)
-    window.localStorage.setItem('temp', JSON.stringify(turnResult))
-  }
-
   return {
     dappSignature: [
       turnResult.response.nonce,

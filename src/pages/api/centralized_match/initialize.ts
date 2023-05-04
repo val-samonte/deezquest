@@ -112,7 +112,11 @@ export default async function handler(
 
   const returnObj: CentralizedMatchResponse = {
     botTurns,
-    response,
+    response: {
+      nonce: response.nonce,
+      order: response.order,
+      match,
+    },
     signature: bs58.encode(dappSignature),
   }
 

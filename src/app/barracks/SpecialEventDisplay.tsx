@@ -3,29 +3,31 @@
 import { useUserWallet } from '@/atoms/userWalletAtom'
 import { trimAddress } from '@/utils/trimAddress'
 import classNames from 'classnames'
+import { atom, useAtom } from 'jotai'
 import { ReactNode, useEffect, useState } from 'react'
 
 interface PlayerStatus {
   score?: number
   energy?: number
 }
+
+export const playerStatusAtom = atom<PlayerStatus>({
+  score: undefined,
+  energy: undefined,
+})
+
 interface SpecialEventDisplayProps {
   children: ReactNode
-  onStatus: (status: PlayerStatus) => void
 }
 
 export default function SpecialEventDisplay({
   children,
-  onStatus,
 }: SpecialEventDisplayProps) {
   const wallet = useUserWallet()
   const [leaderboard, setLeaderboard] = useState<
     { score: number; owner: string; date: number }[]
   >([])
-  const [status, setStatus] = useState<PlayerStatus>({
-    score: undefined,
-    energy: undefined,
-  })
+  const [status, setStatus] = useAtom(playerStatusAtom)
   const publicKey = wallet?.publicKey
 
   useEffect(() => {
@@ -40,10 +42,6 @@ export default function SpecialEventDisplay({
       .then((resp) => resp.json())
       .then((status) => setStatus(status))
   }, [publicKey, setStatus])
-
-  useEffect(() => {
-    onStatus(status)
-  }, [status, onStatus])
 
   return (
     <div className='flex gap-10 portrait:flex-col w-full'>

@@ -34,7 +34,7 @@ export class BackpackIframeAdapter extends BaseMessageSignerWalletAdapter {
   }
 
   static async make() {
-    console.log('INITIALIZING XNFT', BACKPACK_ORIGIN)
+    // console.log('INITIALIZING XNFT', BACKPACK_ORIGIN)
     window.parent.postMessage(
       JSON.stringify({
         action: 'publicKey',

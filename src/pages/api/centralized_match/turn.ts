@@ -176,7 +176,10 @@ export default async function handler(
     botTurns,
     gameResult,
     newScore,
-    response,
+    response: {
+      nonce: response.nonce,
+      order: response.order,
+    },
     signature: bs58.encode(newDappSignature),
   }
 

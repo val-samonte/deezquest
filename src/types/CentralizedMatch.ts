@@ -48,7 +48,7 @@ export interface CentralizedMatchResponse {
   response: {
     nonce: string // random value
     order: number // incremented for every request
-    match: Match
+    match?: Match
     // & {
     //   matchType: MatchTypes
     //   gameHash: string // combineHash of opponent.nft + player.nft
@@ -61,7 +61,7 @@ export interface CentralizedMatchResponse {
     //     publicKey: string // burner
     //   }
     // }
-    gameState: GameState // post processed of the bot moves
+    // gameState: GameState // post processed of the bot moves
   }
   signature: string // dappKey signature of the response object
 }
