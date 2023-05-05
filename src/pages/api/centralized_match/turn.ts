@@ -159,6 +159,7 @@ export default async function handler(
           break
         }
       }
+
       await kv.set('leaderboard', leaderboard)
     }
   }
