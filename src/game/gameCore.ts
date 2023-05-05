@@ -22,11 +22,6 @@ import {
   OperationArguments,
   parseSkillInstructionCode,
 } from './parseSkillInstructionCode'
-import { MatchTypes } from '@/enums/MatchTypes'
-
-const modifyHp = (hero: Hero) => {
-  return 10 + hero.vit * 2 + Math.floor((hero.vit - 1) / 2) * 3
-}
 
 export const initialize = (match: Match) => {
   const player = match.player
@@ -37,11 +32,6 @@ export const initialize = (match: Match) => {
   let playerHero = heroFromPublicKey(player.nft)
   let opponentHero = heroFromPublicKey(opponent.nft)
   let hash = bs58.decode(match.gameHash)
-
-  if (match.matchType === MatchTypes.CENTRALIZED) {
-    playerHero.hp = playerHero.maxHp = modifyHp(playerHero)
-    opponentHero.hp = opponentHero.maxHp = modifyHp(opponentHero)
-  }
 
   const heroInTurn = getNextTurn(
     playerHero,
