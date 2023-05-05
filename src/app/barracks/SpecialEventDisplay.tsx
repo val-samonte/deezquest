@@ -41,10 +41,14 @@ export default function SpecialEventDisplay({
 
   useEffect(() => {
     setLeaderboard([])
-    fetch('/api/centralized_match/leaderboard')
+    fetch(
+      `/api/centralized_match/leaderboard${
+        publicKey ? '?publicKey=' + publicKey : ''
+      }`,
+    )
       .then((resp) => resp.json())
       .then((top) => setLeaderboard(top ?? []))
-  }, [setLeaderboard])
+  }, [publicKey, setLeaderboard])
 
   useEffect(() => {
     setStatus(statusDefault)
