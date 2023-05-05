@@ -39,8 +39,8 @@ export const initialize = (match: Match) => {
   let hash = bs58.decode(match.gameHash)
 
   if (match.matchType === MatchTypes.CENTRALIZED) {
-    modifyHp(playerHero)
-    modifyHp(opponentHero)
+    playerHero.hp = playerHero.maxHp = modifyHp(playerHero)
+    opponentHero.hp = opponentHero.maxHp = modifyHp(opponentHero)
   }
 
   const heroInTurn = getNextTurn(
