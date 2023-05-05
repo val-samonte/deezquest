@@ -29,8 +29,8 @@ export default function AttributeDescription({
         <>
           Affects the maximum{' '}
           <span className='italic font-bold'>Hit Points</span> of the hero. Max
-          HP increases by 3 point per each point of VIT. An additional bonus HP
-          of 5/10/15 for level 4/7/10 of VIT.
+          HP increases by 2 point per each point of VIT. An additional bonus HP
+          of 3/6/9 for level 4/7/10 of VIT.
         </>
       )
     case HeroAttributes.STR:
