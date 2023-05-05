@@ -125,7 +125,7 @@ export const innateSkills: Skill[] = [
       '+9 Armor, +10 Magic Barrier',
     ],
     code: getOperationsFromCode(
-      '00 00 00 04 ' + // mana
+      '00 00 00 05 ' + // mana
         '00 ' + //        version
         '01 C9 02 ' + //  C9 = 2
         '01 D0 03 ' + //  D0 = 3
