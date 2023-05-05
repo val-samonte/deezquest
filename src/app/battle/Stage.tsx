@@ -4,7 +4,6 @@ import {
   gameStateAtom,
   gameFunctions,
   gameTransitionQueueAtom,
-  isGameTransitioningAtom,
   gameResultAtom,
 } from '@/atoms/gameStateAtom'
 import { isPortraitAtom, stageDimensionAtom } from '@/atoms/stageDimensionAtom'
@@ -17,7 +16,7 @@ import {
   Stage as PixiStage,
 } from 'react-pixi-fiber/index.js'
 import PlayerCard, { updateHeroesAtom } from './PlayerCard'
-import StageCursor from './StageCursor'
+import StageCursor, { scoreAtom } from './StageCursor'
 import Tile from './Tile'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import CastingDisplay from './CastingDisplay'
@@ -36,7 +35,6 @@ export default function Stage() {
   const gameFn = useSetAtom(gameFunctions)
   const setGameState = useSetAtom(gameStateAtom)
   const updateHeroes = useSetAtom(updateHeroesAtom)
-  const setIsTransitioning = useSetAtom(isGameTransitioningAtom)
   const [transitionQueue, setTransitionQueue] = useAtom(gameTransitionQueueAtom)
   const [tiles, setTiles] = useState<any[]>([])
   const [skill, setSkill] = useState<{
@@ -47,20 +45,18 @@ export default function Stage() {
   const [match, setMatch] = useAtom(matchAtom)
   const [gameResult, setGameResult] = useAtom(gameResultAtom)
   const peerInstance = useAtomValue(peerAtom)
+  const score = useAtomValue(scoreAtom)
 
   const currentTransition = useRef<any>(null)
   useEffect(() => {
     if (currentTransition.current) return
     ;(async () => {
       if (transitionQueue.length === 0) {
-        setIsTransitioning(false)
         return
       }
 
       const [next, ...queue] = transitionQueue
       currentTransition.current = next
-
-      setIsTransitioning(true)
 
       next.tiles &&
         setTiles(
@@ -115,7 +111,6 @@ export default function Stage() {
     transitionQueue,
     setTransitionQueue,
     updateHeroes,
-    setIsTransitioning,
     setGameResult,
     setTiles,
     setSkill,
@@ -165,7 +160,10 @@ export default function Stage() {
           <PlayerCard
             asOpponent
             heroPublicKey={match.opponent.nft}
-            dummy={match.matchType === MatchTypes.BOT}
+            dummy={
+              match.matchType === MatchTypes.BOT ||
+              match.matchType === MatchTypes.CENTRALIZED
+            }
           />
         )}
       </div>
@@ -257,6 +255,26 @@ export default function Stage() {
                 Return to Barracks
               </button>
             </div>
+          )}
+
+          {match?.matchType === MatchTypes.CENTRALIZED && (
+            <>
+              <div className='text-3xl font-bold'>New Score: {score}</div>
+              <div className='flex gap-5 mx-5'>
+                <button
+                  className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
+                  onClick={() => {
+                    window.sessionStorage.clear()
+                    setGameState(null)
+                    setMatch(null)
+                    setGameResult('')
+                    router.push('/barracks')
+                  }}
+                >
+                  Return to Barracks
+                </button>
+              </div>
+            </>
           )}
         </Transition>
       )}

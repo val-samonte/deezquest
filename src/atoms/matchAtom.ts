@@ -8,23 +8,13 @@ export interface Player {
   peerId?: string
 }
 
-export interface FriendlyMatch {
-  matchType: MatchTypes.FRIENDLY
+export interface Match {
+  matchType: MatchTypes
   ongoing: boolean
   gameHash: string
   opponent: Player
   player: Player
 }
-
-export interface BotMatch {
-  matchType: MatchTypes.BOT
-  ongoing: boolean
-  gameHash: string
-  opponent: Player
-  player: Player
-}
-
-type Match = FriendlyMatch | BotMatch
 
 export const matchAtom = atomWithStorage<Match | null>(
   'match',

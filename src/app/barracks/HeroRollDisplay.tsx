@@ -1,7 +1,7 @@
 import AttributesDisplay from '@/components/AttributesDisplay'
 import SkillView from '@/components/SkillView'
 import { SkillTypes } from '@/enums/SkillTypes'
-import { heroFromPublicKey } from '@/utils/gameFunctions'
+import { heroFromPublicKey } from '@/game/gameFunctions'
 import { innateSkills } from '@/utils/innateSkills'
 import { PublicKey } from '@solana/web3.js'
 import { ReactNode, useMemo } from 'react'

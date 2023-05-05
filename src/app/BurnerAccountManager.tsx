@@ -10,6 +10,7 @@ import { Dialog } from '@/components/Dialog'
 import classNames from 'classnames'
 import { hashv } from '@/utils/hashv'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
+import { sign } from 'tweetnacl'
 
 // Backend (Dapp) Seed:
 // to strengthen the security, an extra seed is given by the backend so that no other dapps
@@ -50,13 +51,27 @@ export default function BurnerAccountManager() {
   // Initialize burnerNonce
   useEffect(() => {
     if (!publicKey) return
-    // TODO: check PDA for existing saved nonce
     if (burnerNonce) return
 
-    const newNonce = bs58.encode(
-      window.crypto.getRandomValues(new Uint8Array(16)),
-    )
-    setBurnerNonce(newNonce)
+    const burnerNonceCheck = async () => {
+      // TODO: check PDA for existing saved nonce < higher priority
+      const nonceResponse = await fetch('/api/centralized_match/burner_nonce', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pubkey: publicKey.toBase58() }),
+      })
+      const nonce = await nonceResponse.text()
+
+      const newNonce =
+        nonce !== 'null'
+          ? nonce
+          : bs58.encode(window.crypto.getRandomValues(new Uint8Array(16)))
+
+      setBurnerNonce(newNonce)
+    }
+    burnerNonceCheck()
   }, [publicKey, burnerNonce, setBurnerNonce])
 
   // Invalidate credentials, except burnerNonce
@@ -72,7 +87,7 @@ export default function BurnerAccountManager() {
   }, [publicKey, dappSeed, setBurner, setDappSeed, setErrorMsg])
 
   const [busy, setBusy] = useState(false)
-  const sign = useCallback(async () => {
+  const signPrerequisites = useCallback(async () => {
     if (!publicKey) return
     if (!signMessage) return
     if (!burnerNonce) return
@@ -83,6 +98,9 @@ export default function BurnerAccountManager() {
     try {
       // extract dappSeed
       let appSeed = dappSeed?.nonce ? bs58.decode(dappSeed.nonce) : null
+      let message = ''
+      let signature = ''
+      let requireLinking = false
 
       if (dappSeed?.publicKey !== publicKey.toBase58()) {
         appSeed = null
@@ -93,8 +111,8 @@ export default function BurnerAccountManager() {
         const nonceResponse = await fetch('/api/request_nonce')
         const nonce = await nonceResponse.text()
 
-        const message = `Please sign to prove your public key ownership\n\n${publicKey?.toBase58()}:${nonce}`
-        const signature = bs58.encode(await signMessage(Buffer.from(message)))
+        message = `Please sign to prove your public key ownership\n\n${publicKey?.toBase58()}:${nonce}:${burnerNonce}`
+        signature = bs58.encode(await signMessage(Buffer.from(message)))
         const payload = JSON.stringify({ message, signature })
 
         const seedResponse = await fetch('/api/get_burner_seeds', {
@@ -105,13 +123,15 @@ export default function BurnerAccountManager() {
           body: payload,
         })
 
-        const { data } = await seedResponse.json()
-        appSeed = bs58.decode(data)
+        const response = await seedResponse.json()
+        appSeed = bs58.decode(response.data)
 
         setDappSeed({
-          nonce: data,
+          nonce: response.data,
           publicKey: publicKey.toBase58(),
         })
+
+        requireLinking = response.requireLinking
       }
 
       // TODO: if backpack, burner is stored in storage
@@ -120,11 +140,38 @@ export default function BurnerAccountManager() {
 
       // sign 2nd half
       const signedMessage = await signMessage(
-        Buffer.from(`Please sign to retrieve your game account`, 'utf8'),
+        Buffer.from(
+          `Please sign to retrieve your game account ${burnerNonce}`,
+          'utf8',
+        ),
       )
 
       const hash = hashv([appSeed, signedMessage.slice(0, 16)])
       const kp = Keypair.fromSeed(hash)
+
+      try {
+        if (requireLinking && message && signature) {
+          const burnerSignature = bs58.encode(
+            sign.detached(Buffer.from(message), kp.secretKey),
+          )
+          const payload = JSON.stringify({
+            message,
+            signature,
+            burnerSignature,
+            pubkey: kp.publicKey.toBase58(),
+          })
+
+          await fetch('/api/centralized_match/link_burner', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: payload,
+          })
+        }
+      } catch (e) {
+        // proceed regardless
+      }
 
       setBurner(kp)
     } catch (e) {
@@ -215,7 +262,7 @@ export default function BurnerAccountManager() {
             busy && 'opacity-20',
             'px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded w-full',
           )}
-          onClick={() => sign()}
+          onClick={() => signPrerequisites()}
         >
           <>
             Sign{' '}

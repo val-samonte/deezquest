@@ -10,6 +10,7 @@ interface DialogProps {
   title?: ReactNode | string
   children: ReactNode
   className?: string
+  padVertical?: boolean
   onClose?: () => void
 }
 
@@ -18,6 +19,7 @@ export function Dialog({
   title,
   children,
   className,
+  padVertical,
   onClose,
 }: DialogProps) {
   return (
@@ -62,7 +64,12 @@ export function Dialog({
                     </button>
                   </UiDialog.Title>
                 )}
-                <div className='bg-neutral-900 h-full min-h-[280px] text-stone-300 w-full py-5 flex flex-col overflow-auto'>
+                <div
+                  className={classNames(
+                    padVertical !== false && 'py-5',
+                    'bg-neutral-900 h-full min-h-[280px] text-stone-300 w-full flex flex-col overflow-auto',
+                  )}
+                >
                   {children}
                 </div>
               </UiDialog.Panel>

@@ -1,14 +1,14 @@
 import { SkillTypes } from '../enums/SkillTypes'
 import { describe, expect, test, beforeEach } from '@jest/globals'
 import { Keypair } from '@solana/web3.js'
-import { combinePublicKeysAsHash } from './combinePublicKeysAsHash'
+import { combinePublicKeysAsHash } from '../utils/combinePublicKeysAsHash'
 import { Hero, heroFromPublicKey, getNextTurn } from './gameFunctions'
 import {
   OperationArguments,
   parseSkillInstructionCode,
 } from './parseSkillInstructionCode'
-import { hashv } from './hashv'
-import { getOperationsFromCode, innateSkills } from './innateSkills'
+import { hashv } from '../utils/hashv'
+import { getOperationsFromCode, innateSkills } from '../utils/innateSkills'
 
 let playerKeypair: Keypair
 let opponentKeypair: Keypair

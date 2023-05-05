@@ -1,7 +1,7 @@
 import { SkillTypes } from '@/enums/SkillTypes'
-import { clamp } from './clamp'
-import { hashToTiles, Hero } from './gameFunctions'
-import { hashv } from './hashv'
+import { clamp } from '../utils/clamp'
+import { hashToTiles, Hero } from '../game/gameFunctions'
+import { hashv } from '../utils/hashv'
 
 export interface OperationArguments {
   commandLevel: number
