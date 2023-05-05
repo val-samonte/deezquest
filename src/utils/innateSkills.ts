@@ -19,7 +19,7 @@ export const innateSkills: Skill[] = [
       '24 Magic Damage + Base Damage',
     ],
     code: getOperationsFromCode(
-      '04 00 00 00 ' + // mana
+      '05 00 00 00 ' + // mana
         '43 01 00 ' + //  version
         '01 D0 08 ' + //  D0 = 8
         '37 D0 42 ' + //  D0 *= command level
@@ -55,7 +55,7 @@ export const innateSkills: Skill[] = [
     type: SkillTypes.ATTACK,
     cmdLvls: ['10 Magic Damage', '20 Magic Damage', '30 Magic Damage'],
     code: getOperationsFromCode(
-      '00 00 05 00 ' + // mana
+      '00 00 06 00 ' + // mana
         '43 01 00 ' + //  version
         '01 D0 0A ' + //  D0 = 10
         '37 D0 42 ' + //  D0 *= command level
@@ -125,7 +125,7 @@ export const innateSkills: Skill[] = [
       '+9 Armor, +10 Magic Barrier',
     ],
     code: getOperationsFromCode(
-      '00 00 00 05 ' + // mana
+      '00 00 00 06 ' + // mana
         '00 ' + //        version
         '01 C9 02 ' + //  C9 = 2
         '01 D0 03 ' + //  D0 = 3
