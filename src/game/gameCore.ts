@@ -25,7 +25,7 @@ import {
 import { MatchTypes } from '@/enums/MatchTypes'
 
 const modifyHp = (hero: Hero) => {
-  return 10 + hero.vit * 3 + Math.floor((hero.vit - 1) / 3) * 5
+  return 10 + hero.vit * 2 + Math.floor((hero.vit - 1) / 2) * 3
 }
 
 export const initialize = (match: Match) => {
