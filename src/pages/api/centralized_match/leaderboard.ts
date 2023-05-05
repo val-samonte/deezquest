@@ -22,7 +22,6 @@ export default async function handler(
         owner: id,
         date: new Date().getTime(),
       }
-
       leaderboard = leaderboard.filter((t) => t.owner !== id)
 
       for (let i = 0; i < 20; i++) {
@@ -30,7 +29,8 @@ export default async function handler(
           leaderboard[i] = entry
           break
         } else if (score > leaderboard[i].score) {
-          leaderboard = leaderboard.splice(i, 0, entry).slice(0, 20)
+          leaderboard.splice(i, 0, entry)
+          leaderboard = leaderboard.slice(0, 20)
           break
         }
       }

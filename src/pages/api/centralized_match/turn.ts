@@ -154,8 +154,9 @@ export default async function handler(
         if (typeof leaderboard[i] === 'undefined') {
           leaderboard[i] = entry
           break
-        } else if (newScore > leaderboard[i].score) {
-          leaderboard = leaderboard.splice(i, 0, entry).slice(0, 20)
+        } else if (score > leaderboard[i].score) {
+          leaderboard.splice(i, 0, entry)
+          leaderboard = leaderboard.slice(0, 20)
           break
         }
       }
