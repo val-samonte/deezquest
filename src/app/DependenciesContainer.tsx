@@ -63,7 +63,11 @@ export function AtomsInitializer() {
     )
     setIsXNft(!!backpackIframe)
 
-    if (backpackIframe && !walletContextState.connected) {
+    if (
+      backpackIframe &&
+      (!walletContextState.connected ||
+        walletContextState.wallet?.adapter.name !== BackpackIframeWalletName)
+    ) {
       walletContextState.select(BackpackIframeWalletName)
       return
     }
