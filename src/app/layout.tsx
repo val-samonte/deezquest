@@ -4,6 +4,7 @@ import Backgrounds from './Backgrounds'
 import BurnerAccountManager from './BurnerAccountManager'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
+import BgmManager from './BgmManager'
 // import PeerConnectionManager from './PeerConnectionManager'
 
 const MainMenu = dynamic(() => import('./MainMenu'), { ssr: false })
@@ -25,6 +26,7 @@ export default function RootLayout({
       <head />
       <body className='bg-black text-neutral-200'>
         <DependenciesContainer>
+          <BgmManager />
           <Backgrounds />
           <div className='fixed inset-0'>
             <div className='w-full h-full overflow-y-auto relative'>
