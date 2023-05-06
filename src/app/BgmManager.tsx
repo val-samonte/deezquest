@@ -4,6 +4,11 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import useSound from 'use-sound'
 
+// BGM by https://twitter.com/thenakarada
+// - Battle Theme: Grundar
+// - Home Theme: Tavern Loop One
+// "RPG Victory Fanfare 3 - The Will of Light" By Dylan Kelk
+
 export default function BgmManager() {
   const pathname = usePathname()
   const homeInit = useRef(false)
@@ -26,7 +31,6 @@ export default function BgmManager() {
       homeSound.on('fade', () => {
         if (homeSound.volume() === 0) {
           homeSound.stop()
-          console.log('HOME SOUND STOP')
         }
       })
       homeInit.current = true
@@ -38,7 +42,6 @@ export default function BgmManager() {
       battleSound.on('fade', () => {
         if (battleSound.volume() === 0) {
           battleSound.stop()
-          console.log('BATTLE SOUND STOP')
         }
       })
       battleInit.current = true
@@ -57,8 +60,11 @@ export default function BgmManager() {
         }
       } else {
         if (homeSound && !homeSound.playing()) {
-          playHome()
-          homeSound.fade(homeSound.volume(), 0.5, 1000)
+          setTimeout(() => {
+            playHome()
+            homeSound.volume(0.5)
+            // homeSound.fade(homeSound.volume(), 0.5, 1000)
+          }, 1000)
         }
         if (battleSound && battleSound.playing()) {
           battleSound.fade(battleSound.volume(), 0, 1000)
