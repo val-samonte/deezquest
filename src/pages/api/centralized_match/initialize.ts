@@ -120,11 +120,12 @@ export default async function handler(
     signature: bs58.encode(dappSignature),
   }
 
-  if (energy === 10) {
+  await kv.set(`pubkey_energy_${burnerOwner}`, energy - 1 + '')
+
+  const ttl = await kv.ttl(`pubkey_energy_${burnerOwner}`)
+  if (ttl < 0) {
     await kv.expire(`pubkey_energy_${burnerOwner}`, 60 * 60 * 24)
   }
-
-  await kv.set(`pubkey_energy_${burnerOwner}`, energy - 1 + '')
 
   res.status(200).json(returnObj)
 }
