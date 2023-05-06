@@ -16,11 +16,13 @@ const cartelOne = Carter_One({
 interface PlayerStatus {
   score?: number
   energy?: number
+  reset?: number
 }
 
 const statusDefault = {
   score: undefined,
   energy: undefined,
+  reset: undefined,
 }
 
 export const playerStatusAtom = atom<PlayerStatus>(statusDefault)

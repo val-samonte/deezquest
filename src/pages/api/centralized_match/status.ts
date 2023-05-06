@@ -14,5 +14,11 @@ export default async function handler(
   const score = parseInt((await kv.get(`pubkey_score_${id}`)) ?? '0')
   const energy = parseInt((await kv.get(`pubkey_energy_${id}`)) ?? '10')
 
-  res.status(200).json({ score, energy })
+  let ttl = await kv.ttl(`pubkey_energy_${id}`)
+  if (ttl < 0) {
+    await kv.expire(`pubkey_energy_${id}`, 60 * 60 * 24)
+    ttl = 60 * 60 * 24
+  }
+
+  res.status(200).json({ score, energy, reset: ttl })
 }
