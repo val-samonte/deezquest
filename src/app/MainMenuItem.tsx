@@ -1,7 +1,16 @@
 import classNames from 'classnames'
 import { atom, useAtom } from 'jotai'
+import { IM_Fell_DW_Pica } from 'next/font/google'
+
+const font = IM_Fell_DW_Pica({
+  weight: '400',
+  subsets: ['latin'],
+})
+
+// font.className
 
 export interface MainMenuItemProps {
+  name: string
   link: string
   maskImg: string
   bgImg: string
@@ -10,6 +19,7 @@ export interface MainMenuItemProps {
 export const hoveredAtom = atom('')
 
 export default function MainMenuItem({
+  name,
   link,
   bgImg,
   maskImg,
@@ -20,8 +30,8 @@ export default function MainMenuItem({
     <div
       className={classNames(
         hovered && hovered !== link && 'grayscale brightness-50',
-        hovered && hovered === link && 'scale-110 relative z-10',
-        'w-[25vh] h-full flex items-center justify-center pointer-events-none transition-all duration-500 ',
+        hovered && hovered === link && 'scale-110 z-10',
+        'w-[25vh] h-full flex items-center justify-center pointer-events-none transition-all duration-500 relative',
       )}
     >
       <div className='h-[25vh] aspect-[5/1]'>
@@ -53,6 +63,19 @@ export default function MainMenuItem({
             }}
           />
         </div>
+      </div>
+      <div
+        style={{
+          WebkitFontSmoothing: 'antialised',
+        }}
+        className={classNames(
+          hovered && hovered !== link && 'opacity-50',
+          hovered && hovered === link && 'scale-150',
+          'text-white absolute inset-0 flex items-center justify-center text-4xl transition-all duration-500',
+          font.className,
+        )}
+      >
+        {name}
       </div>
     </div>
   )

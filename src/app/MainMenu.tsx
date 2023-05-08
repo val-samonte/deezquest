@@ -72,19 +72,22 @@ export default function MainMenu() {
                   <div className='' onMouseOut={() => setHoveredItem('')}>
                     <div className='flex items-center justify-center gap-[4.5vh]'>
                       <MainMenuItem
+                        name='Barracks'
                         link='/barracks'
                         bgImg='/bg_barracks.png'
-                        maskImg='/mask_brush_2.png'
-                      />
-                      <MainMenuItem
-                        link='/pub'
-                        bgImg='/bg_bar.png'
                         maskImg='/mask_brush_1.png'
                       />
                       <MainMenuItem
+                        name='Pub'
+                        link='/pub'
+                        bgImg='/bg_bar.png'
+                        maskImg='/mask_brush_2.png'
+                      />
+                      <MainMenuItem
+                        name='Tutorial'
                         link='/tutorial'
                         bgImg='/bg_library.png'
-                        maskImg='/mask_brush_2.png'
+                        maskImg='/mask_brush_1.png'
                       />
                     </div>
                   </div>
