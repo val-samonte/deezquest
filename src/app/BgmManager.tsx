@@ -48,30 +48,30 @@ export default function BgmManager() {
     }
   }, [battleSound])
 
-  // useEffect(() => {
-  //   if (pathname && homeInit.current && battleInit.current) {
-  //     if (pathname.includes('/battle')) {
-  //       if (battleSound && !battleSound.playing()) {
-  //         playBattle()
-  //         battleSound.fade(battleSound.volume(), 0.5, 1000)
-  //       }
-  //       if (homeSound && homeSound.playing()) {
-  //         homeSound.fade(homeSound.volume(), 0, 1000)
-  //       }
-  //     } else {
-  //       if (homeSound && !homeSound.playing()) {
-  //         setTimeout(() => {
-  //           playHome()
-  //           homeSound.volume(0.5)
-  //           // homeSound.fade(homeSound.volume(), 0.5, 1000)
-  //         }, 1000)
-  //       }
-  //       if (battleSound && battleSound.playing()) {
-  //         battleSound.fade(battleSound.volume(), 0, 1000)
-  //       }
-  //     }
-  //   }
-  // }, [pathname, homeSound, battleSound, playHome, playBattle])
+  useEffect(() => {
+    if (pathname && homeInit.current && battleInit.current) {
+      if (pathname.includes('/battle')) {
+        if (battleSound && !battleSound.playing()) {
+          playBattle()
+          battleSound.fade(battleSound.volume(), 0.5, 1000)
+        }
+        if (homeSound && homeSound.playing()) {
+          homeSound.fade(homeSound.volume(), 0, 1000)
+        }
+      } else {
+        if (homeSound && !homeSound.playing()) {
+          setTimeout(() => {
+            playHome()
+            homeSound.volume(0.5)
+            // homeSound.fade(homeSound.volume(), 0.5, 1000)
+          }, 1000)
+        }
+        if (battleSound && battleSound.playing()) {
+          battleSound.fade(battleSound.volume(), 0, 1000)
+        }
+      }
+    }
+  }, [pathname, homeSound, battleSound, playHome, playBattle])
 
   return null
 }
