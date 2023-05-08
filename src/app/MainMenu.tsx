@@ -17,6 +17,7 @@ import { peerAtom } from '@/atoms/peerConnectionAtom'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
+import MainMenuItem, { hoveredAtom } from './MainMenuItem'
 
 export const showMenuAtom = atom(false)
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
@@ -34,6 +35,7 @@ export default function MainMenu() {
   const setGameState = useSetAtom(gameStateAtom)
   const setGameResult = useSetAtom(gameResultAtom)
   const [quitMatchConfirm, setQuitMatchConfirm] = useState(false)
+  const setHoveredItem = useSetAtom(hoveredAtom)
 
   return (
     <>
@@ -64,8 +66,36 @@ export default function MainMenu() {
             leaveTo='opacity-0 scale-95'
           >
             <div className='fixed inset-0 flex items-center justify-center'>
-              <div className='m-auto w-full max-h-full px-3 py-5 overflow-auto'>
-                <Dialog.Panel className='max-w-xs mx-auto'>
+              <div className='m-auto w-full max-h-full px-3 py-5'>
+                <Dialog.Panel className='mx-auto'>
+                  {/* MAIN WRAPPER */}
+                  <div className='' onMouseOut={() => setHoveredItem('')}>
+                    <div className='flex items-center justify-center gap-[4.5vh]'>
+                      <MainMenuItem
+                        link='/barracks'
+                        bgImg='/bg_barracks.png'
+                        maskImg='/mask_brush_2.png'
+                      />
+                      <MainMenuItem
+                        link='/pub'
+                        bgImg='/bg_bar.png'
+                        maskImg='/mask_brush_1.png'
+                      />
+                      <MainMenuItem
+                        link='/tutorial'
+                        bgImg='/bg_library.png'
+                        maskImg='/mask_brush_2.png'
+                      />
+                    </div>
+                  </div>
+                  {/* <div className='absolute inset-0 flex items-center justify-center'>
+                    <img
+                      src='/Title.png'
+                      className='h-[25vh] object-contain mr-[100vh] mb-[30vh]'
+                    />
+                  </div> */}
+
+                  {/*                   
                   <div className='flex items-center justify-center'>
                     <img src='/logo.png' className='w-20 h-20 mb-5' />
                   </div>
@@ -236,7 +266,6 @@ export default function MainMenu() {
                                 alt='Twitter'
                               />
                             </a>
-                            {/* <span className='hidden md:inline'>Twitter</span> */}
                           </li>
                           <li className='opacity-20 flex items-center justify-center gap-3'>
                             <img
@@ -244,7 +273,7 @@ export default function MainMenu() {
                               className='w-6 h-6'
                               alt='Discord'
                             />
-                            {/* <span className='hidden md:inline'>Discord</span> */}
+                            
                           </li>
                           <li className='flex items-center justify-center gap-3 p-2'>
                             <a
@@ -259,7 +288,6 @@ export default function MainMenu() {
                               />
                             </a>
 
-                            {/* <span className='hidden md:inline'>Github</span> */}
                           </li>
                         </ul>
                       ) : (
@@ -273,7 +301,7 @@ export default function MainMenu() {
                         </button>
                       )}
                     </li>
-                  </ul>
+                  </ul> */}
                 </Dialog.Panel>
               </div>
             </div>
