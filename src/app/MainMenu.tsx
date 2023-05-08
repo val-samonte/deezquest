@@ -75,7 +75,7 @@ export default function MainMenu() {
                   {/* MENU ITEM WRAPPER */}
                   <div className='max-w-min mx-auto relative'>
                     <div
-                      className='flex items-center justify-center gap-[8vh]'
+                      className='flex portrait:flex-col items-center justify-center landscape:gap-[8vh] portrait:gap-[8vw]'
                       onMouseOut={() => setHoveredItem(pathname ?? '')}
                     >
                       <MainMenuItem
@@ -97,15 +97,15 @@ export default function MainMenu() {
                         maskImg='/mask_brush_1.png'
                       />
                     </div>
-                    <div className='absolute -top-[20vh] -left-[20vh]'>
+                    <div className='absolute portrait:fixed -top-[20vh] -left-[20vh] portrait:p-10 portrait:top-0 portrait:left-0'>
                       <img
                         src='/logo.png'
-                        className='h-[15vh] object-contain aspect-square'
+                        className='landscape:h-[15vh] portrait:w-[15vw] object-contain aspect-square'
                       />
                     </div>
-                    <div className='absolute -bottom-[20vh] -right-[20vh] text-right flex flex-col justify-end w-64'>
+                    <div className='absolute portrait:fixed -bottom-[20vh] -right-[20vh] portrait:bottom-0 portrait:right-0 text-right flex flex-col justify-end w-64 portrait:w-screen portrait:p-5 z-50'>
                       {wallet?.connected && (
-                        <li className='flex items-center justify-end text-base py-5 gap-5'>
+                        <li className='flex items-center justify-center sm:justify-end text-base py-5 gap-5'>
                           <span className='flex items-center gap-2'>
                             <span className='font-bold'>
                               {trimAddress(wallet.publicKey?.toBase58() ?? '')}

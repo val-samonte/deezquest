@@ -35,14 +35,18 @@ export default function MainMenuItem({
       className={classNames(
         hovered && !hovered.includes(link) && 'grayscale',
         hovered && hovered.includes(link) && 'scale-110 z-10',
-        'w-[25vh] h-full flex items-center justify-center pointer-events-none transition-all duration-500 relative',
+        'w-[25vh] h-full',
+        'portrait:w-[14.75vh] h-full',
+        'flex items-center justify-center pointer-events-none transition-all duration-500 relative',
       )}
     >
       <div
         className={classNames(
           !hovered && 'brightness-50',
           hovered && !hovered.includes(link) && 'brightness-50',
-          'h-[25vh] aspect-[5/1] transition-all duration-500',
+          'h-[25vh]',
+          'portrait:h-[14.75vh]',
+          'aspect-[5/1] transition-all duration-500',
         )}
       >
         <div
@@ -53,7 +57,8 @@ export default function MainMenuItem({
           onMouseOver={() => setHovered(link)}
           className={classNames(
             hovered && hovered.includes(link) && 'scale-110',
-            'relative h-full flex items-center justify-center -rotate-45 pointer-events-auto transition-all duration-500 cursor-pointer',
+            'h-full',
+            'relative flex items-center justify-center -rotate-45 pointer-events-auto transition-all duration-500 cursor-pointer',
           )}
           style={{
             WebkitMaskImage: `url("${maskImg}")`,
@@ -67,7 +72,8 @@ export default function MainMenuItem({
           <div
             className={classNames(
               hovered && hovered.includes(link) && 'scale-90',
-              'absolute inset-x-0 w-full aspect-square rotate-45 pointer-events-none transition-all duration-500',
+              'inset-x-0 w-full',
+              'absolute aspect-square rotate-45 pointer-events-none transition-all duration-500',
             )}
             style={{
               backgroundImage: `url("${bgImg}")`,
@@ -91,7 +97,7 @@ export default function MainMenuItem({
         )}
       >
         <img
-          className='h-[3.5vh] object-contain'
+          className={classNames('h-[3.5vh]', 'object-contain')}
           src={`/text_${name.toLowerCase()}.png`}
           alt={name}
         />
