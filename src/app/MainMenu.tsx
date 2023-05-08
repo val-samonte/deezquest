@@ -103,7 +103,7 @@ export default function MainMenu() {
                         className='landscape:h-[15vh] portrait:w-[15vw] object-contain aspect-square'
                       />
                     </div>
-                    <div className='absolute portrait:fixed -bottom-[20vh] -right-[20vh] portrait:bottom-0 portrait:right-0 text-right flex flex-col justify-end max-w-min portrait:w-screen portrait:p-5 z-50'>
+                    <div className='absolute portrait:fixed -bottom-[20vh] -right-[20vh] portrait:bottom-0 portrait:right-0 text-right flex flex-col justify-end max-w-max portrait:w-screen portrait:p-5 z-50'>
                       {wallet?.connected && (
                         <li className='flex items-center justify-center sm:justify-end text-base py-5 gap-5'>
                           <span className='flex items-center gap-2'>
