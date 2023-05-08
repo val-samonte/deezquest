@@ -61,7 +61,15 @@ export default function Backgrounds() {
         )}
       />
       <img
-        src='/bg_ruins.png'
+        src='/bg_bar.png'
+        className={classNames(
+          commonClasses,
+          pathname?.includes('/pub') ? 'opacity-100' : 'opacity-0',
+          'brightness-50',
+        )}
+      />
+      <img
+        src='/bg_library.png'
         className={classNames(
           commonClasses,
           pathname?.includes('/tutorial') ? 'opacity-100' : 'opacity-0',
