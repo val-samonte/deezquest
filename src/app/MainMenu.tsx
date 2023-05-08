@@ -79,15 +79,15 @@ export default function MainMenu() {
                       onMouseOut={() => setHoveredItem(pathname ?? '')}
                     >
                       <MainMenuItem
-                        name='Barracks'
-                        link='/barracks'
-                        bgImg='/bg_barracks.png'
-                        maskImg='/mask_brush_1.png'
-                      />
-                      <MainMenuItem
                         name='Pub'
                         link='/pub'
                         bgImg='/bg_bar.png'
+                        maskImg='/mask_brush_1.png'
+                      />
+                      <MainMenuItem
+                        name='Barracks'
+                        link='/barracks'
+                        bgImg='/bg_barracks.png'
                         maskImg='/mask_brush_2.png'
                       />
                       <MainMenuItem
