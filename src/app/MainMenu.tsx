@@ -38,13 +38,25 @@ export default function MainMenu() {
   const setHoveredItem = useSetAtom(hoveredAtom)
 
   useEffect(() => {
-    setHoveredItem(pathname ?? '')
+    setHoveredItem(!pathname || pathname === '/' ? '' : pathname)
   }, [pathname, setHoveredItem])
+
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen((o) => !o)
+      }
+    }
+    window.addEventListener('keyup', listener)
+    return () => {
+      window.removeEventListener('keyup', listener)
+    }
+  }, [])
 
   return (
     <>
       <Transition show={open} as={Fragment}>
-        <Dialog onClose={() => setOpen(false)} className='relative z-50'>
+        <Dialog onClose={() => {}} className='relative z-50'>
           <Transition.Child
             as={Fragment}
             enter='ease-out duration-300'
@@ -56,7 +68,7 @@ export default function MainMenu() {
           >
             <div
               onClick={() => setOpen(false)}
-              className='fixed h-screen inset-0 bg-black/80 backdrop-blur-sm'
+              className='fixed h-screen inset-0 bg-black/90 backdrop-blur-sm'
               aria-hidden='true'
             />
           </Transition.Child>
@@ -75,8 +87,12 @@ export default function MainMenu() {
                   {/* MENU ITEM WRAPPER */}
                   <div className='max-w-min mx-auto relative'>
                     <div
-                      className='flex portrait:flex-col items-center justify-center landscape:gap-[8vh] portrait:gap-[8vw]'
-                      onMouseOut={() => setHoveredItem(pathname ?? '')}
+                      className='flex portrait:flex-col items-center justify-center landscape:gap-[8vw] portrait:gap-[8vh]'
+                      onMouseOut={() =>
+                        setHoveredItem(
+                          !pathname || pathname === '/' ? '' : pathname,
+                        )
+                      }
                     >
                       <MainMenuItem
                         name='Pub'
@@ -97,13 +113,13 @@ export default function MainMenu() {
                         maskImg='/mask_brush_1.png'
                       />
                     </div>
-                    <div className='absolute portrait:fixed -top-[20vh] -left-[20vh] portrait:p-10 portrait:top-0 portrait:left-0'>
+                    <div className='absolute portrait:fixed -top-[14.5vw] -left-[14.5vw] portrait:p-10 portrait:top-0 portrait:left-0'>
                       <img
                         src='/logo.png'
                         className='landscape:h-[15vh] portrait:w-[15vw] object-contain aspect-square'
                       />
                     </div>
-                    <div className='absolute portrait:fixed -bottom-[20vh] -right-[20vh] portrait:bottom-0 portrait:right-0 text-right flex flex-col justify-end mx-auto sm:max-w-max portrait:w-screen portrait:p-5 z-50'>
+                    <div className='absolute portrait:fixed -bottom-[14.5vw] -right-[14.5vw] portrait:bottom-0 portrait:right-0 text-right flex flex-col justify-end mx-auto sm:max-w-max portrait:w-screen portrait:p-5 z-50'>
                       {wallet?.connected && (
                         <li className='flex items-center justify-center sm:justify-end text-base py-5 gap-5'>
                           <span className='flex items-center gap-2'>
