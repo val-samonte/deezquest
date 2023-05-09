@@ -1,8 +1,9 @@
-import { HeroAttributes } from '@/enums/HeroAttributes'
-import { Popover } from '@headlessui/react'
 import classNames from 'classnames'
 import { ReactNode, useState } from 'react'
 import { usePopper } from 'react-popper'
+
+import { HeroAttributes } from '@/enums/HeroAttributes'
+import { Popover } from '@headlessui/react'
 
 interface AttributeTileProps {
   attrName: HeroAttributes

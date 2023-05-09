@@ -1,6 +1,7 @@
 'use client'
 
 import { useSetAtom } from 'jotai'
+
 import { showMenuAtom } from './MainMenu'
 
 export default function Home() {

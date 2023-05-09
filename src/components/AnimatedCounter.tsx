@@ -1,8 +1,9 @@
 'use client'
 
-import { animated, useSpringValue } from '@react-spring/web'
 import classNames from 'classnames'
 import { useEffect } from 'react'
+
+import { animated, useSpringValue } from '@react-spring/web'
 
 export default function AnimatedCounter({
   value,

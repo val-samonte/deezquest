@@ -2,6 +2,7 @@
 
 import classNames from 'classnames'
 import { ReactNode } from 'react'
+
 import AnimatedCounter from './AnimatedCounter'
 
 interface StatCounterProps {

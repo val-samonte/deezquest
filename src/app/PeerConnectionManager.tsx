@@ -1,14 +1,11 @@
 'use client'
 
-import { PeerErrorType, PeerInstance, usePeer } from '@/atoms/peerAtom'
-import { hashv } from '@/utils/hashv'
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
-import { atomWithStorage, createJSONStorage } from 'jotai/utils'
-import { burnerKeypairAtom } from './BurnerAccountManager'
 import bs58 from 'bs58'
-import { useEffect, useState } from 'react'
-import { Dialog } from '@/components/Dialog'
 import classNames from 'classnames'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { useEffect, useState } from 'react'
+
+import { PeerErrorType, usePeer } from '@/atoms/peerAtom'
 import {
   connectionListAtom,
   peerAtom,
@@ -17,6 +14,9 @@ import {
   peerOpenAtom,
   renewEnabledAtom,
 } from '@/atoms/peerConnectionAtom'
+import { Dialog } from '@/components/Dialog'
+
+import { burnerKeypairAtom } from './BurnerAccountManager'
 
 // Peer Connection:
 // for p2p, we need another nonce as well, which is colocated in the same PDA with
