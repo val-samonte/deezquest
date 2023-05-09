@@ -5,6 +5,7 @@ import BurnerAccountManager from './BurnerAccountManager'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
 import BgmManager from './BgmManager'
+import ExistingMatch from './ExistingMatch'
 // import PeerConnectionManager from './PeerConnectionManager'
 
 const MainMenu = dynamic(() => import('./MainMenu'), { ssr: false })
@@ -35,6 +36,7 @@ export default function RootLayout({
                   {children}
                 </div>
                 <MainMenu />
+                <ExistingMatch />
               </div>
             </div>
           </div>

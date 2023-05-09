@@ -18,6 +18,7 @@ import { PeerMessages } from '@/enums/PeerMessages'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
 import MainMenuItem, { hoveredAtom } from './MainMenuItem'
+import { existingMatchAtom } from './ExistingMatch'
 
 export const showMenuAtom = atom(false)
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
@@ -31,6 +32,7 @@ export default function MainMenu() {
   const peerInstance = useAtomValue(peerAtom)
   const isXNft = useAtomValue(isXNftAtom)
   const [open, setOpen] = useAtom(showMenuAtom)
+  const [actualOpen, setActualOpen] = useState(false)
   const [match, setMatch] = useAtom(matchAtom)
   const setGameState = useSetAtom(gameStateAtom)
   const setGameResult = useSetAtom(gameResultAtom)
@@ -53,9 +55,16 @@ export default function MainMenu() {
     }
   }, [])
 
+  useEffect(() => {
+    setActualOpen(open)
+    // if (open && match && pathname === '/') {
+
+    // }
+  }, [open, match, pathname, setActualOpen])
+
   return (
     <>
-      <Transition show={open} as={Fragment}>
+      <Transition show={actualOpen} as={Fragment}>
         <Dialog onClose={() => {}} className='relative z-50'>
           <Transition.Child
             as={Fragment}
@@ -87,13 +96,36 @@ export default function MainMenu() {
                   {/* MENU ITEM WRAPPER */}
                   <div className='max-w-min mx-auto relative'>
                     <div
-                      className='flex portrait:flex-col items-center justify-center landscape:gap-[8vw] portrait:gap-[8vh]'
+                      className='flex portrait:flex-col items-center justify-center landscape:gap-[5vw] portrait:gap-[5vh] -mt-10 portrait:-mt-20'
                       onMouseOut={() =>
                         setHoveredItem(
                           !pathname || pathname === '/' ? '' : pathname,
                         )
                       }
                     >
+                      {wallet?.connected && match && (
+                        <MainMenuItem
+                          alt={
+                            pathname?.includes('/battle') ? 'Quit' : 'Resume'
+                          }
+                          isRed={pathname?.includes('/battle')}
+                          name='Battle'
+                          link='/battle'
+                          bgImg='/bg_arena.png'
+                          maskImg='/mask_brush_2.png'
+                          onSelect={() => {
+                            if (pathname?.includes('/battle')) {
+                              setOpen(false)
+                              setQuitMatchConfirm(true)
+                            } else {
+                              setOpen(false)
+                              setTimeout(() => {
+                                router.push('/battle')
+                              }, 500)
+                            }
+                          }}
+                        />
+                      )}
                       <MainMenuItem
                         name='Pub'
                         link='/pub'
@@ -113,13 +145,31 @@ export default function MainMenu() {
                         maskImg='/mask_brush_1.png'
                       />
                     </div>
-                    <div className='absolute portrait:fixed -top-[14.5vw] -left-[14.5vw] portrait:p-10 portrait:top-0 portrait:left-0'>
+                    <div
+                      className={classNames(
+                        'fixed landscape:xl:absolute z-50',
+                        'top-[5vh] left-[5vh]',
+                        'landscape:top-[5vw] landscape:left-[5vw]',
+                        'landscape:xl:-top-[20vh] landscape:xl:-left-[5vw]',
+                      )}
+                    >
                       <img
                         src='/logo.png'
                         className='landscape:h-[15vh] portrait:w-[15vw] object-contain aspect-square'
                       />
                     </div>
-                    <div className='absolute portrait:fixed -bottom-[14.5vw] -right-[14.5vw] portrait:bottom-0 portrait:right-0 text-right flex flex-col justify-end mx-auto sm:max-w-max portrait:w-screen portrait:p-5 z-50'>
+                    <div
+                      className={classNames(
+                        'fixed landscape:xl:absolute z-50',
+                        'bottom-0 right-0 portrait:w-screen',
+                        'portrait:sm:bottom-[5vh] portrait:sm:right-[5vh]',
+                        'landscape:bottom-[5vw] landscape:right-[5vw]',
+                        'landscape:xl:-bottom-[20vh] landscape:xl:-right-[5vw]',
+                        'portrait:p-5 sm:max-w-max mx-auto',
+                        'landscape:xl:-bottom-[20vh]',
+                        'flex flex-col justify-end text-right',
+                      )}
+                    >
                       {wallet?.connected && (
                         <li className='flex items-center justify-center sm:justify-end text-base py-5 gap-5'>
                           <span className='flex items-center gap-2'>
