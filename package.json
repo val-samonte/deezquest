@@ -49,6 +49,7 @@
     "use-sound": "^4.0.1"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "autoprefixer": "^10.4.13",
     "jest-environment-node": "^29.5.0",
     "postcss": "^8.4.21",

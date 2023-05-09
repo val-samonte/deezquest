@@ -1,24 +1,24 @@
 'use client'
 
-import { useUserWallet } from '@/atoms/userWalletAtom'
-import BackIcon from '@/components/BackIcon'
-import { trimAddress } from '@/utils/trimAddress'
-import { Dialog, Transition } from '@headlessui/react'
-import { Dialog as UIDialog } from '@/components/Dialog'
 import classNames from 'classnames'
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
-import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
 import { Fragment, useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
-import { matchAtom } from '@/atoms/matchAtom'
+
 import { gameResultAtom, gameStateAtom } from '@/atoms/gameStateAtom'
-import { peerAtom } from '@/atoms/peerConnectionAtom'
-import { PeerMessages } from '@/enums/PeerMessages'
-import { MatchTypes } from '@/enums/MatchTypes'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
+import { matchAtom } from '@/atoms/matchAtom'
+import { peerAtom } from '@/atoms/peerConnectionAtom'
+import { useUserWallet } from '@/atoms/userWalletAtom'
+import BackIcon from '@/components/BackIcon'
+import { Dialog as UIDialog } from '@/components/Dialog'
+import { MatchTypes } from '@/enums/MatchTypes'
+import { PeerMessages } from '@/enums/PeerMessages'
+import { trimAddress } from '@/utils/trimAddress'
+import { Dialog, Transition } from '@headlessui/react'
+
 import MainMenuItem, { hoveredAtom } from './MainMenuItem'
-import { existingMatchAtom } from './ExistingMatch'
 
 export const showMenuAtom = atom(false)
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
@@ -186,7 +186,13 @@ export default function MainMenu() {
                             <button
                               type='button'
                               className='underline font-bold'
-                              onClick={() => wallet.disconnect()}
+                              onClick={() => {
+                                setOpen(false)
+                                setTimeout(() => {
+                                  wallet.disconnect()
+                                  router.push('/')
+                                }, 500)
+                              }}
                             >
                               Disconnect
                             </button>

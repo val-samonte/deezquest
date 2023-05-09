@@ -1,16 +1,17 @@
 'use client'
 
-import { useUserWallet } from '@/atoms/userWalletAtom'
-import { Keypair } from '@solana/web3.js'
+import bs58 from 'bs58'
+import classNames from 'classnames'
 import { atom, useAtom, useAtomValue } from 'jotai'
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import bs58 from 'bs58'
-import { Dialog } from '@/components/Dialog'
-import classNames from 'classnames'
-import { hashv } from '@/utils/hashv'
-import { isXNftAtom } from '@/atoms/isXNftAtom'
 import { sign } from 'tweetnacl'
+
+import { isXNftAtom } from '@/atoms/isXNftAtom'
+import { useUserWallet } from '@/atoms/userWalletAtom'
+import { Dialog } from '@/components/Dialog'
+import { hashv } from '@/utils/hashv'
+import { Keypair } from '@solana/web3.js'
 
 // Backend (Dapp) Seed:
 // to strengthen the security, an extra seed is given by the backend so that no other dapps

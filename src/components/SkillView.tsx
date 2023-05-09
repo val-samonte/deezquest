@@ -1,12 +1,13 @@
 'use client'
 
+import classNames from 'classnames'
+import { useState } from 'react'
+import { usePopper } from 'react-popper'
+
 import { elementColors } from '@/enums/ElementColors'
-import { SkillTypes } from '@/enums/SkillTypes'
 import { Skill } from '@/types/Skill'
 import { Popover } from '@headlessui/react'
-import classNames from 'classnames'
-import { useMemo, useState } from 'react'
-import { usePopper } from 'react-popper'
+
 import CommandLevelsDescription from './CommandLevelsDescription'
 
 interface SkillViewProps {

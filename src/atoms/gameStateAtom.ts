@@ -1,13 +1,15 @@
+import bs58 from 'bs58'
 import { atom } from 'jotai'
 import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
-import { checkWinner, getNextTurn, Hero } from '@/game/gameFunctions'
-import { matchAtom } from './matchAtom'
-import { MatchTypes } from '@/enums/MatchTypes'
-import { initialize, processGameCombo, swap } from '@/game/gameCore'
+
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { GameTransitions } from '@/enums/GameTransitions'
+import { MatchTypes } from '@/enums/MatchTypes'
+import { initialize, processGameCombo, swap } from '@/game/gameCore'
+import { checkWinner, getNextTurn, Hero } from '@/game/gameFunctions'
 import { PublicKey } from '@solana/web3.js'
-import bs58 from 'bs58'
+
+import { matchAtom } from './matchAtom'
 
 export interface GameState {
   hashes: string[]

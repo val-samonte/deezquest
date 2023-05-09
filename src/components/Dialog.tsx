@@ -1,9 +1,9 @@
 'use client'
 
-import { Dialog as UiDialog, Transition } from '@headlessui/react'
 import classNames from 'classnames'
-import { Fragment, ReactNode } from 'react'
 import CloseIcon from './CloseIcon'
+import { Dialog as UiDialog, Transition } from '@headlessui/react'
+import { ReactNode, Fragment } from 'react'
 
 interface DialogProps {
   show: boolean
