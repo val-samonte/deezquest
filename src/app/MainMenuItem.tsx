@@ -12,19 +12,25 @@ const font = IM_Fell_DW_Pica({
 // font.className
 
 export interface MainMenuItemProps {
+  alt?: string
   name: string
   link: string
   maskImg: string
   bgImg: string
+  onSelect?: () => unknown
+  isRed?: boolean
 }
 
 export const hoveredAtom = atom('')
 
 export default function MainMenuItem({
+  alt,
   name,
   link,
   bgImg,
   maskImg,
+  isRed,
+  onSelect,
 }: MainMenuItemProps) {
   const [hovered, setHovered] = useAtom(hoveredAtom)
   const setShowMenu = useSetAtom(showMenuAtom)
@@ -51,8 +57,12 @@ export default function MainMenuItem({
       >
         <div
           onClick={() => {
-            router.push(link)
-            setShowMenu(false)
+            if (onSelect) {
+              onSelect()
+            } else {
+              router.push(link)
+              setShowMenu(false)
+            }
           }}
           onMouseOver={() => setHovered(link)}
           className={classNames(
@@ -71,7 +81,8 @@ export default function MainMenuItem({
         >
           <div
             className={classNames(
-              hovered && hovered.includes(link) && 'scale-75',
+              isRed && 'sepia',
+              hovered && hovered.includes(link) && 'scale-75 contrast-125',
               'inset-x-0 w-full',
               'absolute aspect-square rotate-45 pointer-events-none transition-all duration-500',
             )}
@@ -96,6 +107,13 @@ export default function MainMenuItem({
           font.className,
         )}
       >
+        {alt && (
+          <img
+            className={classNames('h-8 xl:h-[3.5vh]', 'object-contain')}
+            src={`/text_${alt.toLowerCase()}.png`}
+            alt={alt}
+          />
+        )}
         <img
           className={classNames('h-8 xl:h-[3.5vh]', 'object-contain')}
           src={`/text_${name.toLowerCase()}.png`}
