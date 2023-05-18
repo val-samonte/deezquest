@@ -15,16 +15,11 @@ export default function Backgrounds() {
   return (
     <div className='fixed inset-0'>
       <img
-        src={
-          match?.matchType === MatchTypes.CENTRALIZED
-            ? '/BUNNiEZ_bg.png'
-            : '/bg_arena.png'
-        }
+        src={'/bg_arena.png'}
         className={classNames(
           commonClasses,
           pathname?.includes('/battle') ? 'opacity-100' : 'opacity-0',
-          match?.matchType === MatchTypes.CENTRALIZED ? '' : 'brightness-75',
-          'object-bottom',
+          'object-bottom brightness-75',
         )}
       />
       <img
@@ -36,12 +31,11 @@ export default function Backgrounds() {
         )}
       />
       <img
-        // src='/bg_plains.png'
-        src='/BUNNiEZ_bg.png'
+        src='/bg_plains.png'
         className={classNames(
           commonClasses,
           pathname === '/' ? 'opacity-100' : 'opacity-0',
-          'object-bottom blur-none',
+          'object-bottom brightness-75 blur-none',
         )}
       />
       <img

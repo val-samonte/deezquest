@@ -127,7 +127,6 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
 
   return (
     <Dialog
-      title='DARK BUNNiEZ'
       show={show}
       onClose={onClose}
       className='max-w-3xl'
@@ -137,7 +136,6 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
         <div
           className='absolute inset-0 opacity-20'
           style={{
-            background: 'url("/BUNNiEZ_img.png")',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
@@ -145,11 +143,11 @@ export default function SpecialDialogMatch({ show, onClose }: BotMatchProps) {
         />
         <div className='relative flex flex-col w-full gap-5'>
           <SpecialEventDisplay>
-            <img
-              src={'/evil_bunniez1.jpg'}
+            {/* <img
+              src={'/event_avatar.jpg'}
               className='w-full h-full object-contain'
               style={{ transform: 'scaleX(-1)' }}
-            />
+            /> */}
           </SpecialEventDisplay>
           <div className='flex gap-3 justify-center pt-5 px-5'>
             <button

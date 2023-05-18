@@ -10,7 +10,6 @@ import BotMatchDialog from './BotDialogMatch'
 import FriendlyMatchDialog from './FriendlyMatchDialog'
 import { userNftCollectionAtom } from './HeroContentPage'
 import RankedMatch from './RankedMatch'
-import SpecialDialogMatch from './SpecialDialogMatch'
 
 export default function HeroActionButtons() {
   const pathname = usePathname()
@@ -32,7 +31,6 @@ export default function HeroActionButtons() {
   const [showRankedDialog, setShowRankedDialog] = useState(false)
   const [showFriendlyDialog, setShowFriendlyDialog] = useState(false)
   const [showBotDialog, setShowBotDialog] = useState(false)
-  const [showBunniezDialog, setShowBunniezDialog] = useState(false)
 
   return (
     <>
@@ -82,19 +80,19 @@ export default function HeroActionButtons() {
           >
             <div className='fixed inset-0 flex items-center justify-center'>
               <div className='m-auto w-full max-h-full p-5 portrait:px-10 overflow-auto'>
-                <Dialog.Panel className={'w-full max-w-4xl mx-auto'}>
+                <Dialog.Panel className={'w-full max-w-2xl mx-auto'}>
                   <Dialog.Title
                     className={'flex items-center justify-center mb-5'}
                   >
                     <img src='/BattleIcon.svg' className='w-8 h-8' />
                     <span className='ml-2 text-2xl font-bold'>Battle</span>
                   </Dialog.Title>
-                  <ul className='grid grid-cols-1 landscape:grid-cols-4 gap-5'>
-                    <li>
+                  <ul className='grid grid-cols-1 landscape:grid-cols-3 gap-5'>
+                    <li className='w-full'>
                       <button
                         type='button'
                         className={classNames(
-                          'portrait:text-left portrait:w-full',
+                          'portrait:text-left w-full',
                           'landscape:items-center landscape:justify-center',
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
                           'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded h-full',
@@ -103,7 +101,6 @@ export default function HeroActionButtons() {
                           setShowRankedDialog(true)
                           setShowFriendlyDialog(false)
                           setShowBotDialog(false)
-                          setShowBunniezDialog(false)
                         }}
                       >
                         <img
@@ -118,11 +115,11 @@ export default function HeroActionButtons() {
                         </div>
                       </button>
                     </li>
-                    <li>
+                    <li className='w-full'>
                       <button
                         type='button'
                         className={classNames(
-                          'portrait:text-left portrait:w-full',
+                          'portrait:text-left w-full',
                           'landscape:items-center landscape:justify-center',
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
                           'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded h-full',
@@ -131,7 +128,6 @@ export default function HeroActionButtons() {
                           setShowRankedDialog(false)
                           setShowFriendlyDialog(true)
                           setShowBotDialog(false)
-                          setShowBunniezDialog(false)
                         }}
                       >
                         <img
@@ -146,11 +142,11 @@ export default function HeroActionButtons() {
                         </div>
                       </button>
                     </li>
-                    <li>
+                    <li className='w-full'>
                       <button
                         type='button'
                         className={classNames(
-                          'portrait:text-left portrait:w-full',
+                          'portrait:text-left w-full',
                           'landscape:items-center landscape:justify-center',
                           'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
                           'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded h-full',
@@ -159,7 +155,6 @@ export default function HeroActionButtons() {
                           setShowRankedDialog(false)
                           setShowFriendlyDialog(false)
                           setShowBotDialog(true)
-                          setShowBunniezDialog(false)
                         }}
                       >
                         <img
@@ -170,38 +165,6 @@ export default function HeroActionButtons() {
                           <h3 className='text-lg font-bold'>Practice</h3>
                           <p className='text-sm text-neutral-300'>
                             Play against a bot off-chain
-                          </p>
-                        </div>
-                      </button>
-                    </li>
-
-                    <li>
-                      <button
-                        type='button'
-                        className={classNames(
-                          'portrait:text-left portrait:w-full',
-                          'landscape:items-center landscape:justify-center',
-                          'bg-gradient-to-tr from-neutral-900 via-neutral-900 to-neutral-900 hover:to-purple-600',
-                          'p-3 landscape:p-5 flex landscape:flex-col gap-3 rounded h-full',
-                        )}
-                        onClick={() => {
-                          setShowRankedDialog(false)
-                          setShowFriendlyDialog(false)
-                          setShowBotDialog(false)
-                          setShowBunniezDialog(true)
-                        }}
-                      >
-                        <img
-                          src='/evil_bunniez1.jpg'
-                          className='flex-none landscape:w-full portrait:h-14 aspect-square object-contain'
-                          style={{ transform: 'scaleX(-1)' }}
-                        />
-                        <div className='flex flex-col landscape:gap-2'>
-                          <h3 className='text-lg font-bold text-purple-500'>
-                            DARK BUNNIEZ
-                          </h3>
-                          <p className='text-sm text-neutral-300'>
-                            A BUNNiEZ event
                           </p>
                         </div>
                       </button>
@@ -240,11 +203,6 @@ export default function HeroActionButtons() {
       <BotMatchDialog
         show={showBotDialog}
         onClose={() => setShowBotDialog(false)}
-      />
-
-      <SpecialDialogMatch
-        show={showBunniezDialog}
-        onClose={() => setShowBunniezDialog(false)}
       />
     </>
   )

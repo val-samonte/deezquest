@@ -116,10 +116,6 @@ export default function HeroPortrait({
 
   const url = useMemo(() => {
     if (dummy) {
-      if (matchType === MatchTypes.CENTRALIZED) {
-        return `/evil_bunniez_${dominantAttr}.jpg`
-      }
-
       return 'https://shdw-drive.genesysgo.net/52zh6ZjiUQ5UKCwLBwob2k1BC3KF2qhvsE7V4e8g2pmD/SolanaSpaceman.png'
     }
     return metadata?.image ?? ''
@@ -227,11 +223,7 @@ export default function HeroPortrait({
             </a>
           ) : (
             <div className='flex flex-col justify-center'>
-              <h2 className='text-3xl'>
-                {match?.matchType === MatchTypes.CENTRALIZED
-                  ? 'Dark BUNNiEZ'
-                  : 'Practice Bot'}
-              </h2>
+              <h2 className='text-3xl'>Practice Bot</h2>
             </div>
           )}
         </div>

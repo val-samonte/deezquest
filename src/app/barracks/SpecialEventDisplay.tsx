@@ -74,35 +74,14 @@ export default function SpecialEventDisplay({
 
         <div className='flex flex-col gap-5'>
           <div className='flex items-center justify-center w-full'>
-            <img src='/BUNNiEZ_logo.png' className='h-24 object-contain' />
+            {/* <img src='/event_logo.png' className='h-24 object-contain' /> */}
           </div>
-          <ul className='flex gap-5 items-center justify-center'>
-            <li>
-              <a
-                href='https://twitter.com/bunniezsol'
-                className='flex items-center gap-2 font-bold'
-                rel='noopener noreferrer'
-              >
-                <img src='/twitter.svg' className='h-4 w-4' />
-                Twitter
-              </a>
-            </li>
-            <li>
-              <a
-                href='https://discord.gg/bunniez'
-                className='flex items-center gap-2 font-bold'
-                rel='noopener noreferrer'
-              >
-                <img src='/discord.svg' className='h-4 w-4' />
-                Discord
-              </a>
-            </li>
-          </ul>
 
           <p className='text-white'>
-            Some <span className='font-bold'>Dark BUNNiEZ</span> have been
-            pestering the Rabbit Hole and delivering chaos. Defeat them, and the
-            chief will reward you mfers. Hophop!
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
+            culpa dolores impedit eligendi natus! Consequuntur, accusamus culpa
+            sed earum labore at dolor tempora dicta cumque sapiente, obcaecati
+            ipsam alias? Eum?
           </p>
           <p className='grid grid-cols-3'>
             <span className='col-span-2'>Your Score</span>
