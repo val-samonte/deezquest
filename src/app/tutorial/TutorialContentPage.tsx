@@ -5,7 +5,7 @@ export default function TutorialContentPage() {
     <div className='absolute inset-0 flex flex-col items-center justify-center'>
       <div className='relative flex flex-col items-center justify-center gap-5 p-5'>
         <p className='text-center sm:text-lg xl:text-xl'>
-          Our master is not yet home
+          The library is under construction
         </p>
         <Link
           href='/barracks'
