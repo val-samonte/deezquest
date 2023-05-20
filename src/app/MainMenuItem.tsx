@@ -1,8 +1,7 @@
 import { hoveredAtom, showMenuAtom } from '@/atoms/menuAtom'
 import classNames from 'classnames'
-import { atom, useAtom, useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { IM_Fell_DW_Pica } from 'next/font/google'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 const font = IM_Fell_DW_Pica({
@@ -105,18 +104,7 @@ export default function MainMenuItem({
           font.className,
         )}
       >
-        {alt && (
-          <Image
-            className={classNames('h-8 xl:h-[3.5vh]', 'object-contain')}
-            src={`${process.env.NEXT_PUBLIC_CDN}/text_${alt.toLowerCase()}.png`}
-            alt={alt}
-          />
-        )}
-        <Image
-          className={classNames('h-8 xl:h-[3.5vh]', 'object-contain')}
-          src={`${process.env.NEXT_PUBLIC_CDN}/text_${name.toLowerCase()}.png`}
-          alt={name}
-        />
+        {alt || ''} {name}
       </div>
     </div>
   )

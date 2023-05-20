@@ -14,17 +14,23 @@ export default function BgmManager() {
   const homeInit = useRef(false)
   const battleInit = useRef(false)
 
-  const [playHome, { sound: homeSound }] = useSound('/bgm_home.ogg', {
-    volume: 0.5,
-    loop: true,
-    interrupt: true,
-  })
+  const [playHome, { sound: homeSound }] = useSound(
+    `${process.env.NEXT_PUBLIC_CDN}/bgm_home.ogg`,
+    {
+      volume: 0.5,
+      loop: true,
+      interrupt: true,
+    },
+  )
 
-  const [playBattle, { sound: battleSound }] = useSound('/bgm_battle.ogg', {
-    volume: 0.5,
-    loop: true,
-    interrupt: true,
-  })
+  const [playBattle, { sound: battleSound }] = useSound(
+    `${process.env.NEXT_PUBLIC_CDN}/bgm_battle.ogg`,
+    {
+      volume: 0.5,
+      loop: true,
+      interrupt: true,
+    },
+  )
 
   useEffect(() => {
     if (homeSound && !homeInit.current) {

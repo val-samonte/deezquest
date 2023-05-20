@@ -151,13 +151,14 @@ export default function MainMenu() {
                         'landscape:xl:-top-[20vh] landscape:xl:-left-[5vw]',
                       )}
                     >
-                      <Image
-                        alt='DeezQuest Logo'
-                        src={`${process.env.NEXT_PUBLIC_CDN}/logo.png`}
-                        className='landscape:h-[15vh] portrait:w-[15vw] object-contain aspect-square'
-                        width={342}
-                        height={332}
-                      />
+                      <div className='landscape:h-[15vh] portrait:w-[15vw] aspect-square relative'>
+                        <Image
+                          alt='DeezQuest Logo'
+                          fill={true}
+                          className='object-contain'
+                          src={`${process.env.NEXT_PUBLIC_CDN}/logo.png`}
+                        />
+                      </div>
                     </div>
                     <div
                       className={classNames(
@@ -220,6 +221,8 @@ export default function MainMenu() {
                                 src='/twitter.svg'
                                 className='w-6 h-6'
                                 alt='Twitter'
+                                width={248}
+                                height={204}
                               />
                             </a>
                           </li>
@@ -228,6 +231,8 @@ export default function MainMenu() {
                               src='/discord.svg'
                               className='w-6 h-6'
                               alt='Discord'
+                              width={71}
+                              height={55}
                             />
                           </li>
                           <li className='flex items-center justify-center gap-3 p-2'>
@@ -240,6 +245,8 @@ export default function MainMenu() {
                                 src='/github.svg'
                                 className='w-6 h-6'
                                 alt='Github'
+                                width={98}
+                                height={96}
                               />
                             </a>
                           </li>
