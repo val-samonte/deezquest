@@ -2,12 +2,10 @@ import '@solana/wallet-adapter-react-ui/styles.css'
 import './globals.css'
 
 import { Metadata } from 'next'
-import dynamic from 'next/dynamic'
 import Backgrounds from './Backgrounds'
 import BgmManager from './BgmManager'
 import DependenciesContainer from './DependenciesContainer'
-
-const MainMenu = dynamic(() => import('./MainMenu'), { ssr: false })
+import MainMenu from './MainMenu'
 
 export const metadata: Metadata = {
   title: 'DeezQuest | Puzzle RPG in Solana',
@@ -37,6 +35,7 @@ export default function RootLayout({
             <div className='w-full h-full overflow-y-auto relative'>
               <div className='w-full h-full flex flex-col'>
                 <div className='flex flex-auto relative overflow-hidden'>
+                  {/* backpack close button clearance is 56px in height */}
                   {children}
                 </div>
                 <MainMenu />

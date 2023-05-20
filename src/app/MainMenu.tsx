@@ -6,7 +6,6 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
 import { Fragment, useEffect, useState } from 'react'
-
 import { gameResultAtom, gameStateAtom } from '@/atoms/gameStateAtom'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
 import { matchAtom } from '@/atoms/matchAtom'
@@ -202,7 +201,7 @@ export default function MainMenu() {
                         </li>
                       )}
                       {!isXNft ? (
-                        <ul className='text-base grid grid-cols-4'>
+                        <ul className='text-base grid grid-cols-4 landscape:w-60'>
                           <li className='flex items-center justify-center gap-2 font-bold'>
                             <button
                               type='button'

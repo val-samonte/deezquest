@@ -2,6 +2,7 @@ import { hoveredAtom, showMenuAtom } from '@/atoms/menuAtom'
 import classNames from 'classnames'
 import { useAtom, useSetAtom } from 'jotai'
 import { IM_Fell_DW_Pica } from 'next/font/google'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 const font = IM_Fell_DW_Pica({
@@ -83,13 +84,14 @@ export default function MainMenuItem({
               'inset-x-0 w-full',
               'absolute aspect-square rotate-45 pointer-events-none transition-all duration-500',
             )}
-            style={{
-              backgroundImage: `url("${process.env.NEXT_PUBLIC_CDN}${bgImg}")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
+          >
+            <Image
+              alt={name}
+              fill={true}
+              src={`${process.env.NEXT_PUBLIC_CDN}${bgImg}`}
+              className='object-cover'
+            />
+          </div>
         </div>
       </div>
       <div
