@@ -1,3 +1,4 @@
+// TODO: remove this and use tailwind values
 export const elementColors = [
   'rgb(246,0,0)',
   'rgb(35,220,31)',

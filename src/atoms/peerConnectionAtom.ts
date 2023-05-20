@@ -21,8 +21,6 @@ export const peerIdAtom = atom((get) => {
 })
 
 export const renewEnabledAtom = atom(false)
-
-// TODO: lots of things to refactor here
 export const peerAtom = atom<PeerInstance | null>(null)
 
 export interface PeerMessage {

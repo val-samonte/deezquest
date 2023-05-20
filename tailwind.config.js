@@ -4,6 +4,20 @@ module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      colors: {
+        fire: {
+          400: 'rgb(246,0,0)',
+        },
+        wind: {
+          400: 'rgb(35,220,31)',
+        },
+        water: {
+          400: 'rgb(19,113,255)',
+        },
+        earth: {
+          400: 'rgb(253,169,10)',
+        },
+      },
       keyframes: {
         antispin: {
           '0%': { transform: 'rotate(0deg)' },

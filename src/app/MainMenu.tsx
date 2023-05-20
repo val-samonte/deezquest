@@ -2,6 +2,7 @@
 
 import classNames from 'classnames'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
 import { Fragment, useEffect, useState } from 'react'
@@ -19,7 +20,6 @@ import { Dialog, Transition } from '@headlessui/react'
 import { hoveredAtom, showMenuAtom } from '@/atoms/menuAtom'
 import BackIcon from '@/components/BackIcon'
 import MainMenuItem from './MainMenuItem'
-import Image from 'next/image'
 
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
   ssr: false,
