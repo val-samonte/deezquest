@@ -16,6 +16,7 @@ export default function Home() {
           className='portrait:max-w-[80vw] landscape:max-h-[40vh] object-contain'
           width={2118}
           height={1106}
+          priority
         />
       </div>
       <button
