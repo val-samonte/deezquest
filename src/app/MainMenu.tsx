@@ -1,7 +1,7 @@
 'use client'
 
 import classNames from 'classnames'
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
 import { Fragment, useEffect, useState } from 'react'
@@ -11,16 +11,15 @@ import { isXNftAtom } from '@/atoms/isXNftAtom'
 import { matchAtom } from '@/atoms/matchAtom'
 import { peerAtom } from '@/atoms/peerConnectionAtom'
 import { useUserWallet } from '@/atoms/userWalletAtom'
-import BackIcon from '@/components/BackIcon'
 import { Dialog as UIDialog } from '@/components/Dialog'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { trimAddress } from '@/utils/trimAddress'
 import { Dialog, Transition } from '@headlessui/react'
+import { hoveredAtom, showMenuAtom } from '@/atoms/menuAtom'
+import BackIcon from '@/components/BackIcon'
+import MainMenuItem from './MainMenuItem'
 
-import MainMenuItem, { hoveredAtom } from './MainMenuItem'
-
-export const showMenuAtom = atom(false)
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
   ssr: false,
 })
@@ -57,9 +56,6 @@ export default function MainMenu() {
 
   useEffect(() => {
     setActualOpen(open)
-    // if (open && match && pathname === '/') {
-
-    // }
   }, [open, match, pathname, setActualOpen])
 
   return (
@@ -255,50 +251,6 @@ export default function MainMenu() {
                       )}
                     </div>
                   </div>
-
-                  {/*
-                    {wallet?.connected &&
-                      match &&
-                      !pathname?.includes('/battle') && (
-                        <li
-                          className={classNames(
-                            ' rounded shadow-sm p-3 px-5',
-                            'bg-gradient-to-r from-neutral-900 to-red-600 hover:bg-red-600 transition-colors',
-                          )}
-                        >
-                          <Link
-                            href={'/battle'}
-                            className='flex items-center gap-3 outline-none'
-                            onClick={() => setOpen(false)}
-                          >
-                            <img src='/BattleIcon.svg' className='w-12 h-12' />
-                            Resume Battle
-                          </Link>
-                        </li>
-                      )}
-                    {wallet?.connected &&
-                      match &&
-                      pathname?.includes('/battle') && (
-                        <li
-                          className={classNames(
-                            'shadow-sm rounded',
-                            'bg-gradient-to-r from-neutral-900 to-red-600 hover:bg-red-600 transition-colors',
-                          )}
-                        >
-                          <button
-                            type='button'
-                            className='flex items-center gap-3 outline-none w-full p-3 px-5 rounded'
-                            onClick={() => {
-                              setOpen(false)
-                              setQuitMatchConfirm(true)
-                            }}
-                          >
-                            <img src='/BattleIcon.svg' className='w-12 h-12' />
-                            Quit Battle
-                          </button>
-                        </li>
-                      )}
-                     */}
                 </Dialog.Panel>
               </div>
             </div>

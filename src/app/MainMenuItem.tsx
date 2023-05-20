@@ -1,16 +1,13 @@
+import { hoveredAtom, showMenuAtom } from '@/atoms/menuAtom'
 import classNames from 'classnames'
 import { atom, useAtom, useSetAtom } from 'jotai'
 import { IM_Fell_DW_Pica } from 'next/font/google'
 import { useRouter } from 'next/navigation'
 
-import { showMenuAtom } from './MainMenu'
-
 const font = IM_Fell_DW_Pica({
   weight: '400',
   subsets: ['latin'],
 })
-
-// font.className
 
 export interface MainMenuItemProps {
   alt?: string
@@ -18,11 +15,9 @@ export interface MainMenuItemProps {
   link: string
   maskImg: string
   bgImg: string
-  onSelect?: () => unknown
   isRed?: boolean
+  onSelect?: () => unknown
 }
-
-export const hoveredAtom = atom('')
 
 export default function MainMenuItem({
   alt,

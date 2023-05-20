@@ -1,10 +1,10 @@
-import { burnerKeypairAtom } from '@/app/BurnerAccountManager'
 import { hashv } from '@/utils/hashv'
 import { atom } from 'jotai'
 import { atomFamily, atomWithStorage, createJSONStorage } from 'jotai/utils'
 import bs58 from 'bs58'
 import { PeerInstance } from './peerAtom'
 import Peer, { DataConnection } from 'peerjs'
+import { burnerKeypairAtom } from './burnerKeypairAtom'
 
 export const peerNonceAtom = atomWithStorage<string | null>(
   'peer_nonce',

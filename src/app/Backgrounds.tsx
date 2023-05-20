@@ -1,9 +1,6 @@
 'use client'
 
-import { matchAtom } from '@/atoms/matchAtom'
-import { MatchTypes } from '@/enums/MatchTypes'
 import classNames from 'classnames'
-import { useAtomValue } from 'jotai'
 import { usePathname } from 'next/navigation'
 
 const commonClasses =
@@ -11,7 +8,6 @@ const commonClasses =
 
 export default function Backgrounds() {
   const pathname = usePathname()
-  const match = useAtomValue(matchAtom)
   return (
     <div className='fixed inset-0'>
       <img

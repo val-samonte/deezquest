@@ -8,10 +8,8 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import {
   BackpackIframeAdapter,
   BackpackIframeWalletName,
-} from '@/adapter/BackpackIframeAdapter'
+} from '@/utils/BackpackIframeAdapter'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
-
-// import { idbAtom } from '@/atoms/idbAtom'
 
 export default function DependenciesContainer({
   children,
@@ -40,12 +38,6 @@ export default function DependenciesContainer({
 }
 
 export function AtomsInitializer() {
-  ///////////////////////////
-  // PRELOAD IDB
-  ///////////////////////////
-
-  // useAtomValue(idbAtom)
-
   ///////////////////////////
   // USER WALLET ATOM
   ///////////////////////////

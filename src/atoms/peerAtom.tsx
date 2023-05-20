@@ -1,7 +1,7 @@
 'use client'
 
 import Peer, { DataConnection } from 'peerjs'
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Keypair } from '@solana/web3.js'
 import { sign } from 'tweetnacl'

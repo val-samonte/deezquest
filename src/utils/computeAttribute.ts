@@ -13,7 +13,6 @@ export const computeAttribute = (attr: HeroAttributes, value: number) => {
       }
     case HeroAttributes.VIT:
       return {
-        // totalHp: 55 + value * 3 + Math.floor((value - 1) / 3) * 5,
         totalHp: 10 + value * 2 + Math.floor((value - 1) / 2) * 3,
       }
     case HeroAttributes.STR:

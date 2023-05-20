@@ -1,8 +1,8 @@
-import { Uses } from '@/app/battle/useUseCount'
 import { GameState } from '@/atoms/gameStateAtom'
 import { Match } from '@/atoms/matchAtom'
 import { GameStateFunctions } from '@/enums/GameStateFunctions'
 import { Hero } from './gameFunctions'
+import { Uses } from '@/utils/innateSkills'
 
 export type Move = {
   origin: number
