@@ -2,11 +2,13 @@ import { hoveredAtom, showMenuAtom } from '@/atoms/menuAtom'
 import classNames from 'classnames'
 import { atom, useAtom, useSetAtom } from 'jotai'
 import { IM_Fell_DW_Pica } from 'next/font/google'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 const font = IM_Fell_DW_Pica({
   weight: '400',
   subsets: ['latin'],
+  display: 'swap',
 })
 
 export interface MainMenuItemProps {
@@ -67,8 +69,8 @@ export default function MainMenuItem({
             'relative flex items-center justify-center -rotate-45 pointer-events-auto transition-all duration-500 cursor-pointer',
           )}
           style={{
-            WebkitMaskImage: `url("${maskImg}")`,
-            maskImage: `url("${maskImg}")`,
+            WebkitMaskImage: `url("${process.env.NEXT_PUBLIC_CDN}${maskImg}")`,
+            maskImage: `url("${process.env.NEXT_PUBLIC_CDN}${maskImg}")`,
             WebkitMaskRepeat: 'no-repeat',
             maskRepeat: 'no-repeat',
             WebkitMaskSize: 'contain',
@@ -83,7 +85,7 @@ export default function MainMenuItem({
               'absolute aspect-square rotate-45 pointer-events-none transition-all duration-500',
             )}
             style={{
-              backgroundImage: `url("${bgImg}")`,
+              backgroundImage: `url("${process.env.NEXT_PUBLIC_CDN}${bgImg}")`,
               backgroundRepeat: 'no-repeat',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
@@ -104,15 +106,15 @@ export default function MainMenuItem({
         )}
       >
         {alt && (
-          <img
+          <Image
             className={classNames('h-8 xl:h-[3.5vh]', 'object-contain')}
-            src={`/text_${alt.toLowerCase()}.png`}
+            src={`${process.env.NEXT_PUBLIC_CDN}/text_${alt.toLowerCase()}.png`}
             alt={alt}
           />
         )}
-        <img
+        <Image
           className={classNames('h-8 xl:h-[3.5vh]', 'object-contain')}
-          src={`/text_${name.toLowerCase()}.png`}
+          src={`${process.env.NEXT_PUBLIC_CDN}/text_${name.toLowerCase()}.png`}
           alt={name}
         />
       </div>

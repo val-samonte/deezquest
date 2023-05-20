@@ -1,6 +1,7 @@
 'use client'
 
 import classNames from 'classnames'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const commonClasses =
@@ -10,56 +11,70 @@ export default function Backgrounds() {
   const pathname = usePathname()
   return (
     <div className='fixed inset-0'>
-      <img
-        src={'/bg_arena.png'}
+      <Image
+        alt='arena'
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_arena.png`}
+        fill={true}
         className={classNames(
           commonClasses,
           pathname?.includes('/battle') ? 'opacity-100' : 'opacity-0',
           'object-bottom brightness-75',
         )}
       />
-      <img
-        src='/bg_barracks.png'
+      <Image
+        alt='barracks'
+        fill={true}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_barracks.png`}
         className={classNames(
           commonClasses,
           pathname?.includes('/barracks') ? 'opacity-100' : 'opacity-0',
           'brightness-50',
         )}
       />
-      <img
-        src='/bg_plains.png'
+      <Image
+        alt='plains'
+        fill={true}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_plains.png`}
         className={classNames(
           commonClasses,
           pathname === '/' ? 'opacity-100' : 'opacity-0',
           'object-bottom brightness-75 blur-none',
         )}
       />
-      <img
-        src='/bg_shop.png'
+      <Image
+        alt='shop'
+        fill={true}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_shop.png`}
         className={classNames(
           commonClasses,
           pathname?.includes('/shop') ? 'opacity-100' : 'opacity-0',
           'object-bottom brightness-75',
         )}
       />
-      <img
-        src='/bg_storage.png'
+      <Image
+        alt='storage'
+        fill={true}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_storage.png`}
         className={classNames(
           commonClasses,
           pathname?.includes('/inventory') ? 'opacity-100' : 'opacity-0',
           'object-bottom brightness-50',
         )}
       />
-      <img
-        src='/bg_bar.png'
+      <Image
+        alt='bar'
+        fill={true}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_bar.png`}
         className={classNames(
           commonClasses,
           pathname?.includes('/pub') ? 'opacity-100' : 'opacity-0',
           'brightness-50',
         )}
       />
-      <img
-        src='/bg_library.png'
+      <Image
+        alt='library'
+        fill={true}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_library.png`}
         className={classNames(
           commonClasses,
           pathname?.includes('/tutorial') ? 'opacity-100' : 'opacity-0',

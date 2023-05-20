@@ -19,6 +19,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { hoveredAtom, showMenuAtom } from '@/atoms/menuAtom'
 import BackIcon from '@/components/BackIcon'
 import MainMenuItem from './MainMenuItem'
+import Image from 'next/image'
 
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
   ssr: false,
@@ -52,6 +53,7 @@ export default function MainMenu() {
     return () => {
       window.removeEventListener('keyup', listener)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -149,9 +151,12 @@ export default function MainMenu() {
                         'landscape:xl:-top-[20vh] landscape:xl:-left-[5vw]',
                       )}
                     >
-                      <img
-                        src='/logo.png'
+                      <Image
+                        alt='DeezQuest Logo'
+                        src={`${process.env.NEXT_PUBLIC_CDN}/logo.png`}
                         className='landscape:h-[15vh] portrait:w-[15vw] object-contain aspect-square'
+                        width={342}
+                        height={332}
                       />
                     </div>
                     <div
@@ -211,7 +216,7 @@ export default function MainMenu() {
                               target='_blank'
                               rel='noreferrer'
                             >
-                              <img
+                              <Image
                                 src='/twitter.svg'
                                 className='w-6 h-6'
                                 alt='Twitter'
@@ -219,7 +224,7 @@ export default function MainMenu() {
                             </a>
                           </li>
                           <li className='opacity-20 flex items-center justify-center gap-3'>
-                            <img
+                            <Image
                               src='/discord.svg'
                               className='w-6 h-6'
                               alt='Discord'
@@ -231,7 +236,7 @@ export default function MainMenu() {
                               target='_blank'
                               rel='noreferrer'
                             >
-                              <img
+                              <Image
                                 src='/github.svg'
                                 className='w-6 h-6'
                                 alt='Github'

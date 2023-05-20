@@ -153,7 +153,16 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
         setPeer(null)
       }
     }
-  }, [peer, keypair, peerId, onError, setPeer, setOpen, setConnections])
+  }, [
+    peer,
+    keypair,
+    peerId,
+    onError,
+    setPeer,
+    setOpen,
+    setConnections,
+    setupConnection,
+  ])
 
   const sendMessage = useCallback(
     async (receiverId: string, message: any) => {
@@ -218,7 +227,7 @@ export function usePeer({ peerId, keypair, onError }: PeerProps): PeerInstance {
 
       connection.send(payload, false)
     },
-    [keypair, peer, connections, setConnections],
+    [keypair, peer, connections, setupConnection],
   )
 
   const clearMessages = useCallback(
