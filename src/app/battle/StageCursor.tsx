@@ -8,16 +8,7 @@ import { Sprite } from 'react-pixi-fiber/index.js'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { peerAtom } from '@/atoms/peerConnectionAtom'
 import { Match, matchAtom } from '@/atoms/matchAtom'
-import {
-  CentralizedMatchResponse,
-  TurnCentralizedMatchPayload,
-  TurnCentralizedMatchPayloadPrevious,
-} from '@/types/CentralizedMatch'
-import canonicalize from 'canonicalize'
-import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
-import { sign } from 'tweetnacl'
-import { Keypair } from '@solana/web3.js'
-import { botTurnsAtom, dappSignatureAtom } from '../barracks/SpecialDialogMatch'
+import { TurnCentralizedMatchPayloadPrevious } from '@/types/CentralizedMatch'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { burnerKeypairAtom } from '../BurnerAccountManager'
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
@@ -42,8 +33,6 @@ export default function StageCursor() {
     null,
   )
   const gameState = useAtomValue(gameStateAtom)
-  const [dappSignature, setDappSignature] = useAtom(dappSignatureAtom)
-  const setBotTurns = useSetAtom(botTurnsAtom)
   const setScore = useSetAtom(scoreAtom)
 
   const onPointerUp = useCallback(
@@ -81,28 +70,6 @@ export default function StageCursor() {
                   data: payload,
                 })
 
-              if (
-                match.matchType === MatchTypes.CENTRALIZED &&
-                dappSignature &&
-                burner
-              ) {
-                const previous = reconstructPreviousResponse(
-                  dappSignature,
-                  JSON.parse(JSON.stringify(match)),
-                  JSON.parse(JSON.stringify(gameState)),
-                )
-
-                centralizedMatchTurn(payload.data, burner, previous).then(
-                  (result) => {
-                    setDappSignature(result.dappSignature)
-                    setBotTurns(result.botTurns ?? [])
-                    if (result.newScore) {
-                      setScore(result.newScore)
-                    }
-                  },
-                )
-              }
-
               gameFn(payload)
             }
             return null
@@ -119,17 +86,7 @@ export default function StageCursor() {
         return null
       })
     },
-    [
-      dappSignature,
-      tileSize,
-      match,
-      gameState,
-      peerInstance,
-      burner,
-      setScore,
-      setDappSignature,
-      setBotTurns,
-    ],
+    [tileSize, match, gameState, peerInstance, burner, setScore],
   )
 
   return (
@@ -168,50 +125,5 @@ function reconstructPreviousResponse(
       match,
     },
     signature,
-  }
-}
-
-async function centralizedMatchTurn(
-  data: any,
-  burner: Keypair,
-  previous: TurnCentralizedMatchPayloadPrevious,
-) {
-  const nonceResponse = await fetch('/api/request_nonce')
-  const nonce = await nonceResponse.text()
-
-  const payload = {
-    data,
-    nonce,
-  }
-
-  const playerSignature = bs58.encode(
-    sign.detached(Buffer.from(canonicalize(payload) ?? ''), burner.secretKey),
-  )
-
-  const turnPayload: TurnCentralizedMatchPayload = {
-    payload,
-    signature: playerSignature,
-    previous,
-  }
-
-  const turnResponse = await fetch('/api/centralized_match/turn', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(turnPayload),
-  })
-
-  const turnResult = (await turnResponse.json()) as CentralizedMatchResponse
-
-  return {
-    dappSignature: [
-      turnResult.response.nonce,
-      turnResult.response.order,
-      turnResult.signature,
-    ].join('_'),
-    botTurns: turnResult.botTurns,
-    gameResult: turnResult.gameResult,
-    newScore: turnResult.newScore,
   }
 }

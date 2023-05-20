@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { sign } from 'tweetnacl'
 import bs58 from 'bs58'
 import { dappKey, verifyNonce } from '@/utils/nonce'
-import kv from '@vercel/kv'
 
 // returns the first half of the burner seeds (16 bytes) in base58
 export default async function handler(
@@ -45,22 +44,6 @@ export default async function handler(
   }
 
   let requireLinking = false
-  try {
-    if (burnerNonce) {
-      const expiry = 60 * 60 * 24 * 30 // set 30 days
-      const key = `burner_nonce_${pubkey}`
-      await kv.set(key, burnerNonce)
-      await kv.expire(key, expiry)
-
-      // TODO: check if the burner and pubkey is already linked before adding keyref
-      const burner = await kv.get(`burner_${pubkey}`)
-      if (!burner) {
-        requireLinking = true
-      }
-    }
-  } catch (e) {
-    // proceed regardless
-  }
 
   const slice = sign(publicKey, dappKey.secretKey).slice(0, 16)
 

@@ -56,19 +56,10 @@ export default function BurnerAccountManager() {
 
     const burnerNonceCheck = async () => {
       // TODO: check PDA for existing saved nonce < higher priority
-      const nonceResponse = await fetch('/api/centralized_match/burner_nonce', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ pubkey: publicKey.toBase58() }),
-      })
-      const nonce = await nonceResponse.text()
 
-      const newNonce =
-        nonce !== 'null'
-          ? nonce
-          : bs58.encode(window.crypto.getRandomValues(new Uint8Array(16)))
+      const newNonce = bs58.encode(
+        window.crypto.getRandomValues(new Uint8Array(16)),
+      )
 
       setBurnerNonce(newNonce)
     }
@@ -149,30 +140,6 @@ export default function BurnerAccountManager() {
 
       const hash = hashv([appSeed, signedMessage.slice(0, 16)])
       const kp = Keypair.fromSeed(hash)
-
-      try {
-        if (requireLinking && message && signature) {
-          const burnerSignature = bs58.encode(
-            sign.detached(Buffer.from(message), kp.secretKey),
-          )
-          const payload = JSON.stringify({
-            message,
-            signature,
-            burnerSignature,
-            pubkey: kp.publicKey.toBase58(),
-          })
-
-          await fetch('/api/centralized_match/link_burner', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: payload,
-          })
-        }
-      } catch (e) {
-        // proceed regardless
-      }
 
       setBurner(kp)
     } catch (e) {
