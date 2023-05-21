@@ -1,7 +1,11 @@
+'use client'
+
 import { ReactNode } from 'react'
 import classNames from 'classnames'
 import { IM_Fell_DW_Pica } from 'next/font/google'
 import Image from 'next/image'
+import { useSetAtom } from 'jotai'
+import { showMenuAtom } from '@/atoms/menuAtom'
 
 const font = IM_Fell_DW_Pica({
   weight: '400',
@@ -15,9 +19,12 @@ export interface PageTitleProps {
 }
 
 export default function PageTitle({ title, children }: PageTitleProps) {
+  const showMenu = useSetAtom(showMenuAtom)
+
   return (
-    <div className='h-14 flex justify-between backdrop-grayscale backdrop-brightness-125'>
+    <div className='h-14 flex flex-none justify-between backdrop-grayscale backdrop-brightness-50 shadow'>
       <button
+        onClick={() => showMenu(true)}
         type='button'
         className={classNames('relative text-white', font.className)}
         style={{
