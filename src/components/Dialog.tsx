@@ -1,27 +1,16 @@
 'use client'
 
-import classNames from 'classnames'
-import CloseIcon from './CloseIcon'
 import { Dialog as UiDialog, Transition } from '@headlessui/react'
-import { ReactNode, Fragment } from 'react'
+import { Fragment } from 'react'
+import Panel, { PanelProps } from './Panel'
+import Center from './Center'
 
-interface DialogProps {
+export interface DialogProps extends PanelProps {
   show: boolean
-  title?: ReactNode | string
-  children: ReactNode
-  className?: string
-  padVertical?: boolean
   onClose?: () => void
 }
 
-export function Dialog({
-  show,
-  title,
-  children,
-  className,
-  padVertical,
-  onClose,
-}: DialogProps) {
+export function Dialog({ show, onClose, ...props }: DialogProps) {
   return (
     <Transition show={show} as={Fragment}>
       <UiDialog onClose={onClose ?? (() => {})} className='relative z-50'>
@@ -48,32 +37,10 @@ export function Dialog({
           leaveFrom='opacity-100 scale-100'
           leaveTo='opacity-0 scale-95'
         >
-          <div className='fixed inset-0 flex items-center justify-center'>
-            <div className='m-auto w-full max-h-full p-5 overflow-auto'>
-              <UiDialog.Panel
-                className={classNames(
-                  'w-full mx-auto overflow-hidden shadow-md drop-shadow-xl rounded',
-                  className,
-                )}
-              >
-                {title && (
-                  <UiDialog.Title className='bg-neutral-800 border-b border-b-black/50 flex justify-between items-center px-5 py-4'>
-                    <div className='text-lg gradient-1'>{title}</div>
-                    <button type='button' onClick={onClose}>
-                      <CloseIcon />
-                    </button>
-                  </UiDialog.Title>
-                )}
-                <div
-                  className={classNames(
-                    padVertical !== false && 'py-5',
-                    'bg-neutral-900 h-full min-h-[280px] text-stone-300 w-full flex flex-col overflow-auto',
-                  )}
-                >
-                  {children}
-                </div>
-              </UiDialog.Panel>
-            </div>
+          <div className='fixed inset-0'>
+            <Center>
+              <Panel {...props} asDialog />
+            </Center>
           </div>
         </Transition.Child>
       </UiDialog>

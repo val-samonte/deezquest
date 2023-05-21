@@ -1,25 +1,26 @@
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import Center from './Center'
+import Panel from './Panel'
+import Button from './Button'
 
 export default function WalletGuard() {
   const { setVisible } = useWalletModal()
 
   return (
-    <div className='absolute inset-0 flex flex-col items-center justify-center'>
-      <div className='relative flex flex-col items-center justify-center gap-5 p-5'>
-        <p className='text-center sm:text-lg xl:text-xl'>
-          Please connect your wallet to continue <br />
-          <span className='sm:text-sm xl:text-base'>
-            (Please switch to DEVNET)
-          </span>
-        </p>
-        <button
-          type='button'
-          className='px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded'
-          onClick={() => setVisible(true)}
-        >
-          Connect
-        </button>
-      </div>
-    </div>
+    <Center>
+      <Panel className='max-w-xs'>
+        <div className='overflow-auto h-full relative'>
+          <p className='px-5 my-5 text-center'>
+            Connect your wallet to continue <br />
+            <span className='text-sm text-neutral-400'>
+              (Please switch to DEVNET)
+            </span>
+          </p>
+          <div className='p-5 flex justify-center sticky bottom-0'>
+            <Button onClick={() => setVisible(true)}>Connect Wallet</Button>
+          </div>
+        </div>
+      </Panel>
+    </Center>
   )
 }

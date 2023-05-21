@@ -23,7 +23,7 @@ export default function PageTitle({ title, children }: PageTitleProps) {
   const showMenu = useSetAtom(showMenuAtom)
 
   return (
-    <div className='h-14 flex flex-none justify-between backdrop-grayscale backdrop-brightness-75 shadow-md'>
+    <div className='h-14 flex flex-none justify-between backdrop-grayscale backdrop-brightness-50 shadow-md'>
       <button
         onClick={() => showMenu(true)}
         type='button'
@@ -33,6 +33,7 @@ export default function PageTitle({ title, children }: PageTitleProps) {
           textShadow: '0px -2px rgba(0,0,0,0.5)',
         }}
       >
+        {/* 
         <Image
           priority
           alt={'menu_title_bg'}
@@ -40,7 +41,8 @@ export default function PageTitle({ title, children }: PageTitleProps) {
           height={280}
           src={`${process.env.NEXT_PUBLIC_CDN}/mask_brush_1.png`}
           className='h-[120%] w-full absolute -inset-y-2 right-0 -left-10 opacity-80 -rotate-1'
-        />
+        /> 
+        */}
         <div className='relative flex h-full items-center pl-3 gap-1'>
           <div className='relative h-full aspect-square p-3'>
             <Image

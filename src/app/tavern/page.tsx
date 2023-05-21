@@ -10,9 +10,11 @@ export default function Tavern() {
       <PageTitle title='Tavern' />
       <Center>
         <Panel className='max-w-xs w-full'>
-          <div className='p-5 flex flex-col'>
-            <p className='py-5 mb-5 text-center'>Tavern is coming soon</p>
-            <Button>Head to Barracks</Button>
+          <div className='overflow-auto h-full relative'>
+            <p className='px-5 my-5 text-center'>Tavern is currently closed</p>
+            <div className='p-5 flex justify-center sticky bottom-0'>
+              <Button>Head to Barracks</Button>
+            </div>
           </div>
         </Panel>
       </Center>
