@@ -67,7 +67,7 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_bar.png`}
         className={classNames(
           commonClasses,
-          pathname?.includes('/pub') ? 'opacity-100' : 'opacity-0',
+          pathname?.includes('/tavern') ? 'opacity-100' : 'opacity-0',
           'brightness-50',
         )}
       />

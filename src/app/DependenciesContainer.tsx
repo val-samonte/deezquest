@@ -21,7 +21,9 @@ export default function DependenciesContainer({
 
   useEffect(() => {
     try {
-      BackpackIframeAdapter.make().then((backpack) => setBackpack(backpack))
+      BackpackIframeAdapter.make().then(
+        (backpack) => backpack && setBackpack(backpack),
+      )
     } catch (e) {
       console.log(e)
     }

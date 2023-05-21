@@ -8,9 +8,8 @@ import DependenciesContainer from './DependenciesContainer'
 import MainMenu from './MainMenu'
 
 export const metadata: Metadata = {
-  title: 'DeezQuest | Puzzle RPG in Solana',
-  description:
-    'Play Match 3 with a twist of RPG in Solana! 100% decentralized and open source.',
+  title: 'DeezQuest',
+  description: 'Open Source Puzzle RPG',
   icons: {
     icon: '/favicon-32x32.png',
     shortcut: '/favicon-32x32.png',
@@ -31,17 +30,11 @@ export default function RootLayout({
         <DependenciesContainer>
           <BgmManager />
           <Backgrounds />
-          <div className='fixed inset-0'>
-            <div className='w-full h-full overflow-y-auto relative'>
-              <div className='w-full h-full flex flex-col'>
-                <div className='flex flex-auto relative overflow-hidden'>
-                  {/* backpack close button clearance is 56px in height */}
-                  {children}
-                </div>
-                <MainMenu />
-              </div>
-            </div>
+          <div className='fixed inset-0 w-full h-full flex flex-col'>
+            {/* backpack close button clearance is 56px in height */}
+            {children}
           </div>
+          <MainMenu />
         </DependenciesContainer>
       </body>
     </html>

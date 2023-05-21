@@ -93,7 +93,7 @@ export default function MainMenu() {
                   {/* MENU ITEM WRAPPER */}
                   <div className='max-w-min mx-auto relative'>
                     <div
-                      className='flex portrait:flex-col items-center justify-center landscape:gap-[5vw] portrait:gap-[5vh] -mt-10 portrait:-mt-20'
+                      className='flex portrait:flex-col items-center justify-center landscape:gap-[5vw] portrait:gap-[5vh]'
                       onMouseOut={() =>
                         setHoveredItem(
                           !pathname || pathname === '/' ? '' : pathname,
@@ -124,8 +124,8 @@ export default function MainMenu() {
                         />
                       )}
                       <MainMenuItem
-                        name='Pub'
-                        link='/pub'
+                        name='Tavern'
+                        link='/tavern'
                         bgImg='/bg_bar.png'
                         maskImg='/mask_brush_1.png'
                       />
@@ -153,7 +153,8 @@ export default function MainMenu() {
                       <div className='landscape:h-[15vh] portrait:w-[15vw] aspect-square relative'>
                         <Image
                           alt='DeezQuest Logo'
-                          fill={true}
+                          width={342}
+                          height={332}
                           className='object-contain'
                           src={`${process.env.NEXT_PUBLIC_CDN}/logo.png`}
                         />

@@ -34,13 +34,13 @@ export class BackpackIframeAdapter extends BaseMessageSignerWalletAdapter {
   }
 
   static async make() {
-    // console.log('INITIALIZING XNFT', BACKPACK_ORIGIN)
     window.parent.postMessage(
       JSON.stringify({
         action: 'publicKey',
       }),
       BACKPACK_ORIGIN,
     )
+
     const publicKey = await getXnftResultPromise<string>()
     return new BackpackIframeAdapter(new PublicKey(publicKey))
   }
@@ -116,9 +116,6 @@ const getXnftResultPromise = <U>(): Promise<U> =>
   new Promise((resolve, reject) => {
     const listener = (event: MessageEvent<any>) => {
       if (event.origin !== BACKPACK_ORIGIN) {
-        // throw new Error(
-        //   `Invalid origin ${event.origin}, expecting ${BACKPACK_ORIGIN}`,
-        // )
         console.log(
           `Invalid origin ${event.origin}, expecting ${BACKPACK_ORIGIN}`,
         )
