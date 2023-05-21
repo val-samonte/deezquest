@@ -6,6 +6,7 @@ import { IM_Fell_DW_Pica } from 'next/font/google'
 import Image from 'next/image'
 import { useSetAtom } from 'jotai'
 import { showMenuAtom } from '@/atoms/menuAtom'
+import BackIcon from './BackIcon'
 
 const font = IM_Fell_DW_Pica({
   weight: '400',
@@ -22,7 +23,7 @@ export default function PageTitle({ title, children }: PageTitleProps) {
   const showMenu = useSetAtom(showMenuAtom)
 
   return (
-    <div className='h-14 flex flex-none justify-between backdrop-grayscale backdrop-brightness-50 shadow'>
+    <div className='h-14 flex flex-none justify-between backdrop-grayscale backdrop-brightness-75 shadow-md'>
       <button
         onClick={() => showMenu(true)}
         type='button'
@@ -50,7 +51,8 @@ export default function PageTitle({ title, children }: PageTitleProps) {
             />
           </div>
           <h1 className='text-2xl select-none'>{title}</h1>
-          <div className='flex-auto w-28' />
+          <BackIcon className='-rotate-90 ml-2 opacity-50' />
+          <div className='flex-auto w-20' />
         </div>
       </button>
       <div className='h-full flex'>{children}</div>
