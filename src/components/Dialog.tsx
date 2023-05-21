@@ -10,7 +10,7 @@ export interface DialogProps extends PanelProps {
   onClose?: () => void
 }
 
-export function Dialog({ show, onClose, ...props }: DialogProps) {
+export default function Dialog({ show, onClose, ...props }: DialogProps) {
   return (
     <Transition show={show} as={Fragment}>
       <UiDialog onClose={onClose ?? (() => {})} className='relative z-50'>

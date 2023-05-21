@@ -11,7 +11,7 @@ import { isXNftAtom } from '@/atoms/isXNftAtom'
 import { matchAtom } from '@/atoms/matchAtom'
 import { peerAtom } from '@/atoms/peerConnectionAtom'
 import { useUserWallet } from '@/atoms/userWalletAtom'
-import { Dialog as UIDialog } from '@/components/Dialog'
+import CustomDialog from '@/components/Dialog'
 import { MatchTypes } from '@/enums/MatchTypes'
 import { PeerMessages } from '@/enums/PeerMessages'
 import { trimAddress } from '@/utils/trimAddress'
@@ -19,6 +19,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { hoveredAtom, showMenuAtom } from '@/atoms/menuAtom'
 import BackIcon from '@/components/BackIcon'
 import MainMenuItem from './MainMenuItem'
+import Button from '@/components/Button'
 
 const PeerConnectionIndicator = dynamic(() => import('@/atoms/peerAtom'), {
   ssr: false,
@@ -269,53 +270,41 @@ export default function MainMenu() {
           </Transition.Child>
         </Dialog>
       </Transition>
-      <UIDialog
+      <CustomDialog
         show={quitMatchConfirm}
         title='Quit Battle'
-        className='max-w-sm'
+        className='max-w-sm bg-red-600/50'
         onClose={() => setQuitMatchConfirm(false)}
       >
-        <p className='px-5 mb-5 text-center'>
-          Are you sure you want to quit this match?
-        </p>
-        <div className='flex-auto' />
-        <div className='flex gap-3 px-5'>
-          <button
-            type='button'
-            className={classNames(
-              'px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded flex items-center',
-            )}
-            onClick={() => setQuitMatchConfirm(false)}
-          >
-            Cancel
-          </button>
-          <button
-            type='button'
-            className={classNames(
-              'flex items-center justify-center',
-              'flex-auto px-3 py-2 bg-red-700 hover:bg-red-600 rounded',
-            )}
-            onClick={() => {
-              setQuitMatchConfirm(false)
-              if (
-                match?.matchType === MatchTypes.FRIENDLY &&
-                match?.opponent.peerId
-              ) {
-                peerInstance?.sendMessage(match?.opponent.peerId, {
-                  type: PeerMessages.QUIT,
-                })
-              }
-              window.sessionStorage.clear()
-              setGameState(null)
-              setMatch(null)
-              setGameResult('')
-              router.push('/barracks')
-            }}
-          >
-            Quit Match
-          </button>
+        <div className='overflow-auto h-full relative'>
+          <p className='px-5 my-5 text-center'>
+            Are you sure you want to quit this match?
+          </p>
+          <div className='p-5 flex justify-center gap-3 sticky bottom-0'>
+            <Button onClick={() => setQuitMatchConfirm(false)}>Cancel</Button>
+            <Button
+              onClick={() => {
+                setQuitMatchConfirm(false)
+                if (
+                  match?.matchType === MatchTypes.FRIENDLY &&
+                  match?.opponent.peerId
+                ) {
+                  peerInstance?.sendMessage(match?.opponent.peerId, {
+                    type: PeerMessages.QUIT,
+                  })
+                }
+                window.sessionStorage.clear()
+                setGameState(null)
+                setMatch(null)
+                setGameResult('')
+                router.push('/barracks')
+              }}
+            >
+              Quit Match
+            </Button>
+          </div>
         </div>
-      </UIDialog>
+      </CustomDialog>
     </>
   )
 }
