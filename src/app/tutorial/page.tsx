@@ -4,14 +4,16 @@ import PageContainer from '@/components/PageContainer'
 import PageTitle from '@/components/PageTitle'
 import Panel from '@/components/Panel'
 
-export default function Tavern() {
+export default function Tutorial() {
   return (
     <PageContainer>
-      <PageTitle title='Tavern' />
+      <PageTitle title='Tutorial' />
       <Center>
         <Panel className='max-w-xs w-full'>
           <div className='p-5 flex flex-col'>
-            <p className='py-5 mb-5 text-center'>Tavern is coming soon</p>
+            <p className='py-5 mb-5 text-center'>
+              The library is under construction
+            </p>
             <Button>Head to Barracks</Button>
           </div>
         </Panel>

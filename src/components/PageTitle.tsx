@@ -34,11 +34,12 @@ export default function PageTitle({ title, children }: PageTitleProps) {
         }}
       >
         <Image
+          priority
           alt={'menu_title_bg'}
           width={1400}
           height={280}
           src={`${process.env.NEXT_PUBLIC_CDN}/mask_brush_1.png`}
-          className='h-[120%] w-full absolute -inset-y-2 right-0 -left-10 opacity-60'
+          className='h-[120%] w-full absolute -inset-y-2 right-0 -left-10 opacity-80 -rotate-1'
         />
         <div className='relative flex h-full items-center pl-3 gap-1'>
           <div className='relative h-full aspect-square p-3'>
@@ -52,7 +53,7 @@ export default function PageTitle({ title, children }: PageTitleProps) {
           </div>
           <h1 className='text-2xl select-none'>{title}</h1>
           <BackIcon className='-rotate-90 ml-2 opacity-50' />
-          <div className='flex-auto w-20' />
+          <div className='flex-auto w-28' />
         </div>
       </button>
       <div className='h-full flex'>{children}</div>
