@@ -11,10 +11,17 @@ import Panel from '@/components/Panel'
 import PreloaderAnimation from '@/components/PreloaderAnimation'
 import WalletGuard from '@/components/WalletGuard'
 import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
-import { atom, useAtom, useAtomValue } from 'jotai'
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { HeroCard } from './HeroCard'
+import { gridContainerPosAtom } from '@/atoms/gridContainerPosAtom'
 
 interface NewMintParams {
   address: string
@@ -36,6 +43,7 @@ export default function Barracks() {
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
+  const setContainerPos = useSetAtom(gridContainerPosAtom)
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
@@ -60,6 +68,30 @@ export default function Barracks() {
     setListPreloaded(false)
     loadNfts().then(() => setListPreloaded(true))
   }, [publicKey, loadNfts, setListPreloaded, setCollection])
+
+  const container = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const onResize = () => {
+      setContainerPos((pos) => {
+        if (container.current) {
+          const pos = container.current.getBoundingClientRect()
+          const newPos = {
+            x: pos.left,
+            y: pos.top,
+          }
+
+          return newPos
+        }
+        return pos
+      })
+    }
+    window.addEventListener('resize', onResize)
+
+    onResize()
+    return () => {
+      window.removeEventListener('resize', onResize)
+    }
+  }, [setContainerPos])
 
   if (!wallet?.connected) {
     return (
@@ -112,11 +144,21 @@ export default function Barracks() {
     return (
       <PageContainer key={'barracks_container'}>
         <PageTitle key={'barracks_title'} title='Barracks' />
-        <div className='h-full w-screen sm:w-auto flex-auto overflow-y-auto overflow-x-hidden p-3 xl:p-5'>
-          <div className='flex flex-wrap justify-center gap-3 xl:gap-5 relative'>
-            {collection.map((metadata, i) => (
-              <HeroCard key={i} metadata={metadata} />
-            ))}
+        <div className='flex-auto relative'>
+          <div className='absolute inset-0 h-full w-screen sm:w-auto flex-auto overflow-y-auto overflow-x-visible py-5 pl-5 pr-96'>
+            <div
+              ref={container}
+              className='flex flex-wrap justify-center gap-3 xl:gap-5 relative'
+            >
+              {collection.map((metadata, i) => (
+                <HeroCard key={i} metadata={metadata} />
+              ))}
+            </div>
+          </div>
+          <div className='h-full absolute top-0 right-0 bottom-0 w-96 p-5 pointer-events-none'>
+            <Panel title='Hero Details'>
+              <></>
+            </Panel>
           </div>
         </div>
       </PageContainer>

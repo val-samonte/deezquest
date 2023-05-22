@@ -7,17 +7,29 @@ import { getHeroAttributes } from '@/game/gameFunctions'
 import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { animated, useSpringValue } from '@react-spring/web'
+import { useAtomValue } from 'jotai'
+import { gridContainerPosAtom } from '@/atoms/gridContainerPosAtom'
 
 interface HeroCardProps {
   metadata: Metadata | Nft | Sft
 }
 
 export function HeroCard({ metadata }: HeroCardProps) {
+  const shadow = useRef<HTMLDivElement>(null)
   const metaplex = useMetaplex()
   const isLoading = useRef(false)
   const [nft, setNft] = useState<JsonMetadata | null>(null)
   // const pathname = usePathname()
+
+  const containerPos = useAtomValue(gridContainerPosAtom)
+  const [rect, setRect] = useState<{
+    x: number
+    y: number
+    w: number
+    h: number
+  }>({ x: 0, y: 0, w: 0, h: 0 })
 
   const address = useMemo(() => {
     let address
@@ -66,62 +78,113 @@ export function HeroCard({ metadata }: HeroCardProps) {
     }
   }, [metaplex, metadata, setNft])
 
+  shadow.current?.clientLeft
+
+  useLayoutEffect(() => {
+    const onResize = () => {
+      setRect((rect) => {
+        if (shadow.current) {
+          const pos = shadow.current?.getBoundingClientRect()
+          const w = shadow.current.clientWidth
+          const h = shadow.current.clientHeight
+          const newRect = {
+            x: pos.left - containerPos.x,
+            y: pos.top - containerPos.y,
+            w,
+            h,
+          }
+          if (JSON.stringify(rect) !== JSON.stringify(newRect)) {
+            return newRect
+          }
+        }
+        return rect
+      })
+    }
+    window.addEventListener('resize', onResize)
+
+    onResize()
+    return () => {
+      window.removeEventListener('resize', onResize)
+    }
+  }, [containerPos, setRect])
+
   return (
-    <button>
-      <Panel
-        subtitle='Lvl 1'
-        className={classNames('w-40 xl:w-60 aspect-[3/4] bg-neutral-200/10')}
+    <>
+      <div
+        ref={shadow}
+        className='w-40 xl:w-60 aspect-[3/4] pointer-events-none'
+      />
+      <button
+        className='absolute transition-all'
+        style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h }}
       >
-        <div className='h-full flex flex-col'>
-          {nft?.image ? (
-            <div className='w-full aspect-square flex-none'>
-              <img
-                alt={nft.name ?? 'Unknown'}
-                src={nft.image}
-                className='object-cover w-full'
-              />
-            </div>
-          ) : (
-            <div className='absolute inset-0 flex items-center justify-center'>
-              <SpinnerIcon />
-            </div>
-          )}
-          <div className='border-t border-amber-400/25 flex-auto grid grid-cols-4 font-bold text-xs lg:text-sm xl:text-base'>
-            <div className='flex items-center justify-center relative'>
-              <div
-                className='absolute inset-x-0 top-0 bg-fire-400/20 w-full'
-                style={{ height: stats.rInt }}
-              />
-              <img src='/stat_int.svg' className='w-4 h-4 flex-none relative' />
-              <span className='ml-1 relative'>{stats.int}</span>
-            </div>
-            <div className='flex items-center justify-center relative'>
-              <div
-                className='absolute inset-x-0 top-0 bg-wind-400/20 w-full'
-                style={{ height: stats.rSpd }}
-              />
-              <img src='/stat_spd.svg' className='w-4 h-4 flex-none relative' />
-              <span className='ml-1 relative'>{stats.spd}</span>
-            </div>
-            <div className='flex items-center justify-center relative'>
-              <div
-                className='absolute inset-x-0 top-0 bg-water-400/20 w-full'
-                style={{ height: stats.rVit }}
-              />
-              <img src='/stat_vit.svg' className='w-4 h-4 flex-none relative' />
-              <span className='ml-1 relative'>{stats.vit}</span>
-            </div>
-            <div className='flex items-center justify-center relative'>
-              <div
-                className='absolute inset-x-0 top-0 bg-earth-400/20 w-full'
-                style={{ height: stats.rStr }}
-              />
-              <img src='/stat_str.svg' className='w-4 h-4 flex-none relative' />
-              <span className='ml-1 relative'>{stats.str}</span>
+        <Panel
+          subtitle='Lvl 1'
+          className={classNames('w-40 xl:w-60 aspect-[3/4] bg-black/50')}
+        >
+          <div className='h-full flex flex-col'>
+            {nft?.image ? (
+              <div className='w-full aspect-square flex-none'>
+                <img
+                  alt={nft.name ?? 'Unknown'}
+                  src={nft.image}
+                  className='object-cover w-full'
+                />
+              </div>
+            ) : (
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <SpinnerIcon />
+              </div>
+            )}
+            <div className='border-t border-amber-400/25 flex-auto grid grid-cols-4 font-bold text-xs lg:text-sm xl:text-base'>
+              <div className='flex items-center justify-center relative'>
+                <div
+                  className='absolute inset-x-0 top-0 bg-fire-400/20 w-full'
+                  style={{ height: stats.rInt }}
+                />
+                <img
+                  src='/stat_int.svg'
+                  className='w-4 h-4 flex-none relative'
+                />
+                <span className='ml-1 relative'>{stats.int}</span>
+              </div>
+              <div className='flex items-center justify-center relative'>
+                <div
+                  className='absolute inset-x-0 top-0 bg-wind-400/20 w-full'
+                  style={{ height: stats.rSpd }}
+                />
+                <img
+                  src='/stat_spd.svg'
+                  className='w-4 h-4 flex-none relative'
+                />
+                <span className='ml-1 relative'>{stats.spd}</span>
+              </div>
+              <div className='flex items-center justify-center relative'>
+                <div
+                  className='absolute inset-x-0 top-0 bg-water-400/20 w-full'
+                  style={{ height: stats.rVit }}
+                />
+                <img
+                  src='/stat_vit.svg'
+                  className='w-4 h-4 flex-none relative'
+                />
+                <span className='ml-1 relative'>{stats.vit}</span>
+              </div>
+              <div className='flex items-center justify-center relative'>
+                <div
+                  className='absolute inset-x-0 top-0 bg-earth-400/20 w-full'
+                  style={{ height: stats.rStr }}
+                />
+                <img
+                  src='/stat_str.svg'
+                  className='w-4 h-4 flex-none relative'
+                />
+                <span className='ml-1 relative'>{stats.str}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </Panel>
-    </button>
+        </Panel>
+      </button>
+    </>
   )
 }
