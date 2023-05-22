@@ -8,11 +8,13 @@ import Center from '@/components/Center'
 import PageContainer from '@/components/PageContainer'
 import PageTitle from '@/components/PageTitle'
 import Panel from '@/components/Panel'
+import PreloaderAnimation from '@/components/PreloaderAnimation'
 import WalletGuard from '@/components/WalletGuard'
-import { Metadata, Nft, Sft } from '@metaplex-foundation/js'
+import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import { atom, useAtom, useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { HeroCard } from './HeroCard'
 
 interface NewMintParams {
   address: string
@@ -61,17 +63,70 @@ export default function Barracks() {
 
   if (!wallet?.connected) {
     return (
-      <PageContainer>
-        <PageTitle title='Barracks' />
+      <PageContainer key={'barracks_container'}>
+        <PageTitle key={'barracks_title'} title='Barracks' />
         <WalletGuard />
       </PageContainer>
     )
   }
 
+  if (collection.length === 0 && listPreloaded) {
+    return (
+      <PageContainer key={'barracks_container'}>
+        <PageTitle key={'barracks_title'} title='Barracks' />
+        <Center>
+          <Panel className='max-w-sm w-full' title='Welcome'>
+            <div className='overflow-auto h-full relative'>
+              <p className='px-5 my-5 text-center'>
+                It seems that thou art a new arrival to these parts. Let us
+                employ a fresh hero in thine stead!
+              </p>
+              <p className='px-5 my-5 text-center text-stone-500 italic'>
+                Please make sure you have sufficient SOL in DEVNET.{' '}
+                {!isXNft && (
+                  <>
+                    Visit this{' '}
+                    <a
+                      href='https://faucet.quicknode.com/solana/devnet'
+                      rel='noopener noreferrer'
+                      className='underline'
+                      target='_blank'
+                    >
+                      faucet
+                    </a>{' '}
+                    to get some SOL airdrop.
+                  </>
+                )}
+              </p>
+              <div className='p-5 flex justify-center sticky bottom-0'>
+                <Button>Hire a Hero</Button>
+              </div>
+            </div>
+          </Panel>
+        </Center>
+      </PageContainer>
+    )
+  }
+
+  if (listPreloaded) {
+    return (
+      <PageContainer key={'barracks_container'}>
+        <PageTitle key={'barracks_title'} title='Barracks' />
+        <div className='h-full w-screen sm:w-auto flex-auto overflow-y-auto overflow-x-hidden p-3 xl:p-5'>
+          <div className='flex flex-wrap justify-center gap-3 xl:gap-5 relative'>
+            {collection.map((metadata, i) => (
+              <HeroCard key={i} metadata={metadata} />
+            ))}
+          </div>
+        </div>
+      </PageContainer>
+    )
+  }
+
   return (
-    <PageContainer>
-      <PageTitle title='Barracks' />
-      {JSON.stringify(collection)}
+    <PageContainer key={'barracks_container'}>
+      <PageTitle key={'barracks_title'} title='Barracks' />
+      <PreloaderAnimation />
     </PageContainer>
   )
 }
