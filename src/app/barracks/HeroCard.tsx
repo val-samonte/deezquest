@@ -11,10 +11,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAtomValue } from 'jotai'
 import { gridContainerPosAtom } from '@/atoms/barracksAtoms'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import useMeasure from 'react-use-measure'
 import Image from 'next/image'
-import { flushSync } from 'react-dom'
 
 interface HeroCardProps {
   metadata: Metadata | Nft | Sft
@@ -28,14 +27,13 @@ interface Bounds {
 }
 
 export function HeroCard({ metadata }: HeroCardProps) {
-  // const [shadow, bounds] = useMeasure()
-  const shadow = useRef<HTMLDivElement>(null)
+  const [shadow, bounds] = useMeasure()
   const metaplex = useMetaplex()
   const isLoading = useRef(false)
   const [nft, setNft] = useState<JsonMetadata | null>(null)
-  const pathname = usePathname()
-
   const containerPos = useAtomValue(gridContainerPosAtom)
+  const pathname = usePathname()
+  const router = useRouter()
 
   const address = useMemo(() => {
     let address
@@ -84,108 +82,55 @@ export function HeroCard({ metadata }: HeroCardProps) {
     }
   }, [metaplex, metadata, setNft])
 
-  useEffect(() => {}, [])
-
-  // useLayoutEffect(() => {
-  //   const onResize = () => {
-  //     window.setTimeout(() => {
-  //       setRect((rect) => {
-  //         if (shadow.current && containerPos) {
-  //           const pos = shadow.current?.getBoundingClientRect()
-  //           const w = shadow.current.clientWidth
-  //           const h = shadow.current.clientHeight
-  //           const newRect = {
-  //             x: pos.left - containerPos.x,
-  //             y: pos.top - containerPos.y,
-  //             w,
-  //             h,
-  //           }
-  //           if (JSON.stringify(rect) !== JSON.stringify(newRect)) {
-  //             return newRect
-  //           }
-  //         }
-  //         return rect
-  //       })
-  //     }, 42)
-  //   }
-
-  //   const intId = window.setInterval(() => {
-  //     if (shadow.current) {
-  //       onResize()
-  //       window.clearInterval(intId)
-  //     }
-  //   })
-
-  //   window.addEventListener('resize', onResize)
-
-  //   return () => {
-  //     window.removeEventListener('resize', onResize)
-  //     window.clearInterval(intId)
-  //   }
-  // }, [pathname, containerPos, setRect])
-
-  // const prevBounds = useRef<Bounds | null>(null)
-  // const [b, setB] = useState<Bounds | null>(null)
-
-  // useLayoutEffect(() => {
-  //   const shadowCheck = () => {
-  //     if (shadow.current) {
-  //       const pos = shadow.current.getBoundingClientRect()
-  //       const width = shadow.current.clientWidth
-  //       const height = shadow.current.clientHeight
-
-  //       const newBounds = {
-  //         left: pos.left - (containerPos?.x ?? 0),
-  //         top: pos.top - (containerPos?.y ?? 0),
-  //         width,
-  //         height,
-  //       }
-
-  //       if (JSON.stringify(newBounds) === JSON.stringify(prevBounds.current)) {
-  //         return
-  //       }
-
-  //       prevBounds.current = newBounds
-  //       setB(newBounds)
-
-  //       console.log('new bounds')
-  //     }
-
-  //     requestAnimationFrame(shadowCheck)
-  //   }
-  //   shadowCheck()
-  // }, [containerPos, pathname, setB])
+  const drilldown = pathname !== '/barracks'
+  const selected = pathname.includes(address)
 
   return (
     <>
-      {/* <div
+      <div
         ref={shadow}
         className='w-40 xl:w-60 aspect-[3/4] pointer-events-none'
-      /> */}
-      <Link
-        href={`/barracks/${address}`}
-        // className='absolute transition-all'
-        className='w-40 xl:w-60 aspect-[3/4]'
-        // style={b ?? {}}
+      />
+      <button
+        onClick={() => {
+          selected
+            ? router.push('/barracks')
+            : router.push(`/barracks/${address}`)
+        }}
+        className={classNames(
+          'transition-all duration-300',
+          drilldown && !selected && 'grayscale brightness-50',
+          'absolute transition-all duration-300',
+        )}
+        style={{
+          ...bounds,
+          left: bounds.left - (containerPos?.left ?? 0),
+          top: bounds.top - (containerPos?.top ?? 0),
+        }}
       >
         <Panel
           subtitle='Lvl 1'
-          className={classNames('w-40 xl:w-60 aspect-[3/4] bg-black/50')}
+          className={classNames(
+            'transition-all duration-300',
+            selected ? 'bg-indigo-700/50' : 'bg-black/50',
+            'w-40 xl:w-60 aspect-[3/4] ',
+          )}
         >
           <div className='h-full flex flex-col'>
-            {nft?.image ? (
-              <div className='w-full aspect-square flex-none'>
+            <div className='w-full aspect-square flex-none'>
+              {nft?.image ? (
                 <img
                   alt={nft.name ?? 'Unknown'}
                   src={nft.image}
                   className='object-cover w-full aspect-square'
                 />
-              </div>
-            ) : (
-              <div className='absolute inset-0 flex items-center justify-center'>
-                <SpinnerIcon />
-              </div>
-            )}
+              ) : (
+                <div className='w-full h-full flex items-center justify-center'>
+                  <SpinnerIcon />
+                </div>
+              )}
+            </div>
+
             <div className='border-t border-amber-400/25 flex-auto grid grid-cols-4 font-bold text-xs lg:text-sm xl:text-base'>
               <div className='flex items-center justify-center relative'>
                 <div
@@ -246,7 +191,7 @@ export function HeroCard({ metadata }: HeroCardProps) {
             </div>
           </div>
         </Panel>
-      </Link>
+      </button>
     </>
   )
 }

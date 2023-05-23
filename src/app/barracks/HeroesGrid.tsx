@@ -3,55 +3,29 @@ import {
   userNftCollectionAtom,
 } from '@/atoms/barracksAtoms'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { HeroCard } from './HeroCard'
-
-// hide grid (sm:portrait)
-// padding-right: 100%
-// margin-left: -100%
-
-// not expanded
-// pr-5
-// panel: margin-right: -100%
-
-// expanded
-// pr-96
-// panel: margin-right: 0
+import { usePathname } from 'next/navigation'
+import useMeasure from 'react-use-measure'
 
 export default function HeroesGrid() {
   const setContainerPos = useSetAtom(gridContainerPosAtom)
   const collection = useAtomValue(userNftCollectionAtom)
+  const pathname = usePathname()
 
-  const container = useRef<HTMLDivElement>(null)
+  const [container, bounds] = useMeasure()
+
   useEffect(() => {
-    const onResize = () => {
-      setContainerPos((pos) => {
-        if (container.current) {
-          const pos = container.current.getBoundingClientRect()
-          const newPos = {
-            x: pos.left,
-            y: pos.top,
-          }
+    setContainerPos(bounds)
+  }, [bounds, setContainerPos])
 
-          return newPos
-        }
-        return pos
-      })
-    }
-    window.addEventListener('resize', onResize)
+  useLayoutEffect(() => {
+    window.dispatchEvent(new Event('resize'))
+    window.setTimeout(() => {
+      window.dispatchEvent(new Event('resize'))
+    }, 300)
+  }, [pathname])
 
-    const intId = window.setInterval(() => {
-      if (container.current) {
-        onResize()
-        window.clearInterval(intId)
-      }
-    })
-
-    return () => {
-      window.removeEventListener('resize', onResize)
-      window.clearInterval(intId)
-    }
-  }, [setContainerPos])
   return (
     <div
       ref={container}

@@ -1,8 +1,8 @@
 # Basic of a Match-3 game
 
 The game starts with an 8x8 game board with random symbols in it.
-Simply select any symbol on the board that you want to swap, then click another adjacent symbol to make a move. 
-If you're able to make a row of 3 or more of a same symbol, you have made a match.
+Simply select any symbol on the board that you want to swap, then click another adjacent symbol to make a move.
+If you're able to make a row of 3 or more of the same symbol, you have made a match.
 Unlike other match 3 games, any swap move is valid, regardless if you have made a match or not.
 
 # The objective of the game
@@ -15,6 +15,7 @@ A match may result to a draw if both you and your opponent has the same HP when 
 # Your Hero and its attributes
 
 Every hero has 4 attributes derived from its public address.
+
 1. Intelligence - Affects the total MP and bonus mana absorption points of the hero.
 2. Speed - Affects the turn frequency of the hero. The bigger the gap of the speed between you and the opponent, the more frequent your hero can make a turn.
 3. Vitality - Affects the total HP of your hero, increasing its survivability.
@@ -22,7 +23,8 @@ Every hero has 4 attributes derived from its public address.
 
 # The symbols on the board: Commands and Mana Stones
 
-There are 7 different kinds of symbols in the game which are separated in 2 categories:
+There are 7 different kinds of symbols in the game and are grouped into 2 categories:
+
 1. Commands - The sword, shield and amulet symbols are commands. Matching 3 or more of these in a turn will let your hero execute the respective command.
 2. Mana Stones - Are the mana resources needed for your hero to cast skills. The fire, wind, water and earth stones belong to this category.
 
@@ -37,11 +39,11 @@ The Defend Command increases your Shield Points which protects your hero to phys
 # What are skills and how to use them
 
 Skills are special commands that your hero can cast. There are 3 categories of skill available:
-1. Offensive Skill - 
+
+1. Offensive Skill -
 
 # Skill Power Level
 
 # Shield and Magic Protection
 
 # Turn Points and Turn Time
-

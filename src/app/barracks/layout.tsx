@@ -38,7 +38,6 @@ export default function BarracksLayout({
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
-  const setContainerPos = useSetAtom(gridContainerPosAtom)
   const pathname = usePathname()
   const drilldown = pathname !== '/barracks'
 
@@ -65,37 +64,6 @@ export default function BarracksLayout({
     setListPreloaded(false)
     loadNfts().then(() => setListPreloaded(true))
   }, [publicKey, loadNfts, setListPreloaded, setCollection])
-
-  const container = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const onResize = () => {
-      setContainerPos((pos) => {
-        if (container.current) {
-          const pos = container.current.getBoundingClientRect()
-          const newPos = {
-            x: pos.left,
-            y: pos.top,
-          }
-
-          return newPos
-        }
-        return pos
-      })
-    }
-    window.addEventListener('resize', onResize)
-
-    const intId = window.setInterval(() => {
-      if (container.current) {
-        onResize()
-        window.clearInterval(intId)
-      }
-    })
-
-    return () => {
-      window.removeEventListener('resize', onResize)
-      window.clearInterval(intId)
-    }
-  }, [setContainerPos])
 
   if (!wallet?.connected) {
     return (
@@ -152,8 +120,9 @@ export default function BarracksLayout({
           <div
             className={classNames(
               drilldown ? 'pr-96' : 'pr-5',
-              'transition-all',
-              'absolute inset-0 h-full w-screen sm:w-auto flex-auto overflow-y-auto overflow-x-visible py-5 pl-5',
+              // 'transition-all duration-300',
+              'absolute inset-0 ',
+              'h-full w-screen sm:w-auto flex-auto overflow-y-scroll overflow-x-hidden py-5 pl-5',
             )}
           >
             <HeroesGrid />
@@ -161,7 +130,7 @@ export default function BarracksLayout({
           <div
             className={classNames(
               drilldown ? 'mr-0' : '-mr-[100%]',
-              'transition-all',
+              'transition-all duration-300',
               'h-full absolute top-0 right-0 bottom-0 pointer-events-none',
             )}
           >
