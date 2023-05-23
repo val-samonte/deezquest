@@ -11,13 +11,14 @@ import Panel from '@/components/Panel'
 import PreloaderAnimation from '@/components/PreloaderAnimation'
 import WalletGuard from '@/components/WalletGuard'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import {
   gridContainerPosAtom,
   userNftCollectionAtom,
 } from '@/atoms/barracksAtoms'
 import HeroesGrid from './HeroesGrid'
+import classNames from 'classnames'
 
 interface NewMintParams {
   address: string
@@ -25,16 +26,21 @@ interface NewMintParams {
   image: string
 }
 
-export default function BarracksLayout({ children }: { children: ReactNode }) {
+export default function BarracksLayout({
+  children,
+}: {
+  children: ReactNode | null
+}) {
   const wallet = useUserWallet()
   const metaplex = useMetaplex()
-  const router = useRouter()
   const [listPreloaded, setListPreloaded] = useState(false)
   const [collection, setCollection] = useAtom(userNftCollectionAtom)
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
   const setContainerPos = useSetAtom(gridContainerPosAtom)
+  const pathname = usePathname()
+  const drilldown = pathname !== '/barracks'
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
@@ -143,21 +149,23 @@ export default function BarracksLayout({ children }: { children: ReactNode }) {
       <PageContainer key={'barracks_container'}>
         <PageTitle key={'barracks_title'} title='Barracks' />
         <div className='flex-auto relative'>
-          <div className='absolute inset-0 h-full w-screen sm:w-auto flex-auto overflow-y-auto overflow-x-visible py-5 pl-5 pr-96'>
+          <div
+            className={classNames(
+              drilldown ? 'pr-96' : 'pr-5',
+              'transition-all',
+              'absolute inset-0 h-full w-screen sm:w-auto flex-auto overflow-y-auto overflow-x-visible py-5 pl-5',
+            )}
+          >
             <HeroesGrid />
           </div>
-          <div className='h-full absolute top-0 right-0 bottom-0 w-96 p-5 pointer-events-none'>
-            <div className='h-full flex flex-col gap-5'>
-              <div className='h-96'>
-                <></>
-              </div>
-              <Panel title='Equip' className='bg-black/50'>
-                <></>
-              </Panel>
-              <div className='w-full pointer-events-auto'>
-                <Button className='w-full'>Mission</Button>
-              </div>
-            </div>
+          <div
+            className={classNames(
+              drilldown ? 'mr-0' : '-mr-[100%]',
+              'transition-all',
+              'h-full absolute top-0 right-0 bottom-0 pointer-events-none',
+            )}
+          >
+            {children}
           </div>
         </div>
       </PageContainer>

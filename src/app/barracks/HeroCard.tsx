@@ -10,6 +10,8 @@ import classNames from 'classnames'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAtomValue } from 'jotai'
 import { gridContainerPosAtom } from '@/atoms/barracksAtoms'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 interface HeroCardProps {
   metadata: Metadata | Nft | Sft
@@ -20,7 +22,7 @@ export function HeroCard({ metadata }: HeroCardProps) {
   const metaplex = useMetaplex()
   const isLoading = useRef(false)
   const [nft, setNft] = useState<JsonMetadata | null>(null)
-  // const pathname = usePathname()
+  const pathname = usePathname()
 
   const containerPos = useAtomValue(gridContainerPosAtom)
   const [rect, setRect] = useState<{
@@ -79,25 +81,27 @@ export function HeroCard({ metadata }: HeroCardProps) {
 
   shadow.current?.clientLeft
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const onResize = () => {
-      setRect((rect) => {
-        if (shadow.current && containerPos) {
-          const pos = shadow.current?.getBoundingClientRect()
-          const w = shadow.current.clientWidth
-          const h = shadow.current.clientHeight
-          const newRect = {
-            x: pos.left - containerPos.x,
-            y: pos.top - containerPos.y,
-            w,
-            h,
+      window.setTimeout(() => {
+        setRect((rect) => {
+          if (shadow.current && containerPos) {
+            const pos = shadow.current?.getBoundingClientRect()
+            const w = shadow.current.clientWidth
+            const h = shadow.current.clientHeight
+            const newRect = {
+              x: pos.left - containerPos.x,
+              y: pos.top - containerPos.y,
+              w,
+              h,
+            }
+            if (JSON.stringify(rect) !== JSON.stringify(newRect)) {
+              return newRect
+            }
           }
-          if (JSON.stringify(rect) !== JSON.stringify(newRect)) {
-            return newRect
-          }
-        }
-        return rect
-      })
+          return rect
+        })
+      }, 42)
     }
 
     const intId = window.setInterval(() => {
@@ -111,8 +115,9 @@ export function HeroCard({ metadata }: HeroCardProps) {
 
     return () => {
       window.removeEventListener('resize', onResize)
+      window.clearInterval(intId)
     }
-  }, [containerPos, setRect])
+  }, [pathname, containerPos, setRect])
 
   return (
     <>
@@ -120,7 +125,8 @@ export function HeroCard({ metadata }: HeroCardProps) {
         ref={shadow}
         className='w-40 xl:w-60 aspect-[3/4] pointer-events-none'
       />
-      <button
+      <Link
+        href={`/barracks/${address}`}
         className='absolute transition-all'
         style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h }}
       >
@@ -190,7 +196,7 @@ export function HeroCard({ metadata }: HeroCardProps) {
             </div>
           </div>
         </Panel>
-      </button>
+      </Link>
     </>
   )
 }
