@@ -135,34 +135,34 @@ export default function AttributesDisplay({
           </div>
         </AttributeTile>
       </div>
-      <div className='grid grid-cols-2 gap-x-5 gap-y-2'>
+      <div className='grid grid-cols-2 gap-x-5 gap-y-2 text-sm'>
         <span className='flex items-center'>
           <span className='text-neutral-300 flex-auto'>Total HP: </span>
-          <span className='font-bold text-lime-600'>{hero.maxHp}</span>
+          <span className='font-bold text-white'>{hero.maxHp}</span>
         </span>
         <span className='flex items-center'>
           <span className='text-neutral-300 flex-auto'>Turn Points: </span>
-          <span className='font-bold text-lime-600'>
+          <span className='font-bold text-white'>
             {computeAttribute(HeroAttributes.SPD, hero.spd).turnPoints}
           </span>
         </span>
         <span className='flex items-center'>
           <span className='text-neutral-300 flex-auto'>Total MP: </span>
-          <span className='font-bold text-lime-600'>{hero.maxMp}</span>
+          <span className='font-bold text-white'>{hero.maxMp}</span>
         </span>
         <span className='flex items-center'>
           <span className='text-neutral-300 flex-auto'>Absorb MP: </span>
-          <span className='font-bold text-lime-600'>
+          <span className='font-bold text-white'>
             {computeAttribute(HeroAttributes.INT, hero.int).absorbMp}
           </span>
         </span>
         <span className='flex items-center'>
           <span className='text-neutral-300 flex-auto'>Base Dmg: </span>
-          <span className='font-bold text-lime-600'>{hero.baseDmg}</span>
+          <span className='font-bold text-white'>{hero.baseDmg}</span>
         </span>
         <span className='flex items-center'>
           <span className='text-neutral-300 flex-auto'>Carry Cap: </span>
-          <span className='font-bold text-lime-600'>{hero.str}</span>
+          <span className='font-bold text-white'>{hero.str}</span>
         </span>
       </div>
     </div>

@@ -41,7 +41,7 @@ export default function AttributeTile({
         </div>
       </Popover.Button>
       <Popover.Panel
-        className='absolute z-50 bg-neutral-800 py-3 px-5 rounded text-xs xl:text-sm shadow'
+        className='absolute z-50 bg-black/50 backdrop-blur py-3 px-5 rounded text-xs xl:text-sm shadow'
         ref={setPopperElement as any}
         style={styles.popper}
         {...attributes.popper}

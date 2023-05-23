@@ -8,8 +8,8 @@ import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { useAtomValue } from 'jotai'
-import { gridContainerPosAtom } from '@/atoms/barracksAtoms'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { gridContainerPosAtom, selectedNftAtom } from '@/atoms/barracksAtoms'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import useMeasure from 'react-use-measure'
@@ -27,13 +27,14 @@ interface Bounds {
 }
 
 export function HeroCard({ metadata }: HeroCardProps) {
-  const [shadow, bounds] = useMeasure()
-  const metaplex = useMetaplex()
-  const isLoading = useRef(false)
-  const [nft, setNft] = useState<JsonMetadata | null>(null)
-  const containerPos = useAtomValue(gridContainerPosAtom)
   const pathname = usePathname()
   const router = useRouter()
+  const metaplex = useMetaplex()
+  const [shadow, bounds] = useMeasure()
+  const [nft, setNft] = useState<JsonMetadata | null>(null)
+  const isLoading = useRef(false)
+  const containerPos = useAtomValue(gridContainerPosAtom)
+  const setSelected = useSetAtom(selectedNftAtom)
 
   const address = useMemo(() => {
     let address
@@ -81,6 +82,13 @@ export function HeroCard({ metadata }: HeroCardProps) {
       setNft(metadata.json)
     }
   }, [metaplex, metadata, setNft])
+
+  useEffect(() => {
+    const selected = pathname.includes(address)
+    if (selected && nft) {
+      setSelected({ address, metadata: nft })
+    }
+  }, [pathname, address, nft, setSelected])
 
   const drilldown = pathname !== '/barracks'
   const selected = pathname.includes(address)

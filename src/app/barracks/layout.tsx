@@ -19,6 +19,7 @@ import {
 } from '@/atoms/barracksAtoms'
 import HeroesGrid from './HeroesGrid'
 import classNames from 'classnames'
+import HeroPreview from './HeroPreview'
 
 interface NewMintParams {
   address: string
@@ -134,7 +135,15 @@ export default function BarracksLayout({
               'h-full absolute top-0 right-0 bottom-0 pointer-events-none',
             )}
           >
-            {children}
+            <div className='w-96 h-full flex flex-col px-5 gap-5 bg-gradient-to-r from-black/0 to-black'>
+              <div className='flex-auto'>
+                <HeroPreview />
+              </div>
+              <div className='w-full pointer-events-auto pb-5'>
+                <Button className='w-full'>Mission</Button>
+              </div>
+            </div>
+            {/* {children} */}
           </div>
         </div>
       </PageContainer>
