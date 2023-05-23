@@ -12,12 +12,23 @@ import { useAtomValue } from 'jotai'
 import { gridContainerPosAtom } from '@/atoms/barracksAtoms'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import useMeasure from 'react-use-measure'
+import Image from 'next/image'
+import { flushSync } from 'react-dom'
 
 interface HeroCardProps {
   metadata: Metadata | Nft | Sft
 }
 
+interface Bounds {
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
 export function HeroCard({ metadata }: HeroCardProps) {
+  // const [shadow, bounds] = useMeasure()
   const shadow = useRef<HTMLDivElement>(null)
   const metaplex = useMetaplex()
   const isLoading = useRef(false)
@@ -25,12 +36,6 @@ export function HeroCard({ metadata }: HeroCardProps) {
   const pathname = usePathname()
 
   const containerPos = useAtomValue(gridContainerPosAtom)
-  const [rect, setRect] = useState<{
-    x: number
-    y: number
-    w: number
-    h: number
-  }>({ x: 0, y: 0, w: 0, h: 0 })
 
   const address = useMemo(() => {
     let address
@@ -79,56 +84,89 @@ export function HeroCard({ metadata }: HeroCardProps) {
     }
   }, [metaplex, metadata, setNft])
 
-  shadow.current?.clientLeft
+  useEffect(() => {}, [])
 
-  useEffect(() => {
-    const onResize = () => {
-      window.setTimeout(() => {
-        setRect((rect) => {
-          if (shadow.current && containerPos) {
-            const pos = shadow.current?.getBoundingClientRect()
-            const w = shadow.current.clientWidth
-            const h = shadow.current.clientHeight
-            const newRect = {
-              x: pos.left - containerPos.x,
-              y: pos.top - containerPos.y,
-              w,
-              h,
-            }
-            if (JSON.stringify(rect) !== JSON.stringify(newRect)) {
-              return newRect
-            }
-          }
-          return rect
-        })
-      }, 42)
-    }
+  // useLayoutEffect(() => {
+  //   const onResize = () => {
+  //     window.setTimeout(() => {
+  //       setRect((rect) => {
+  //         if (shadow.current && containerPos) {
+  //           const pos = shadow.current?.getBoundingClientRect()
+  //           const w = shadow.current.clientWidth
+  //           const h = shadow.current.clientHeight
+  //           const newRect = {
+  //             x: pos.left - containerPos.x,
+  //             y: pos.top - containerPos.y,
+  //             w,
+  //             h,
+  //           }
+  //           if (JSON.stringify(rect) !== JSON.stringify(newRect)) {
+  //             return newRect
+  //           }
+  //         }
+  //         return rect
+  //       })
+  //     }, 42)
+  //   }
 
-    const intId = window.setInterval(() => {
-      if (shadow.current) {
-        onResize()
-        window.clearInterval(intId)
-      }
-    })
+  //   const intId = window.setInterval(() => {
+  //     if (shadow.current) {
+  //       onResize()
+  //       window.clearInterval(intId)
+  //     }
+  //   })
 
-    window.addEventListener('resize', onResize)
+  //   window.addEventListener('resize', onResize)
 
-    return () => {
-      window.removeEventListener('resize', onResize)
-      window.clearInterval(intId)
-    }
-  }, [pathname, containerPos, setRect])
+  //   return () => {
+  //     window.removeEventListener('resize', onResize)
+  //     window.clearInterval(intId)
+  //   }
+  // }, [pathname, containerPos, setRect])
+
+  // const prevBounds = useRef<Bounds | null>(null)
+  // const [b, setB] = useState<Bounds | null>(null)
+
+  // useLayoutEffect(() => {
+  //   const shadowCheck = () => {
+  //     if (shadow.current) {
+  //       const pos = shadow.current.getBoundingClientRect()
+  //       const width = shadow.current.clientWidth
+  //       const height = shadow.current.clientHeight
+
+  //       const newBounds = {
+  //         left: pos.left - (containerPos?.x ?? 0),
+  //         top: pos.top - (containerPos?.y ?? 0),
+  //         width,
+  //         height,
+  //       }
+
+  //       if (JSON.stringify(newBounds) === JSON.stringify(prevBounds.current)) {
+  //         return
+  //       }
+
+  //       prevBounds.current = newBounds
+  //       setB(newBounds)
+
+  //       console.log('new bounds')
+  //     }
+
+  //     requestAnimationFrame(shadowCheck)
+  //   }
+  //   shadowCheck()
+  // }, [containerPos, pathname, setB])
 
   return (
     <>
-      <div
+      {/* <div
         ref={shadow}
         className='w-40 xl:w-60 aspect-[3/4] pointer-events-none'
-      />
+      /> */}
       <Link
         href={`/barracks/${address}`}
-        className='absolute transition-all'
-        style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h }}
+        // className='absolute transition-all'
+        className='w-40 xl:w-60 aspect-[3/4]'
+        // style={b ?? {}}
       >
         <Panel
           subtitle='Lvl 1'
@@ -154,7 +192,10 @@ export function HeroCard({ metadata }: HeroCardProps) {
                   className='absolute inset-x-0 top-0 bg-fire-400/20 w-full'
                   style={{ height: stats.rInt }}
                 />
-                <img
+                <Image
+                  width={120}
+                  height={120}
+                  alt={'intelligence'}
                   src='/stat_int.svg'
                   className='w-4 h-4 flex-none relative'
                 />
@@ -165,7 +206,10 @@ export function HeroCard({ metadata }: HeroCardProps) {
                   className='absolute inset-x-0 top-0 bg-wind-400/20 w-full'
                   style={{ height: stats.rSpd }}
                 />
-                <img
+                <Image
+                  width={120}
+                  height={120}
+                  alt={'speed'}
                   src='/stat_spd.svg'
                   className='w-4 h-4 flex-none relative'
                 />
@@ -176,7 +220,10 @@ export function HeroCard({ metadata }: HeroCardProps) {
                   className='absolute inset-x-0 top-0 bg-water-400/20 w-full'
                   style={{ height: stats.rVit }}
                 />
-                <img
+                <Image
+                  width={120}
+                  height={120}
+                  alt={'vitality'}
                   src='/stat_vit.svg'
                   className='w-4 h-4 flex-none relative'
                 />
@@ -187,7 +234,10 @@ export function HeroCard({ metadata }: HeroCardProps) {
                   className='absolute inset-x-0 top-0 bg-earth-400/20 w-full'
                   style={{ height: stats.rStr }}
                 />
-                <img
+                <Image
+                  width={120}
+                  height={120}
+                  alt={'strength'}
                   src='/stat_str.svg'
                   className='w-4 h-4 flex-none relative'
                 />
