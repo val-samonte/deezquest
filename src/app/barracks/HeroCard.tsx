@@ -8,9 +8,8 @@ import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { animated, useSpringValue } from '@react-spring/web'
 import { useAtomValue } from 'jotai'
-import { gridContainerPosAtom } from '@/atoms/gridContainerPosAtom'
+import { gridContainerPosAtom } from '@/atoms/barracksAtoms'
 
 interface HeroCardProps {
   metadata: Metadata | Nft | Sft
@@ -83,7 +82,7 @@ export function HeroCard({ metadata }: HeroCardProps) {
   useLayoutEffect(() => {
     const onResize = () => {
       setRect((rect) => {
-        if (shadow.current) {
+        if (shadow.current && containerPos) {
           const pos = shadow.current?.getBoundingClientRect()
           const w = shadow.current.clientWidth
           const h = shadow.current.clientHeight
@@ -100,9 +99,16 @@ export function HeroCard({ metadata }: HeroCardProps) {
         return rect
       })
     }
+
+    const intId = window.setInterval(() => {
+      if (shadow.current) {
+        onResize()
+        window.clearInterval(intId)
+      }
+    })
+
     window.addEventListener('resize', onResize)
 
-    onResize()
     return () => {
       window.removeEventListener('resize', onResize)
     }
@@ -128,7 +134,7 @@ export function HeroCard({ metadata }: HeroCardProps) {
                 <img
                   alt={nft.name ?? 'Unknown'}
                   src={nft.image}
-                  className='object-cover w-full'
+                  className='object-cover w-full aspect-square'
                 />
               </div>
             ) : (
