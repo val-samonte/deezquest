@@ -19,7 +19,7 @@ export default function AttributesDisplay({
     <div className={classNames('flex flex-col gap-y-5', className)}>
       <div className={classNames('grid grid-cols-4 gap-2')}>
         <AttributeTile attrName={HeroAttributes.INT} value={hero.int}>
-          <div className='font-bold mb-2 flex pb-1 border-b border-b-white/5'>
+          <div className='font-bold mb-2 flex pb-1 border-b border-amber-400/10'>
             <span className='flex-auto'>Intelligence</span>
             <div className={classNames('flex items-center gap-3 font-bold')}>
               <span className='flex items-center xl:gap-2'>
@@ -51,7 +51,7 @@ export default function AttributesDisplay({
           </div>
         </AttributeTile>
         <AttributeTile attrName={HeroAttributes.SPD} value={hero.spd}>
-          <div className='font-bold mb-2 flex pb-1 border-b border-b-white/5'>
+          <div className='font-bold mb-2 flex pb-1 border-b border-amber-400/10'>
             <span className='flex-auto'>Speed</span>
             <div className={classNames('flex items-center gap-3 font-bold')}>
               <span className='flex items-center xl:gap-2'>
@@ -79,7 +79,7 @@ export default function AttributesDisplay({
           </div>
         </AttributeTile>
         <AttributeTile attrName={HeroAttributes.VIT} value={hero.vit}>
-          <div className='font-bold mb-2 flex pb-1 border-b border-b-white/5'>
+          <div className='font-bold mb-2 flex pb-1 border-b border-amber-400/10'>
             <span className='flex-auto'>Vitality</span>
             <div className={classNames('flex items-center gap-3 font-bold')}>
               <span className='flex items-center xl:gap-2'>
@@ -105,7 +105,7 @@ export default function AttributesDisplay({
           </div>
         </AttributeTile>
         <AttributeTile attrName={HeroAttributes.STR} value={hero.str}>
-          <div className='font-bold mb-2 flex pb-1 border-b border-b-white/5'>
+          <div className='font-bold mb-2 flex pb-1 border-b border-amber-400/10'>
             <span className='flex-auto'>Strength</span>
             <div className={classNames('flex items-center gap-3 font-bold')}>
               <span className='flex items-center xl:gap-2'>
@@ -137,7 +137,7 @@ export default function AttributesDisplay({
       </div>
       <div className='grid grid-cols-2 gap-x-5 gap-y-2 text-sm'>
         <span className='flex items-center'>
-          <span className='text-neutral-300 flex-auto'>Total HP: </span>
+          <span className='text-neutral-300 flex-auto'>Max HP: </span>
           <span className='font-bold text-white'>{hero.maxHp}</span>
         </span>
         <span className='flex items-center'>
@@ -147,7 +147,7 @@ export default function AttributesDisplay({
           </span>
         </span>
         <span className='flex items-center'>
-          <span className='text-neutral-300 flex-auto'>Total MP: </span>
+          <span className='text-neutral-300 flex-auto'>Max MP: </span>
           <span className='font-bold text-white'>{hero.maxMp}</span>
         </span>
         <span className='flex items-center'>

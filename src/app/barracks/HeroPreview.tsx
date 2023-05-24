@@ -1,5 +1,6 @@
 import { selectedNftAtom } from '@/atoms/barracksAtoms'
 import AttributesDisplay from '@/components/AttributesDisplay'
+import BackIcon from '@/components/BackIcon'
 import Panel from '@/components/Panel'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import { SkillTypes } from '@/enums/SkillTypes'
@@ -43,7 +44,7 @@ export default function HeroPreview() {
   return (
     <div className='h-full flex flex-col relative pointer-events-auto'>
       <div
-        className='h-full overflow-auto absolute inset-0 p-5'
+        className='h-full overflow-y-auto overflow-x-hidden absolute inset-0 p-5'
         style={{
           WebkitMaskImage: mask,
           maskImage: mask,
@@ -65,13 +66,23 @@ export default function HeroPreview() {
           </Panel>
         </div>
         <div className='sticky -top-5 z-10'>
-          <h2
-            className={classNames(
-              'text-2xl px-5 py-2 bg-black/80 backdrop-grayscale',
-              font.className,
-            )}
-          >
-            {selected.metadata.name}
+          <h2 className='pl-5 py-2 bg-black/80 backdrop-grayscale flex items-center justify-between w-full'>
+            <div
+              className={classNames(
+                'text-2xl overflow-hidden w-48 whitespace-nowrap overflow-ellipsis',
+                font.className,
+              )}
+            >
+              {selected.metadata.name}
+            </div>
+
+            <button
+              type='button'
+              className='flex-none font-bold text-sm tracking-widest uppercase flex items-center '
+            >
+              Loadout
+              <BackIcon className='rotate-180 text-amber-400/50' />
+            </button>
           </h2>
           <div className='backdrop-blur-lg h-1 w-full mb-2 bg-gradient-to-r from-amber-400/50 to-amber-400/0' />
         </div>
