@@ -117,7 +117,7 @@ export function HeroCard({ metadata }: HeroCardProps) {
         }}
       >
         <Panel
-          subtitle='Lvl 1'
+          subtitle='Lv 1'
           className={classNames(
             'transition-all duration-300',
             selected ? 'bg-indigo-700/50' : 'bg-black/50',

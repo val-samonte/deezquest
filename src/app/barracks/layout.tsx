@@ -135,11 +135,11 @@ export default function BarracksLayout({
               'h-full absolute top-0 right-0 bottom-0 pointer-events-none',
             )}
           >
-            <div className='w-96 h-full flex flex-col px-5 gap-5 bg-gradient-to-r from-black/0 to-black'>
+            <div className='w-96 h-full flex flex-col bg-gradient-to-r from-black/0 to-black'>
               <div className='flex-auto'>
                 <HeroPreview />
               </div>
-              <div className='w-full pointer-events-auto pb-5'>
+              <div className='w-full pointer-events-auto pb-5 px-5'>
                 <Button className='w-full'>Mission</Button>
               </div>
             </div>

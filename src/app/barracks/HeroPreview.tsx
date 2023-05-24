@@ -18,6 +18,9 @@ const font = IM_Fell_DW_Pica({
   display: 'swap',
 })
 
+const mask =
+  'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 97.5%, rgba(0,0,0,0) 100%)'
+
 export default function HeroPreview() {
   const selected = useAtomValue(selectedNftAtom)
 
@@ -39,7 +42,13 @@ export default function HeroPreview() {
 
   return (
     <div className='h-full flex flex-col relative pointer-events-auto'>
-      <div className='h-full overflow-auto absolute inset-0 pt-5'>
+      <div
+        className='h-full overflow-auto absolute inset-0 p-5'
+        style={{
+          WebkitMaskImage: mask,
+          maskImage: mask,
+        }}
+      >
         <div className='w-full aspect-square'>
           <Panel className='bg-black/50'>
             {selected.metadata?.image ? (
@@ -55,10 +64,10 @@ export default function HeroPreview() {
             )}
           </Panel>
         </div>
-        <div className='sticky top-0'>
+        <div className='sticky -top-5 z-10'>
           <h2
             className={classNames(
-              'text-2xl px-5 py-2 backdrop-blur-lg',
+              'text-2xl px-5 py-2 bg-black/80 backdrop-grayscale',
               font.className,
             )}
           >
@@ -69,7 +78,7 @@ export default function HeroPreview() {
 
         <AttributesDisplay hero={hero} />
 
-        <div className='flex flex-col gap-3 mt-5'>
+        <div className='flex flex-col gap-5 mt-5'>
           <div className='flex h-16 items-center relative pl-6'>
             <div className='flex justify-center w-10 flex-none'>
               <div className='h-14 aspect-square relative'>
