@@ -101,7 +101,7 @@ export default function HeroPreview() {
             <div className='h-14 w-14 aspect-square absolute left-4 -rotate-45'>
               <div className='h-4 w-4 aspect-square border-l-2 border-t-2 border-amber-400/50 absolute top-0 left-0' />
               <div className='h-4 w-4 aspect-square border-r-2 border-b-2 border-amber-400/50 absolute bottom-0 right-0' />
-              <div className='h-4 w-4 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
+              <div className='h-2 w-2 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
             </div>
             <div className='flex-auto flex flex-col pl-6 gap-1 text-sm'>
               <div className='pl-2 flex justify-between text-white uppercase tracking-widest pr-5'>
@@ -130,7 +130,7 @@ export default function HeroPreview() {
             <div className='h-14 w-14 aspect-square absolute left-4 -rotate-45'>
               <div className='h-4 w-4 aspect-square border-l-2 border-t-2 border-amber-400/50 absolute top-0 left-0' />
               <div className='h-4 w-4 aspect-square border-r-2 border-b-2 border-amber-400/50 absolute bottom-0 right-0' />
-              <div className='h-4 w-4 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
+              <div className='h-2 w-2 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
             </div>
             <div className='flex-auto flex flex-col pl-6 gap-1 text-sm'>
               <div className='pl-2 flex justify-between text-white uppercase tracking-widest pr-5'>
@@ -159,7 +159,7 @@ export default function HeroPreview() {
             <div className='h-14 w-14 aspect-square absolute left-4 -rotate-45'>
               <div className='h-4 w-4 aspect-square border-l-2 border-t-2 border-amber-400/50 absolute top-0 left-0' />
               <div className='h-4 w-4 aspect-square border-r-2 border-b-2 border-amber-400/50 absolute bottom-0 right-0' />
-              <div className='h-4 w-4 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
+              <div className='h-2 w-2 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
             </div>
             <div className='flex-auto flex flex-col pl-6 gap-1 text-sm'>
               <div className='pl-2 flex justify-between text-white uppercase tracking-widest pr-5'>

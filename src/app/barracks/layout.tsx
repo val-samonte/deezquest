@@ -139,7 +139,7 @@ export default function BarracksLayout({
               <div className='flex-auto'>
                 <HeroPreview />
               </div>
-              <div className='w-full pointer-events-auto pb-5 px-5'>
+              <div className='w-full pointer-events-auto p-5'>
                 <Button className='w-full'>Mission</Button>
               </div>
             </div>
