@@ -36,11 +36,11 @@ export default function AttributesDisplay({
           </div>
           <div className='grid grid-cols-2 mb-2'>
             <span>
-              <span className='text-neutral-300'>Total MP: </span>
+              <span className='text-neutral-400'>Total MP: </span>
               <span className='font-bold text-lime-600'>{hero.maxMp}</span>
             </span>
             <span>
-              <span className='text-neutral-300'>Absorb MP: </span>
+              <span className='text-neutral-400'>Absorb MP: </span>
               <span className='font-bold text-lime-600'>
                 {computeAttribute(HeroAttributes.INT, hero.int).absorbMp}
               </span>
@@ -68,7 +68,7 @@ export default function AttributesDisplay({
           </div>
           <div className='grid grid-cols-1 mb-2'>
             <span>
-              <span className='text-neutral-300'>Turn Points: </span>
+              <span className='text-neutral-400'>Turn Points: </span>
               <span className='font-bold text-lime-600'>
                 {computeAttribute(HeroAttributes.SPD, hero.spd).turnPoints}
               </span>
@@ -96,7 +96,7 @@ export default function AttributesDisplay({
           </div>
           <div className='grid grid-cols-1 mb-2'>
             <span>
-              <span className='text-neutral-300'>Total HP: </span>
+              <span className='text-neutral-400'>Total HP: </span>
               <span className='font-bold text-lime-600'>{hero.maxHp}</span>
             </span>
           </div>
@@ -122,11 +122,11 @@ export default function AttributesDisplay({
           </div>
           <div className='grid grid-cols-2 mb-2'>
             <span>
-              <span className='text-neutral-300'>Base DMG: </span>
+              <span className='text-neutral-400'>Base DMG: </span>
               <span className='font-bold text-lime-600'>{hero.baseDmg}</span>
             </span>
             <span>
-              <span className='text-neutral-300'>Carry Cap: </span>
+              <span className='text-neutral-400'>Carry Cap: </span>
               <span className='font-bold text-lime-600'>{hero.carryCap}</span>
             </span>
           </div>
@@ -135,33 +135,33 @@ export default function AttributesDisplay({
           </div>
         </AttributeTile>
       </div>
-      <div className='grid grid-cols-2 gap-x-5 gap-y-2 text-sm'>
+      <div className='grid grid-cols-2 gap-x-5 gap-y-2 text-sm px-5'>
         <span className='flex items-center'>
-          <span className='text-neutral-300 flex-auto'>Max HP: </span>
+          <span className='text-neutral-400 flex-auto'>Max HP: </span>
           <span className='font-bold text-white'>{hero.maxHp}</span>
         </span>
         <span className='flex items-center'>
-          <span className='text-neutral-300 flex-auto'>Turn Points: </span>
+          <span className='text-neutral-400 flex-auto'>Max MP: </span>
+          <span className='font-bold text-white'>{hero.maxMp}</span>
+        </span>
+        <span className='flex items-center'>
+          <span className='text-neutral-400 flex-auto'>Turn Points: </span>
           <span className='font-bold text-white'>
             {computeAttribute(HeroAttributes.SPD, hero.spd).turnPoints}
           </span>
         </span>
         <span className='flex items-center'>
-          <span className='text-neutral-300 flex-auto'>Max MP: </span>
-          <span className='font-bold text-white'>{hero.maxMp}</span>
-        </span>
-        <span className='flex items-center'>
-          <span className='text-neutral-300 flex-auto'>Absorb MP: </span>
+          <span className='text-neutral-400 flex-auto'>Absorb MP: </span>
           <span className='font-bold text-white'>
             {computeAttribute(HeroAttributes.INT, hero.int).absorbMp}
           </span>
         </span>
         <span className='flex items-center'>
-          <span className='text-neutral-300 flex-auto'>Base Dmg: </span>
+          <span className='text-neutral-400 flex-auto'>Base Dmg: </span>
           <span className='font-bold text-white'>{hero.baseDmg}</span>
         </span>
         <span className='flex items-center'>
-          <span className='text-neutral-300 flex-auto'>Carry Cap: </span>
+          <span className='text-neutral-400 flex-auto'>Carry Cap: </span>
           <span className='font-bold text-white'>{hero.str}</span>
         </span>
       </div>
