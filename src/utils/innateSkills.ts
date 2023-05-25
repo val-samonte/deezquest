@@ -98,7 +98,9 @@ export const innateSkills: Skill[] = [
     code: getOperationsFromCode(
       '00 04 00 00 ' + // mana
         '00 ' + //        version
-        '35 0F 42', //    player.spd += command level
+        '01 D0 03 ' + //  D0 = 3
+        '37 D0 42 ' + //  D0 *= command level
+        '35 0F D0', //    player.spd += D0
     ),
   },
   {

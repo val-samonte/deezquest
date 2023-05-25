@@ -9,7 +9,7 @@ export const computeAttribute = (attr: HeroAttributes, value: number) => {
       }
     case HeroAttributes.SPD:
       return {
-        turnPoints: Math.min(value + 15, 50),
+        turnPoints: Math.min(Math.floor(value / 3) + 15, 50),
       }
     case HeroAttributes.VIT:
       return {

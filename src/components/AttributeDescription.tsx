@@ -8,40 +8,58 @@ export default function AttributeDescription({
   switch (attr) {
     case HeroAttributes.INT:
       return (
-        <>
-          Affects the maximum{' '}
-          <span className='italic font-bold'>Mana Points</span> of the hero.
-          Mana capacity increases by 1 point per each point of INT. Whenever the
-          hero absorbs mana, a bonus of 1/2/3 points per each element are gained
-          for level 4/7/10 of INT.
-        </>
+        <div className='flex flex-col gap-2'>
+          <p>
+            Affects the maximum{' '}
+            <span className='italic font-bold'>Mana Points</span> of the hero.
+            Mana capacity increases by 1 point per each point of INT.
+          </p>
+          <p>
+            Whenever the hero absorbs mana, a bonus mana is absorbed per each 3
+            points of INT, starting from INT 4.
+          </p>
+        </div>
       )
     case HeroAttributes.SPD:
       return (
-        <>
-          Affects the <span className='italic font-bold'>Turn Points</span> of
-          the hero. The higher the hero&apos;s Turn Point value against the
-          opponent&apos;s, the more likely the hero will get an extra turn.
-        </>
+        <div className='flex flex-col gap-2'>
+          <p>
+            Affects the <span className='italic font-bold'>Turn Points</span> of
+            the hero.
+          </p>
+          <p>
+            The higher the hero&apos;s Turn Point value against the
+            opponent&apos;s, the more likely the hero will get an extra turn.
+          </p>
+        </div>
       )
     case HeroAttributes.VIT:
       return (
-        <>
-          Affects the maximum{' '}
-          <span className='italic font-bold'>Hit Points</span> of the hero. Max
-          HP increases by 2 point per each point of VIT. An additional bonus HP
-          of 3/6/9 for level 4/7/10 of VIT.
-        </>
+        <div className='flex flex-col gap-2'>
+          <p>
+            Affects the maximum{' '}
+            <span className='italic font-bold'>Hit Points</span> of the hero.
+            Max HP increases by 2 point per each point of VIT.
+          </p>
+          <p>
+            A bonus 3 HP is added per each 2 points of VIT, starting from VIT 4.
+          </p>
+        </div>
       )
     case HeroAttributes.STR:
       return (
-        <>
-          Affects the{' '}
-          <span className='italic font-bold'>Base Attack Damage</span> and{' '}
-          <span className='italic font-bold'>Weight Capacity</span> of the hero.
-          Base Attack Damage is added to the total AtkDmg; has initial value of
-          1 + increments of 1/2/3 for level 4/7/10 of STR.
-        </>
+        <div className='flex flex-col gap-2'>
+          <p>
+            Affects the{' '}
+            <span className='italic font-bold'>Base Attack Damage</span> and{' '}
+            <span className='italic font-bold'>Weight Capacity</span> of the
+            hero.
+          </p>
+          <p>
+            Base Attack Damage has initial value of 1 plus additional point per
+            each 3 points of STR, starting from STR 4.
+          </p>
+        </div>
       )
   }
 }

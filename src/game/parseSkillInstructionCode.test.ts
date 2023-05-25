@@ -322,19 +322,19 @@ describe('Tailwind', () => {
 
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
-    expect(args.player.spd).toBe(preMutPlayer.spd + 1)
+    expect(args.player.spd).toBe(preMutPlayer.spd + 3)
   })
 
   test('Command Level 2', () => {
     args.commandLevel = 2
     parseSkillInstructionCode(args, code)
-    expect(args.player.spd).toBe(preMutPlayer.spd + 2)
+    expect(args.player.spd).toBe(preMutPlayer.spd + 6)
   })
 
   test('Command Level 3', () => {
     args.commandLevel = 3
     parseSkillInstructionCode(args, code)
-    expect(args.player.spd).toBe(preMutPlayer.spd + 3)
+    expect(args.player.spd).toBe(preMutPlayer.spd + 9)
   })
 })
 
