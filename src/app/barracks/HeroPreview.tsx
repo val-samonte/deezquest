@@ -86,7 +86,9 @@ export default function HeroPreview() {
           <div className='h-1 w-full mb-2 bg-gradient-to-r from-amber-400/50 to-amber-400/0' />
         </button>
 
-        <AttributesDisplay hero={hero} />
+        <div className='max-w-sm mx-auto'>
+          <AttributesDisplay hero={hero} />
+        </div>
 
         {skills && (
           <div className='flex flex-col gap-3 mt-5'>

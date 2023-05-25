@@ -20,6 +20,8 @@ import {
 import HeroesGrid from './HeroesGrid'
 import classNames from 'classnames'
 import HeroPreview from './HeroPreview'
+import BackIcon from '@/components/BackIcon'
+import Link from 'next/link'
 
 interface NewMintParams {
   address: string
@@ -34,12 +36,12 @@ export default function BarracksLayout({
 }) {
   const wallet = useUserWallet()
   const metaplex = useMetaplex()
+  const pathname = usePathname()
   const [listPreloaded, setListPreloaded] = useState(false)
   const [collection, setCollection] = useAtom(userNftCollectionAtom)
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
-  const pathname = usePathname()
   const drilldown = pathname !== '/barracks'
 
   // TODO: convert this to atom
@@ -120,9 +122,13 @@ export default function BarracksLayout({
         <div className='flex-auto relative'>
           <div
             className={classNames(
-              drilldown ? 'pr-96' : 'pr-5',
-              // 'transition-all duration-300',
-              'absolute inset-0 ',
+              drilldown
+                ? 'pointer-events-none opacity-0 ' +
+                    'landscape:pointer-events-auto landscape:opacity-100 landscape:pr-96 ' +
+                    'portrait:sm:pointer-events-auto portrait:sm:opacity-100 portrait:sm:pr-96'
+                : 'pr-5',
+              'transition-opacity',
+              'absolute inset-0',
               'h-full w-screen sm:w-auto flex-auto overflow-y-scroll overflow-x-hidden py-5 pl-5',
             )}
           >
@@ -135,12 +141,27 @@ export default function BarracksLayout({
               'h-full absolute top-0 right-0 bottom-0 pointer-events-none',
             )}
           >
-            <div className='w-96 h-full flex flex-col bg-gradient-to-r from-black/0 to-black'>
+            <div
+              className={classNames(
+                'w-screen',
+                'landscape:w-96 portrait:sm:w-96',
+                'h-full flex flex-col bg-gradient-to-r from-black/0 to-black',
+              )}
+            >
               <div className='flex-auto'>
                 <HeroPreview />
               </div>
-              <div className='w-full pointer-events-auto pb-5 px-5 overflow-y-scroll'>
-                <Button className='w-full'>Mission</Button>
+              <div className='w-full pointer-events-auto pb-5 px-5 overflow-y-scroll gap-5 grid grid-cols-4'>
+                <Link
+                  href={'/barracks'}
+                  className='w-full landscape:hidden portrait:sm:hidden col-span-1 flex gap-2 items-center justify-center'
+                >
+                  <BackIcon />
+                  Back
+                </Link>
+                <Button className='w-full col-span-3 landscape:col-span-4 portrait:sm:col-span-4'>
+                  Mission
+                </Button>
               </div>
             </div>
             {/* {children} */}
