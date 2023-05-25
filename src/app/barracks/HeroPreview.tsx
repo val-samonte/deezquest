@@ -7,11 +7,9 @@ import SpinnerIcon from '@/components/SpinnerIcon'
 import { SkillTypes } from '@/enums/SkillTypes'
 import { heroFromPublicKey } from '@/game/gameFunctions'
 import { innateSkills } from '@/utils/innateSkills'
-import { PublicKey } from '@solana/web3.js'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import { IM_Fell_DW_Pica } from 'next/font/google'
-import Image from 'next/image'
 import { useMemo } from 'react'
 
 const font = IM_Fell_DW_Pica({

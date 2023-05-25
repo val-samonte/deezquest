@@ -17,7 +17,7 @@ export const computeAttribute = (attr: HeroAttributes, value: number) => {
       }
     case HeroAttributes.STR:
       return {
-        baseDmg: Math.floor((value - 1) / 3),
+        baseDmg: Math.floor((value - 1) / 3) + 1,
         carryCap: value,
       }
   }

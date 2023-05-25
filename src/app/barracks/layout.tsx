@@ -127,7 +127,7 @@ export default function BarracksLayout({
                     'landscape:pointer-events-auto landscape:opacity-100 landscape:pr-96 ' +
                     'portrait:sm:pointer-events-auto portrait:sm:opacity-100 portrait:sm:pr-96'
                 : 'pr-5',
-              'transition-opacity',
+              'transition-opacity duration-500',
               'absolute inset-0',
               'h-full w-screen sm:w-auto flex-auto overflow-y-scroll overflow-x-hidden py-5 pl-5',
             )}

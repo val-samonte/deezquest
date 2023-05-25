@@ -22,13 +22,13 @@ export default function AttributesDisplay({
           <div className='font-bold mb-2 flex pb-1 border-b border-amber-400/10'>
             <span className='flex-auto'>Intelligence</span>
             <div className={classNames('flex items-center gap-3 font-bold')}>
-              <span className='flex items-center xl:gap-2'>
+              <span className='flex items-center gap-px'>
                 <Image
                   alt='intelligence'
                   width={120}
                   height={120}
                   src='/stat_int.svg'
-                  className='w-4 h-4 lg:w-6 lg:h-6'
+                  className='w-4 h-4'
                 />
                 {hero.int}
               </span>
@@ -54,13 +54,13 @@ export default function AttributesDisplay({
           <div className='font-bold mb-2 flex pb-1 border-b border-amber-400/10'>
             <span className='flex-auto'>Speed</span>
             <div className={classNames('flex items-center gap-3 font-bold')}>
-              <span className='flex items-center xl:gap-2'>
+              <span className='flex items-center gap-px'>
                 <Image
                   alt='speed'
                   width={120}
                   height={120}
                   src='/stat_spd.svg'
-                  className='w-4 h-4 lg:w-6 lg:h-6'
+                  className='w-4 h-4'
                 />
                 {hero.spd}
               </span>
@@ -82,13 +82,13 @@ export default function AttributesDisplay({
           <div className='font-bold mb-2 flex pb-1 border-b border-amber-400/10'>
             <span className='flex-auto'>Vitality</span>
             <div className={classNames('flex items-center gap-3 font-bold')}>
-              <span className='flex items-center xl:gap-2'>
+              <span className='flex items-center gap-px'>
                 <Image
                   alt='vitality'
                   width={120}
                   height={120}
                   src='/stat_vit.svg'
-                  className='w-4 h-4 lg:w-6 lg:h-6'
+                  className='w-4 h-4'
                 />
                 {hero.vit}
               </span>
@@ -108,13 +108,13 @@ export default function AttributesDisplay({
           <div className='font-bold mb-2 flex pb-1 border-b border-amber-400/10'>
             <span className='flex-auto'>Strength</span>
             <div className={classNames('flex items-center gap-3 font-bold')}>
-              <span className='flex items-center xl:gap-2'>
+              <span className='flex items-center gap-px'>
                 <Image
                   alt='strength'
                   width={120}
                   height={120}
                   src='/stat_str.svg'
-                  className='w-4 h-4 lg:w-6 lg:h-6'
+                  className='w-4 h-4'
                 />
                 {hero.str}
               </span>
@@ -122,11 +122,11 @@ export default function AttributesDisplay({
           </div>
           <div className='grid grid-cols-2 mb-2'>
             <span>
-              <span className='text-neutral-400'>Base DMG: </span>
+              <span className='text-neutral-400'>Attack: </span>
               <span className='font-bold text-lime-600'>{hero.baseDmg}</span>
             </span>
             <span>
-              <span className='text-neutral-400'>Carry Cap: </span>
+              <span className='text-neutral-400'>Max Weight: </span>
               <span className='font-bold text-lime-600'>{hero.carryCap}</span>
             </span>
           </div>
@@ -157,7 +157,7 @@ export default function AttributesDisplay({
           </span>
         </span>
         <span className='flex items-center'>
-          <span className='text-neutral-400 flex-auto'>Base Dmg: </span>
+          <span className='text-neutral-400 flex-auto'>Attack: </span>
           <span className='font-bold text-white'>{hero.baseDmg}</span>
         </span>
         <span className='flex items-center'>
