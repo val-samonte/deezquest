@@ -11,7 +11,7 @@ import Panel from '@/components/Panel'
 import PreloaderAnimation from '@/components/PreloaderAnimation'
 import WalletGuard from '@/components/WalletGuard'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import {
   gridContainerPosAtom,
@@ -37,12 +37,16 @@ export default function BarracksLayout({
   const wallet = useUserWallet()
   const metaplex = useMetaplex()
   const pathname = usePathname()
+  const router = useRouter()
   const [listPreloaded, setListPreloaded] = useState(false)
   const [collection, setCollection] = useAtom(userNftCollectionAtom)
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
-  const drilldown = pathname !== '/barracks'
+  const level1 = pathname !== '/barracks'
+  const loadout = pathname.includes('/loadout')
+  const mission = pathname.includes('/mission')
+  const level2 = loadout || mission
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
@@ -122,10 +126,12 @@ export default function BarracksLayout({
         <div className='flex-auto relative'>
           <div
             className={classNames(
-              drilldown
-                ? 'pointer-events-none opacity-0 ' +
-                    'landscape:pointer-events-auto landscape:opacity-100 landscape:pr-96 ' +
-                    'portrait:sm:pointer-events-auto portrait:sm:opacity-100 portrait:sm:pr-96'
+              level1
+                ? 'pointer-events-none opacity-0 landscape:pr-96 portrait:sm:pr-96' +
+                    (level2
+                      ? ''
+                      : ' landscape:pointer-events-auto landscape:opacity-100 ' +
+                        'portrait:sm:pointer-events-auto portrait:sm:opacity-100')
                 : 'pr-5',
               'transition-opacity duration-500',
               'absolute inset-0',
@@ -136,16 +142,24 @@ export default function BarracksLayout({
           </div>
           <div
             className={classNames(
-              drilldown ? 'mr-0' : '-mr-[100%]',
-              'transition-all duration-300',
-              'h-full absolute top-0 right-0 bottom-0 pointer-events-none',
+              'transition-all duration-500',
+              level1
+                ? level2
+                  ? 'ml-0'
+                  : 'landscape:ml-[calc(100vw-24rem)] portrait:sm:ml-[calc(100vw-24rem)]'
+                : 'ml-[100vw]',
+
+              'flex',
+              'h-full relative w-screen pointer-events-none',
             )}
           >
             <div
               className={classNames(
                 'w-screen',
                 'landscape:w-96 portrait:sm:w-96',
-                'h-full flex flex-col bg-gradient-to-r from-black/0 to-black',
+                // level2 ? 'bg-gradient-to-l' : 'bg-gradient-to-r',
+                // 'from-black/0 to-black',
+                'h-full flex flex-col',
               )}
             >
               <div className='flex-auto'>
@@ -159,7 +173,16 @@ export default function BarracksLayout({
                   <BackIcon />
                   Back
                 </Link>
-                <Button className='w-full col-span-3 landscape:col-span-4 portrait:sm:col-span-4'>
+
+                <Button
+                  onClick={() =>
+                    router.push(
+                      // TODO: LOL
+                      pathname.split('/').slice(0, 3).join('/') + '/mission',
+                    )
+                  }
+                  className='w-full col-span-3 landscape:col-span-4 portrait:sm:col-span-4'
+                >
                   Mission
                 </Button>
               </div>
