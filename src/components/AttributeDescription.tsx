@@ -42,7 +42,7 @@ export default function AttributeDescription({
             Max HP increases by 2 point per each point of VIT.
           </p>
           <p>
-            A bonus 3 HP is added per each 2 points of VIT, starting from VIT 4.
+            A 3 HP bonus is added per each 6 points of VIT, starting from VIT 7.
           </p>
         </div>
       )
