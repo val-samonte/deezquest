@@ -132,7 +132,7 @@ export default function MainMenu() {
                       />
                       <MainMenuItem
                         name='Barracks'
-                        link='/barracks'
+                        link='/heroes'
                         bgImg='/bg_barracks.png'
                         maskImg='/mask_brush_2.png'
                       />
@@ -297,7 +297,7 @@ export default function MainMenu() {
                 setGameState(null)
                 setMatch(null)
                 setGameResult('')
-                router.push('/barracks')
+                router.push('/heroes')
               }}
             >
               Quit Match

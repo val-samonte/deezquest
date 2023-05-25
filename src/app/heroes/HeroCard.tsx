@@ -90,7 +90,7 @@ export function HeroCard({ metadata }: HeroCardProps) {
     }
   }, [pathname, address, nft, setSelected])
 
-  const drilldown = pathname !== '/barracks'
+  const drilldown = pathname !== '/heroes'
   const selected = pathname.includes(address)
 
   return (
@@ -101,9 +101,7 @@ export function HeroCard({ metadata }: HeroCardProps) {
       />
       <button
         onClick={() => {
-          selected
-            ? router.push('/barracks')
-            : router.push(`/barracks/${address}`)
+          selected ? router.push('/heroes') : router.push(`/heroes/${address}`)
         }}
         className={classNames(
           'transition-all duration-300',

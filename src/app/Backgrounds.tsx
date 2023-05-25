@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const commonClasses =
-  'absolute inset-0 w-full h-full object-cover blur-sm transition-all duration-500'
+  'absolute inset-0 w-full h-full object-cover transition-all duration-500'
 
 export default function Backgrounds() {
   const pathname = usePathname()
@@ -18,7 +18,7 @@ export default function Backgrounds() {
         className={classNames(
           commonClasses,
           pathname?.includes('/battle') ? 'opacity-100' : 'opacity-0',
-          'object-bottom brightness-75',
+          'blur-sm object-bottom brightness-75',
         )}
       />
       <Image
@@ -27,8 +27,12 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_barracks.png`}
         className={classNames(
           commonClasses,
-          pathname?.includes('/barracks') ? 'opacity-100' : 'opacity-0',
-          'brightness-50',
+          pathname?.includes('/heroes') &&
+            !pathname?.includes('/mission') &&
+            !pathname?.includes('/loadout')
+            ? 'opacity-100'
+            : 'opacity-0',
+          'blur-sm brightness-50',
         )}
       />
       <Image
@@ -38,27 +42,7 @@ export default function Backgrounds() {
         className={classNames(
           commonClasses,
           pathname === '/' ? 'opacity-100' : 'opacity-0',
-          'object-bottom brightness-75 blur-sm',
-        )}
-      />
-      <Image
-        alt='shop'
-        fill={true}
-        src={`${process.env.NEXT_PUBLIC_CDN}/bg_shop.png`}
-        className={classNames(
-          commonClasses,
-          pathname?.includes('/shop') ? 'opacity-100' : 'opacity-0',
-          'object-bottom brightness-75',
-        )}
-      />
-      <Image
-        alt='storage'
-        fill={true}
-        src={`${process.env.NEXT_PUBLIC_CDN}/bg_storage.png`}
-        className={classNames(
-          commonClasses,
-          pathname?.includes('/inventory') ? 'opacity-100' : 'opacity-0',
-          'object-bottom brightness-50',
+          'blur-sm object-bottom brightness-75',
         )}
       />
       <Image
@@ -68,7 +52,7 @@ export default function Backgrounds() {
         className={classNames(
           commonClasses,
           pathname?.includes('/tavern') ? 'opacity-100' : 'opacity-0',
-          'brightness-50',
+          'blur-sm brightness-50',
         )}
       />
       <Image
@@ -78,7 +62,27 @@ export default function Backgrounds() {
         className={classNames(
           commonClasses,
           pathname?.includes('/tutorial') ? 'opacity-100' : 'opacity-0',
-          'brightness-50',
+          'blur-sm brightness-50',
+        )}
+      />
+      <Image
+        alt='mission'
+        fill={true}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_mission.png`}
+        className={classNames(
+          commonClasses,
+          pathname?.includes('/mission') ? 'opacity-100' : 'opacity-0',
+          'blur-sm brightness-75',
+        )}
+      />
+      <Image
+        alt='loadout'
+        fill={true}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_loadout.png`}
+        className={classNames(
+          commonClasses,
+          pathname?.includes('/loadout') ? 'opacity-100' : 'opacity-0',
+          'blur-sm brightness-75',
         )}
       />
     </div>

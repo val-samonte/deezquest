@@ -68,8 +68,8 @@ export default function HeroPreview({ className }: { className?: string }) {
           </Panel>
         </div>
 
-        <button type='button' className='ltr sticky -top-5 z-10 w-full'>
-          <h2 className='text-left pl-5 py-2 transition-colors bg-black/80 hover:bg-amber-400/20 backdrop-grayscale flex items-center justify-between w-full'>
+        <div className='ltr sticky -top-5 z-10 w-full'>
+          <h2 className='text-left px-5 py-2 transition-colors bg-black/80 backdrop-grayscale flex items-center justify-between w-full'>
             <div
               className={classNames(
                 'text-2xl overflow-hidden w-48 whitespace-nowrap overflow-ellipsis',
@@ -78,14 +78,12 @@ export default function HeroPreview({ className }: { className?: string }) {
             >
               {selected.metadata.name}
             </div>
-
-            <div className='flex-none font-bold text-sm tracking-widest uppercase flex items-center '>
-              Loadout
-              <BackIcon className='rotate-180 text-amber-400/50' />
+            <div className='text-sm tracking-widest flex items-center justify-center whitespace-nowrap'>
+              Lv&nbsp;<span className='font-bold'>32</span>
             </div>
           </h2>
           <div className='h-1 w-full mb-2 bg-gradient-to-r from-amber-400/50 to-amber-400/0' />
-        </button>
+        </div>
 
         <div className='ltr max-w-sm mx-auto'>
           <AttributesDisplay hero={hero} />
@@ -116,4 +114,11 @@ export default function HeroPreview({ className }: { className?: string }) {
       </div>
     </div>
   )
+}
+
+{
+  /* <div className='flex-none font-bold text-sm tracking-widest uppercase flex items-center '>
+  Loadout
+  <BackIcon className='rotate-180 text-amber-400/50' />
+</div> */
 }

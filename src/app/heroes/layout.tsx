@@ -22,6 +22,7 @@ import classNames from 'classnames'
 import HeroPreview from './HeroPreview'
 import BackIcon from '@/components/BackIcon'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface NewMintParams {
   address: string
@@ -43,7 +44,7 @@ export default function BarracksLayout({
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
-  const level1 = pathname !== '/barracks'
+  const level1 = pathname !== '/heroes'
   const loadout = pathname.includes('/loadout')
   const mission = pathname.includes('/mission')
   const level2 = loadout || mission
@@ -122,7 +123,10 @@ export default function BarracksLayout({
   if (listPreloaded) {
     return (
       <PageContainer key={'barracks_container'}>
-        <PageTitle key={'barracks_title'} title='Barracks' />
+        <PageTitle
+          key={'barracks_title'}
+          title={mission ? 'Mission' : loadout ? 'Loadout' : 'Barracks'}
+        />
         <div className='flex-auto relative'>
           <div
             className={classNames(
@@ -186,28 +190,85 @@ export default function BarracksLayout({
               <div
                 className={classNames(
                   level2 && 'rtl',
-                  'w-full pointer-events-auto pb-5 px-5 overflow-y-scroll',
+                  'w-full pointer-events-auto p-5 overflow-y-scroll',
                 )}
               >
-                <div className='ltr gap-5 grid grid-cols-4'>
-                  <Link
-                    href={'/barracks'}
-                    className='w-full landscape:hidden portrait:sm:hidden col-span-1 flex gap-2 items-center justify-center'
+                <div className='ltr gap-1 grid grid-cols-4'>
+                  <button
+                    type='button'
+                    onClick={() =>
+                      router.push(pathname.split('/').slice(0, -1).join('/'))
+                    }
+                    className={classNames(
+                      !level2 && 'landscape:hidden portrait:sm:hidden',
+                      'w-full col-span-1 flex gap-1 items-center justify-start text-sm tracking-widest uppercase',
+                    )}
                   >
                     <BackIcon />
                     Back
-                  </Link>
-                  <Button
-                    onClick={() =>
-                      router.push(
-                        // TODO: LOL
-                        pathname.split('/').slice(0, 3).join('/') + '/mission',
-                      )
-                    }
-                    className='w-full col-span-3 landscape:col-span-4 portrait:sm:col-span-4'
+                  </button>
+                  <div
+                    className={classNames(
+                      'flex items-center',
+                      !level2 && 'landscape:col-span-4 portrait:sm:col-span-4',
+                      'w-full col-span-3',
+                    )}
                   >
-                    Mission
-                  </Button>
+                    <Button
+                      onClick={() =>
+                        router.push(
+                          // TODO: LOL
+                          pathname.split('/').slice(0, 3).join('/') +
+                            '/loadout',
+                        )
+                      }
+                      className={classNames(
+                        loadout && 'hidden',
+                        'overflow-hidden px-0',
+                        'flex-auto transition-all',
+                        'flex items-center justify-center gap-1',
+                      )}
+                    >
+                      <Image
+                        alt='Loadout'
+                        src='/cmd_support.svg'
+                        width={120}
+                        height={120}
+                        className='h-4 w-4'
+                      />
+                      Loadout
+                    </Button>
+                    <div
+                      className={classNames(
+                        level2 && 'hidden',
+                        'h-6 w-6 border border-amber-400/50 rotate-45',
+                      )}
+                    />
+                    <Button
+                      onClick={() =>
+                        router.push(
+                          // TODO: LOL
+                          pathname.split('/').slice(0, 3).join('/') +
+                            '/mission',
+                        )
+                      }
+                      className={classNames(
+                        mission && 'hidden',
+                        'overflow-hidden px-0',
+                        'flex-auto transition-all',
+                        'flex items-center justify-center gap-1',
+                      )}
+                    >
+                      <Image
+                        alt='Mission'
+                        src='/BattleIcon.svg'
+                        width={41}
+                        height={41}
+                        className='h-4 w-4'
+                      />
+                      Mission
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
