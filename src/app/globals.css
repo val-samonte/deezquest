@@ -11,3 +11,7 @@
     -webkit-text-stroke: 10px black;
   }
 }
+
+html {
+  color-scheme: dark;
+}

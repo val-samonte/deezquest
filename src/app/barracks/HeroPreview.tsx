@@ -1,6 +1,7 @@
 import { selectedNftAtom } from '@/atoms/barracksAtoms'
 import AttributesDisplay from '@/components/AttributesDisplay'
 import BackIcon from '@/components/BackIcon'
+import { HeroSkillDisplay } from '@/components/HeroSkillDisplay'
 import Panel from '@/components/Panel'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import { SkillTypes } from '@/enums/SkillTypes'
@@ -44,7 +45,7 @@ export default function HeroPreview() {
   return (
     <div className='h-full flex flex-col relative pointer-events-auto'>
       <div
-        className='h-full overflow-y-auto overflow-x-hidden absolute inset-0 p-5'
+        className='h-full overflow-y-scroll overflow-x-hidden absolute inset-0 p-5'
         style={{
           WebkitMaskImage: mask,
           maskImage: mask,
@@ -65,6 +66,7 @@ export default function HeroPreview() {
             )}
           </Panel>
         </div>
+
         <button type='button' className='sticky -top-5 z-10 w-full'>
           <h2 className='text-left pl-5 py-2 transition-colors bg-black/80 hover:bg-amber-400/20 backdrop-grayscale flex items-center justify-between w-full'>
             <div
@@ -86,94 +88,28 @@ export default function HeroPreview() {
 
         <AttributesDisplay hero={hero} />
 
-        <div className='flex flex-col gap-3 mt-5'>
-          <div className='flex h-16 items-center relative pl-6'>
-            <div className='flex justify-center w-10 flex-none'>
-              <div className='h-14 aspect-square relative'>
-                <Image
-                  fill={true}
-                  alt='Offensive Skill'
-                  src='/cmd_attack.svg'
-                  className='object-contain'
-                />
-              </div>
-            </div>
-            <div className='h-14 w-14 aspect-square absolute left-4 -rotate-45'>
-              <div className='h-4 w-4 aspect-square border-l-2 border-t-2 border-amber-400/50 absolute top-0 left-0' />
-              <div className='h-4 w-4 aspect-square border-r-2 border-b-2 border-amber-400/50 absolute bottom-0 right-0' />
-              <div className='h-2 w-2 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
-            </div>
-            <div className='flex-auto flex flex-col pl-6 gap-1 text-sm'>
-              <div className='pl-2 flex justify-between text-white uppercase tracking-widest pr-5'>
-                <span>Crushing Blow</span>
-                <span>A</span>
-              </div>
-              <div className='border-b border-amber-400/50' />
+        {skills && (
+          <div className='flex flex-col gap-3 mt-5'>
+            <HeroSkillDisplay skill={skills[SkillTypes.ATTACK]}>
               <div className='pl-2 flex justify-between text-neutral-400 pr-5'>
                 <span>Unarmed</span>
                 <span>0</span>
               </div>
-            </div>
-          </div>
-
-          <div className='flex h-16 items-center relative pl-6'>
-            <div className='flex justify-center w-10 flex-none'>
-              <div className='h-14 aspect-square relative'>
-                <Image
-                  fill={true}
-                  alt='Support Skill'
-                  src='/cmd_support.svg'
-                  className='object-contain'
-                />
-              </div>
-            </div>
-            <div className='h-14 w-14 aspect-square absolute left-4 -rotate-45'>
-              <div className='h-4 w-4 aspect-square border-l-2 border-t-2 border-amber-400/50 absolute top-0 left-0' />
-              <div className='h-4 w-4 aspect-square border-r-2 border-b-2 border-amber-400/50 absolute bottom-0 right-0' />
-              <div className='h-2 w-2 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
-            </div>
-            <div className='flex-auto flex flex-col pl-6 gap-1 text-sm'>
-              <div className='pl-2 flex justify-between text-white uppercase tracking-widest pr-5'>
-                <span>Focus</span>
-                <span>3</span>
-              </div>
-              <div className='border-b border-amber-400/50' />
+            </HeroSkillDisplay>
+            <HeroSkillDisplay skill={skills[SkillTypes.SUPPORT]}>
               <div className='pl-2 flex justify-between text-neutral-400 pr-5'>
                 <span>No Armor</span>
                 <span>0</span>
               </div>
-            </div>
-          </div>
-
-          <div className='flex h-16 items-center relative pl-6'>
-            <div className='flex justify-center w-10 flex-none'>
-              <div className='h-14 aspect-square relative'>
-                <Image
-                  fill={true}
-                  alt='Special Skill'
-                  src='/cmd_special.svg'
-                  className='object-contain'
-                />
-              </div>
-            </div>
-            <div className='h-14 w-14 aspect-square absolute left-4 -rotate-45'>
-              <div className='h-4 w-4 aspect-square border-l-2 border-t-2 border-amber-400/50 absolute top-0 left-0' />
-              <div className='h-4 w-4 aspect-square border-r-2 border-b-2 border-amber-400/50 absolute bottom-0 right-0' />
-              <div className='h-2 w-2 aspect-square border-r border-b border-amber-400/50 absolute -bottom-1 -right-1' />
-            </div>
-            <div className='flex-auto flex flex-col pl-6 gap-1 text-sm'>
-              <div className='pl-2 flex justify-between text-white uppercase tracking-widest pr-5'>
-                <span>Shuffle</span>
-                <span>2</span>
-              </div>
-              <div className='border-b border-amber-400/50' />
+            </HeroSkillDisplay>
+            <HeroSkillDisplay skill={skills[SkillTypes.SPECIAL]}>
               <div className='pl-2 flex justify-between text-neutral-400 pr-5'>
                 <span>No Accessory</span>
                 <span>0</span>
               </div>
-            </div>
+            </HeroSkillDisplay>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

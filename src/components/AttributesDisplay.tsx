@@ -161,8 +161,8 @@ export default function AttributesDisplay({
           <span className='font-bold text-white'>{hero.baseDmg}</span>
         </span>
         <span className='flex items-center'>
-          <span className='text-neutral-400 flex-auto'>Carry Cap: </span>
-          <span className='font-bold text-white'>{hero.str}</span>
+          <span className='text-neutral-400 flex-auto'>Weight: </span>
+          <span className='font-bold text-white'>0 / {hero.str}</span>
         </span>
       </div>
     </div>
