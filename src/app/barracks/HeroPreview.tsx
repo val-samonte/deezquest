@@ -21,7 +21,7 @@ const font = IM_Fell_DW_Pica({
 const mask =
   'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 97.5%, rgba(0,0,0,0) 100%)'
 
-export default function HeroPreview() {
+export default function HeroPreview({ className }: { className?: string }) {
   const selected = useAtomValue(selectedNftAtom)
 
   const hero = useMemo(() => {
@@ -43,13 +43,16 @@ export default function HeroPreview() {
   return (
     <div className='h-full flex flex-col relative pointer-events-auto'>
       <div
-        className='h-full overflow-y-scroll overflow-x-hidden absolute inset-0 p-5'
+        className={classNames(
+          'h-full overflow-y-scroll overflow-x-hidden absolute inset-0 p-5',
+          className,
+        )}
         style={{
           WebkitMaskImage: mask,
           maskImage: mask,
         }}
       >
-        <div className='w-full aspect-square'>
+        <div className='ltr w-full aspect-square'>
           <Panel className='bg-amber-400/20 rounded-b-none'>
             {selected.metadata?.image ? (
               <img
@@ -65,7 +68,7 @@ export default function HeroPreview() {
           </Panel>
         </div>
 
-        <button type='button' className='sticky -top-5 z-10 w-full'>
+        <button type='button' className='ltr sticky -top-5 z-10 w-full'>
           <h2 className='text-left pl-5 py-2 transition-colors bg-black/80 hover:bg-amber-400/20 backdrop-grayscale flex items-center justify-between w-full'>
             <div
               className={classNames(
@@ -84,12 +87,12 @@ export default function HeroPreview() {
           <div className='h-1 w-full mb-2 bg-gradient-to-r from-amber-400/50 to-amber-400/0' />
         </button>
 
-        <div className='max-w-sm mx-auto'>
+        <div className='ltr max-w-sm mx-auto'>
           <AttributesDisplay hero={hero} />
         </div>
 
         {skills && (
-          <div className='flex flex-col gap-3 mt-5'>
+          <div className='ltr flex flex-col gap-3 mt-5'>
             <HeroSkillDisplay skill={skills[SkillTypes.ATTACK]}>
               <div className='pl-2 flex justify-between text-neutral-400 pr-5'>
                 <span>Unarmed</span>

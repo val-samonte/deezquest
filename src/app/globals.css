@@ -18,6 +18,14 @@ html {
 } 
 */
 
+.rtl {
+  direction: rtl;
+}
+
+.ltr {
+  direction: ltr;
+}
+
 *::-webkit-scrollbar {
   width: 0.5em;
 }

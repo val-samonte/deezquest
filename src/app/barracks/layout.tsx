@@ -126,6 +126,26 @@ export default function BarracksLayout({
         <div className='flex-auto relative'>
           <div
             className={classNames(
+              level2 ? 'opacity-100' : 'opacity-0',
+              'pointer-events-none',
+              'transition-all duration-300',
+              'absolute inset-y-0 w-96 left-0',
+              'from-black/0 to-black',
+              'bg-gradient-to-l',
+            )}
+          />
+          <div
+            className={classNames(
+              level1 && !level2 ? 'opacity-100' : 'opacity-0',
+              'pointer-events-none',
+              'transition-all duration-300',
+              'absolute inset-y-0 w-96 right-0',
+              'from-black/0 to-black',
+              'bg-gradient-to-r',
+            )}
+          />
+          <div
+            className={classNames(
               level1
                 ? 'pointer-events-none opacity-0 landscape:pr-96 portrait:sm:pr-96' +
                     (level2
@@ -142,7 +162,7 @@ export default function BarracksLayout({
           </div>
           <div
             className={classNames(
-              'transition-all duration-500',
+              'transition-all duration-300',
               level1
                 ? level2
                   ? 'ml-0'
@@ -157,34 +177,38 @@ export default function BarracksLayout({
               className={classNames(
                 'w-screen',
                 'landscape:w-96 portrait:sm:w-96',
-                // level2 ? 'bg-gradient-to-l' : 'bg-gradient-to-r',
-                // 'from-black/0 to-black',
                 'h-full flex flex-col',
               )}
             >
               <div className='flex-auto'>
-                <HeroPreview />
+                <HeroPreview className={classNames(level2 && 'rtl')} />
               </div>
-              <div className='w-full pointer-events-auto pb-5 px-5 overflow-y-scroll gap-5 grid grid-cols-4'>
-                <Link
-                  href={'/barracks'}
-                  className='w-full landscape:hidden portrait:sm:hidden col-span-1 flex gap-2 items-center justify-center'
-                >
-                  <BackIcon />
-                  Back
-                </Link>
-
-                <Button
-                  onClick={() =>
-                    router.push(
-                      // TODO: LOL
-                      pathname.split('/').slice(0, 3).join('/') + '/mission',
-                    )
-                  }
-                  className='w-full col-span-3 landscape:col-span-4 portrait:sm:col-span-4'
-                >
-                  Mission
-                </Button>
+              <div
+                className={classNames(
+                  level2 && 'rtl',
+                  'w-full pointer-events-auto pb-5 px-5 overflow-y-scroll',
+                )}
+              >
+                <div className='ltr gap-5 grid grid-cols-4'>
+                  <Link
+                    href={'/barracks'}
+                    className='w-full landscape:hidden portrait:sm:hidden col-span-1 flex gap-2 items-center justify-center'
+                  >
+                    <BackIcon />
+                    Back
+                  </Link>
+                  <Button
+                    onClick={() =>
+                      router.push(
+                        // TODO: LOL
+                        pathname.split('/').slice(0, 3).join('/') + '/mission',
+                      )
+                    }
+                    className='w-full col-span-3 landscape:col-span-4 portrait:sm:col-span-4'
+                  >
+                    Mission
+                  </Button>
+                </div>
               </div>
             </div>
             {/* {children} */}
