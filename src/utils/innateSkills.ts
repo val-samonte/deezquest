@@ -27,6 +27,7 @@ export const innateSkills: Skill[] = [
         '35 D0 07 ' + //  D0 += base damage
         '43 21 25 D0', // apply damage D0
     ),
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_burningpunch.png`,
   },
   {
     name: 'Knifehand Strike',
@@ -49,6 +50,7 @@ export const innateSkills: Skill[] = [
         '37 D0 D2 ' + //    D0 *= D2
         '36 26 D0', //      turnTime -= D0
     ),
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_knifehandstrike.png`,
   },
   {
     name: 'Whip Kick',
@@ -62,6 +64,7 @@ export const innateSkills: Skill[] = [
         '37 D0 42 ' + //  D0 *= command level
         '43 21 25 D0', // apply damage D0
     ),
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_whipkick.png`,
   },
   {
     name: 'Crushing Blow',
@@ -78,6 +81,7 @@ export const innateSkills: Skill[] = [
         '32 D0 42 0D ' + // D0 = command level * player.earthMp
         '43 21 25 D0', //   apply damage D0
     ),
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_crushingblow.png`,
   },
   {
     name: 'Focus',
@@ -89,6 +93,7 @@ export const innateSkills: Skill[] = [
         '00 ' + //        version
         '35 07 42', //    Base Damage += command level
     ),
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_focus.png`,
   },
   {
     name: 'Tailwind',
@@ -102,6 +107,7 @@ export const innateSkills: Skill[] = [
         '37 D0 42 ' + //  D0 *= command level
         '35 0F D0', //    player.spd += D0
     ),
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_tailwind.png`,
   },
   {
     name: 'First Aid',
@@ -117,6 +123,7 @@ export const innateSkills: Skill[] = [
         '35 D0 D1 ' + //  D0 += D1
         '44 01 D0', //    player.hp += D0
     ),
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_firstaid.png`,
   },
   {
     name: 'Harden',
@@ -139,6 +146,7 @@ export const innateSkills: Skill[] = [
         '35 04 D0 ' + //  player.armor += D0
         '35 05 D1', //    player.shell += D1
     ),
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_harden.png`,
   },
   {
     name: 'Shuffle',
@@ -150,6 +158,7 @@ export const innateSkills: Skill[] = [
         '46', //          shuffle
     ),
     cmdLvls: [undefined, 'Shuffle'],
+    icon: `${process.env.NEXT_PUBLIC_CDN}/skill_shuffle.png`,
   },
 ]
 

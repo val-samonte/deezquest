@@ -1,27 +1,31 @@
 import { Skill } from '@/types/Skill'
+import classNames from 'classnames'
 import Image from 'next/image'
 import { ReactNode } from 'react'
 
 export interface HeroSkillDisplayProps {
-  icon?: string
   skill: Skill
   children: ReactNode
 }
 
-export function HeroSkillDisplay({
-  icon,
-  skill,
-  children,
-}: HeroSkillDisplayProps) {
+export function HeroSkillDisplay({ skill, children }: HeroSkillDisplayProps) {
   return (
     <div className='flex h-16 items-center relative pl-6'>
       <div className='flex justify-center w-10 flex-none'>
-        <div className='h-14 aspect-square relative'>
+        <div
+          className={classNames(
+            'h-14 aspect-square relative',
+            skill?.icon && 'scale-75',
+          )}
+        >
           <Image
             fill={true}
             alt={skill.name}
-            src={icon ?? `/cmd_${skill.type}.svg`}
-            className='object-contain'
+            src={skill?.icon ?? `/cmd_${skill.type}.svg`}
+            className={classNames(
+              'object-contain',
+              skill?.icon && '-rotate-45 border border-amber-400/50',
+            )}
           />
         </div>
       </div>
