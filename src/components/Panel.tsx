@@ -3,6 +3,7 @@
 import { Dialog } from '@headlessui/react'
 import classNames from 'classnames'
 import { ReactNode, useMemo } from 'react'
+import CornerDecors from './CornerDecors'
 
 export interface PanelProps {
   title?: string
@@ -50,10 +51,7 @@ export default function Panel({
         )}
       >
         {children}
-        <div className='absolute h-2 w-2 -top-px -left-px border-t-2 border-l-2 border-amber-400/50 pointer-events-none' />
-        <div className='absolute h-2 w-2 -top-px -right-px border-t-2 border-r-2 border-amber-400/50 pointer-events-none' />
-        <div className='absolute h-2 w-2 -bottom-px -left-px border-b-2 border-l-2 border-amber-400/50 pointer-events-none' />
-        <div className='absolute h-2 w-2 -bottom-px -right-px border-b-2 border-r-2 border-amber-400/50 pointer-events-none' />
+        <CornerDecors />
       </div>
       {typeof subtitle !== 'undefined' && (
         <div className='flex-none mt-1 py-1 text-xs font-bold w-full'>

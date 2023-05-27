@@ -13,12 +13,14 @@ import WalletGuard from '@/components/WalletGuard'
 import { useAtom, useAtomValue } from 'jotai'
 import { usePathname, useRouter } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
-import { userNftCollectionAtom } from '@/atoms/barracksAtoms'
+import { flagsAtom, userNftCollectionAtom } from '@/atoms/barracksAtoms'
 import HeroesGrid from './HeroesGrid'
 import classNames from 'classnames'
 import HeroPreview from './HeroPreview'
 import BackIcon from '@/components/BackIcon'
 import Image from 'next/image'
+import CornerDecors from '@/components/CornerDecors'
+import Loadout from './Loadout'
 
 export default function BarracksLayout({
   children,
@@ -34,10 +36,7 @@ export default function BarracksLayout({
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
-  const level1 = pathname !== '/heroes'
-  const loadout = pathname.includes('/loadout')
-  const mission = pathname.includes('/mission')
-  const level2 = loadout || mission
+  const { level1, level2, mission, loadout } = useAtomValue(flagsAtom)
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
@@ -263,30 +262,7 @@ export default function BarracksLayout({
               </div>
             </div>
             <div className='flex-auto relative py-5 pr-5 flex gap-5'>
-              <div className='flex-auto flex flex-col gap-5'>
-                <div className='flex-auto'></div>
-                <ul
-                  className={classNames(
-                    'flex items-center justify-center py-2',
-                    'uppercase tracking-widest font-bold',
-                  )}
-                >
-                  <li className='h-2 w-2 border-b border-l border-amber-400/50 rotate-45' />
-                  <li className='h-4 w-4 border-b-2 border-l-2 border-amber-400/50 rotate-45' />
-                  <li className='mx-1' />
-                  <li className='opacity-100'>Weapon</li>
-                  <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
-                  <li className='opacity-20'>Armor</li>
-                  <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
-                  <li className='opacity-20'>Accesory</li>
-                  <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
-                  <li className='opacity-20'>Backpack</li>
-                  <li className='mx-1' />
-                  <li className='h-4 w-4 border-t-2 border-r-2 border-amber-400/50 rotate-45' />
-                  <li className='h-2 w-2 border-t border-r border-amber-400/50 rotate-45' />
-                </ul>
-              </div>
-              <div className='w-96'></div>
+              <Loadout />
               {/* {children} */}
             </div>
           </div>

@@ -10,6 +10,8 @@ import {
   BackpackIframeWalletName,
 } from '@/utils/BackpackIframeAdapter'
 import { isXNftAtom } from '@/atoms/isXNftAtom'
+import { pathnameAtom } from '@/atoms/pathnameAtom'
+import { usePathname } from 'next/navigation'
 
 export default function DependenciesContainer({
   children,
@@ -80,6 +82,14 @@ export function AtomsInitializer() {
       setUserWalletContextState(walletContextState)
     }
   }, [walletContextState, setUserWalletContextState, setIsXNft])
+
+  // Utility to easily access pathname inside atoms
+
+  const pathname = usePathname()
+  const setPathname = useSetAtom(pathnameAtom)
+  useEffect(() => {
+    setPathname(pathname)
+  }, [pathname])
 
   return null
 }
