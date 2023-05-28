@@ -27,6 +27,8 @@ export const barracksPathFlagsAtom = atom((get) => {
   const level3 = level2 && segments.length === 5
 
   return {
+    pathname,
+    segments,
     level1, // show hero preview
     level2, // show mission / loadout
     level3, // item details

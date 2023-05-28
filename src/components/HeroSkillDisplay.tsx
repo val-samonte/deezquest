@@ -6,11 +6,22 @@ import { ReactNode } from 'react'
 export interface HeroSkillDisplayProps {
   skill: Skill
   children: ReactNode
+  className?: string
+  onClick?: () => unknown
 }
 
-export function HeroSkillDisplay({ skill, children }: HeroSkillDisplayProps) {
+export function HeroSkillDisplay({
+  skill,
+  children,
+  className,
+  onClick,
+}: HeroSkillDisplayProps) {
   return (
-    <div className='flex h-16 items-center relative pl-6'>
+    <button
+      type='button'
+      onClick={onClick}
+      className={classNames('flex h-16 items-center relative pl-6', className)}
+    >
       <div className='flex justify-center w-10 flex-none'>
         <div
           className={classNames(
@@ -57,6 +68,6 @@ export function HeroSkillDisplay({ skill, children }: HeroSkillDisplayProps) {
         <div className='border-b border-amber-400/50' />
         {children}
       </div>
-    </div>
+    </button>
   )
 }

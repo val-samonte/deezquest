@@ -31,14 +31,13 @@ export default function BarracksLayout({
 }) {
   const wallet = useUserWallet()
   const metaplex = useMetaplex()
-  const pathname = usePathname()
   const router = useRouter()
   const [listPreloaded, setListPreloaded] = useState(false)
   const [collection, setCollection] = useAtom(userNftCollectionAtom)
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
-  const { level1, level2, mission, loadout } = useAtomValue(
+  const { segments, level1, level2, level3, mission, loadout } = useAtomValue(
     barracksPathFlagsAtom,
   )
 
@@ -190,7 +189,7 @@ export default function BarracksLayout({
                   <button
                     type='button'
                     onClick={() =>
-                      router.push(pathname.split('/').slice(0, -1).join('/'))
+                      router.push(segments.slice(0, level3 ? -2 : -1).join('/'))
                     }
                     className={classNames(
                       !level2 && 'landscape:hidden portrait:sm:hidden',
@@ -209,10 +208,7 @@ export default function BarracksLayout({
                   >
                     <Button
                       onClick={() =>
-                        router.push(
-                          // TODO: LOL
-                          pathname.split('/').slice(0, 3).join('/') + '/weapon',
-                        )
+                        router.push(segments.slice(0, 3).join('/') + '/weapon')
                       }
                       className={classNames(
                         loadout && 'hidden',
@@ -238,11 +234,7 @@ export default function BarracksLayout({
                     />
                     <Button
                       onClick={() =>
-                        router.push(
-                          // TODO: LOL
-                          pathname.split('/').slice(0, 3).join('/') +
-                            '/mission',
-                        )
+                        router.push(segments.slice(0, 3).join('/') + '/mission')
                       }
                       className={classNames(
                         mission && 'hidden',

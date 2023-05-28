@@ -1,6 +1,5 @@
-import { selectedNftAtom } from '@/atoms/barracksAtoms'
+import { barracksPathFlagsAtom, selectedNftAtom } from '@/atoms/barracksAtoms'
 import AttributesDisplay from '@/components/AttributesDisplay'
-import BackIcon from '@/components/BackIcon'
 import { HeroSkillDisplay } from '@/components/HeroSkillDisplay'
 import Panel from '@/components/Panel'
 import SpinnerIcon from '@/components/SpinnerIcon'
@@ -10,6 +9,7 @@ import { innateSkills } from '@/utils/innateSkills'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import { IM_Fell_DW_Pica } from 'next/font/google'
+import { useRouter } from 'next/navigation'
 import { useMemo } from 'react'
 
 const font = IM_Fell_DW_Pica({
@@ -22,7 +22,11 @@ const mask =
   'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 97.5%, rgba(0,0,0,0) 100%)'
 
 export default function HeroPreview({ className }: { className?: string }) {
+  const router = useRouter()
   const selected = useAtomValue(selectedNftAtom)
+  const { level1, loadout, weapon, armor, accessory, items } = useAtomValue(
+    barracksPathFlagsAtom,
+  )
 
   const hero = useMemo(() => {
     if (!selected?.address) return null
@@ -91,19 +95,49 @@ export default function HeroPreview({ className }: { className?: string }) {
 
         {skills && (
           <div className='ltr flex flex-col gap-3 mt-5'>
-            <HeroSkillDisplay skill={skills[SkillTypes.ATTACK]}>
+            <HeroSkillDisplay
+              onClick={() =>
+                level1 &&
+                router.push(`/heroes/${selected.address}/weapon/nothing`)
+              }
+              skill={skills[SkillTypes.ATTACK]}
+              className={classNames(
+                'transition-all',
+                loadout && !weapon && !items ? 'opacity-20' : 'opacity-100',
+              )}
+            >
               <div className='pl-2 flex justify-between text-neutral-400 pr-5'>
                 <span>Unarmed</span>
                 <span>0</span>
               </div>
             </HeroSkillDisplay>
-            <HeroSkillDisplay skill={skills[SkillTypes.SUPPORT]}>
+            <HeroSkillDisplay
+              onClick={() =>
+                level1 &&
+                router.push(`/heroes/${selected.address}/armor/nothing`)
+              }
+              skill={skills[SkillTypes.SUPPORT]}
+              className={classNames(
+                'transition-all',
+                loadout && !armor && !items ? 'opacity-20' : 'opacity-100',
+              )}
+            >
               <div className='pl-2 flex justify-between text-neutral-400 pr-5'>
                 <span>No Armor</span>
                 <span>0</span>
               </div>
             </HeroSkillDisplay>
-            <HeroSkillDisplay skill={skills[SkillTypes.SPECIAL]}>
+            <HeroSkillDisplay
+              onClick={() =>
+                level1 &&
+                router.push(`/heroes/${selected.address}/accessory/nothing`)
+              }
+              skill={skills[SkillTypes.SPECIAL]}
+              className={classNames(
+                'transition-all',
+                loadout && !accessory && !items ? 'opacity-20' : 'opacity-100',
+              )}
+            >
               <div className='pl-2 flex justify-between text-neutral-400 pr-5'>
                 <span>No Accessory</span>
                 <span>0</span>
@@ -114,11 +148,4 @@ export default function HeroPreview({ className }: { className?: string }) {
       </div>
     </div>
   )
-}
-
-{
-  /* <div className='flex-none font-bold text-sm tracking-widest uppercase flex items-center '>
-  Loadout
-  <BackIcon className='rotate-180 text-amber-400/50' />
-</div> */
 }
