@@ -12,20 +12,18 @@ export const getOperationsFromCode = (codeStr: string) => {
 export const innateSkills: Skill[] = [
   {
     name: 'Burning Punch',
-    desc: 'Imbues bare fist with flames to incinerate enemies, enhancing attack with magical power.',
+    desc: 'Imbues bare fist with flames to incinerate enemies, consuming all fire mana as magical damage.',
     type: SkillTypes.ATTACK,
     cmdLvls: [
-      '8 Magic Damage + Attack Power',
-      '16 Magic Damage + Attack Power',
-      '24 Magic Damage + Attack Power',
+      '1 Magic Damage × Fire Mana',
+      '2 Magic Damage × Fire Mana',
+      '3 Magic Damage × Fire Mana',
     ],
     code: getOperationsFromCode(
-      '05 00 00 00 ' + // mana
-        '43 01 00 ' + //  version
-        '01 D0 08 ' + //  D0 = 8
-        '37 D0 42 ' + //  D0 *= command level
-        '35 D0 07 ' + //  D0 += base damage
-        '43 21 25 D0', // apply damage D0
+      'FF 00 00 00 ' + //   mana
+        '43 01 00 ' + //    version
+        '32 D0 42 0A ' + // D0 = command level * player.fireMp
+        '43 21 25 D0', //   apply damage D0
     ),
     icon: `${process.env.NEXT_PUBLIC_CDN}/skill_burningpunch.png`,
   },
@@ -58,7 +56,7 @@ export const innateSkills: Skill[] = [
     type: SkillTypes.ATTACK,
     cmdLvls: ['10 Magic Damage', '20 Magic Damage', '30 Magic Damage'],
     code: getOperationsFromCode(
-      '00 00 06 00 ' + // mana
+      '00 00 07 00 ' + // mana
         '43 01 00 ' + //  version
         '01 D0 0A ' + //  D0 = 10
         '37 D0 42 ' + //  D0 *= command level
@@ -68,30 +66,32 @@ export const innateSkills: Skill[] = [
   },
   {
     name: 'Crushing Blow',
-    desc: 'Deals a devastating strike, dealing damage based on earth mana of the hero. Consumes all earth mana.',
+    desc: `Deals a devastating strike, enhanced with earth's magical power.`,
     type: SkillTypes.ATTACK,
     cmdLvls: [
-      '1 Magic Damage × Earth Mana',
-      '2 Magic Damage × Earth Mana',
-      '3 Magic Damage × Earth Mana',
+      '8 Magic Damage + Attack Power',
+      '16 Magic Damage + Attack Power',
+      '24 Magic Damage + Attack Power',
     ],
     code: getOperationsFromCode(
-      '00 00 00 FF ' + //   mana
-        '43 01 00 ' + //    version
-        '32 D0 42 0D ' + // D0 = command level * player.earthMp
-        '43 21 25 D0', //   apply damage D0
+      '00 00 00 05 ' + // mana
+        '43 01 00 ' + //  version
+        '01 D0 08 ' + //  D0 = 8
+        '37 D0 42 ' + //  D0 *= command level
+        '35 D0 07 ' + //  D0 += base damage
+        '43 21 25 D0', // apply damage D0
     ),
     icon: `${process.env.NEXT_PUBLIC_CDN}/skill_crushingblow.png`,
   },
   {
-    name: 'Focus',
-    desc: 'Unleashes inner strength, increasing attack power.',
+    name: 'Meditate',
+    desc: 'Harness the fiery energy of fire to enhance concentration, increasing intelligence.',
     type: SkillTypes.SUPPORT,
-    cmdLvls: ['+1 Attack Power', '+2 Attack Power', '+3 Attack Power'],
+    cmdLvls: ['+1 Intelligence', '+2 Intelligence', '+3 Intelligence'],
     code: getOperationsFromCode(
       '03 00 00 00 ' + // mana
         '00 ' + //        version
-        '35 07 42', //    Base Damage += command level
+        '35 0E 42', //    Base Damage += command level
     ),
     icon: `${process.env.NEXT_PUBLIC_CDN}/skill_focus.png`,
   },
@@ -99,7 +99,7 @@ export const innateSkills: Skill[] = [
     name: 'Tailwind',
     desc: 'Channels the wind to increase movement speed, allowing the hero to make turns more frequently.',
     type: SkillTypes.SUPPORT,
-    cmdLvls: ['+1 Speed', '+2 Speed', '+3 Speed'],
+    cmdLvls: ['+1 Turn Point', '+2 Turn Points', '+3 Turn Points'],
     code: getOperationsFromCode(
       '00 04 00 00 ' + // mana
         '00 ' + //        version

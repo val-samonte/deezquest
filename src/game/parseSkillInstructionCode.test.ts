@@ -246,47 +246,50 @@ describe('Burning Punch', () => {
   const code = innateSkills[0].code
 
   test('Command Level 1', () => {
+    args.player.fireMp = 6
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 8 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, args.player.fireMp).hp,
     )
   })
 
   test('Command Level 2', () => {
     args.commandLevel = 2
+    args.player.fireMp = 6
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 16 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, args.player.fireMp * 2).hp,
     )
   })
 
   test('Command Level 3', () => {
     args.commandLevel = 3
+    args.player.fireMp = 6
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, 24 + preMutPlayer.baseDmg).hp,
+      applyDamage(preMutOpponent, 0, args.player.fireMp * 3).hp,
     )
   })
 })
 
-describe('Focus', () => {
+describe('Meditate', () => {
   const code = innateSkills[4].code
 
   test('Command Level 1', () => {
     parseSkillInstructionCode(args, code)
-    expect(args.player.baseDmg).toBe(preMutPlayer.baseDmg + 1)
+    expect(args.player.int).toBe(preMutPlayer.int + 1)
   })
 
   test('Command Level 2', () => {
     args.commandLevel = 2
     parseSkillInstructionCode(args, code)
-    expect(args.player.baseDmg).toBe(preMutPlayer.baseDmg + 2)
+    expect(args.player.int).toBe(preMutPlayer.int + 2)
   })
 
   test('Command Level 3', () => {
     args.commandLevel = 3
     parseSkillInstructionCode(args, code)
-    expect(args.player.baseDmg).toBe(preMutPlayer.baseDmg + 3)
+    expect(args.player.int).toBe(preMutPlayer.int + 3)
   })
 })
 
@@ -387,28 +390,25 @@ describe('Crushing Blow', () => {
   const code = innateSkills[3].code
 
   test('Command Level 1', () => {
-    args.player.eartMp = 6
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, args.player.eartMp).hp,
+      applyDamage(preMutOpponent, 0, 8 + preMutPlayer.baseDmg).hp,
     )
   })
 
   test('Command Level 2', () => {
     args.commandLevel = 2
-    args.player.eartMp = 6
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, args.player.eartMp * 2).hp,
+      applyDamage(preMutOpponent, 0, 16 + preMutPlayer.baseDmg).hp,
     )
   })
 
   test('Command Level 3', () => {
     args.commandLevel = 3
-    args.player.eartMp = 6
     parseSkillInstructionCode(args, code)
     expect(args.opponent.hp).toBe(
-      applyDamage(preMutOpponent, 0, args.player.eartMp * 3).hp,
+      applyDamage(preMutOpponent, 0, 24 + preMutPlayer.baseDmg).hp,
     )
   })
 })

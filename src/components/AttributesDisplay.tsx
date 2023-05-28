@@ -157,7 +157,7 @@ export default function AttributesDisplay({
           </span>
         </span>
         <span className='flex items-center'>
-          <span className='text-neutral-400 flex-auto'>Attack: </span>
+          <span className='text-neutral-400 flex-auto'>Attack Power: </span>
           <span className='font-bold text-white'>{hero.baseDmg}</span>
         </span>
         <span className='flex items-center'>
