@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 export default function CommandLevelsDescription({ skill }: { skill: Skill }) {
   return (
-    <div className='flex flex-col mt-2 gap-1'>
+    <div className='flex flex-col mt-2 gap-1 text-sm'>
       {skill.cmdLvls.map(
         (cmdLevelDesc, i) =>
           cmdLevelDesc && (

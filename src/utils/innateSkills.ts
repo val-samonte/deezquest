@@ -68,12 +68,12 @@ export const innateSkills: Skill[] = [
   },
   {
     name: 'Crushing Blow',
-    desc: 'Deals a devastating strike, dealing damage based on earth mana of the hero.',
+    desc: 'Deals a devastating strike, dealing damage based on earth mana of the hero. Consumes all earth mana.',
     type: SkillTypes.ATTACK,
     cmdLvls: [
-      '1 Magic Damage × EarthMP',
-      '2 Magic Damage × EarthMP',
-      '3 Magic Damage × EarthMP',
+      '1 Magic Damage × Earth Mana',
+      '2 Magic Damage × Earth Mana',
+      '3 Magic Damage × Earth Mana',
     ],
     code: getOperationsFromCode(
       '00 00 00 FF ' + //   mana
