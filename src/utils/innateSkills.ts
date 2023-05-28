@@ -12,12 +12,12 @@ export const getOperationsFromCode = (codeStr: string) => {
 export const innateSkills: Skill[] = [
   {
     name: 'Burning Punch',
-    desc: 'Imbues bare fist with flames to incinerate enemies, enhancing base attack damage.',
+    desc: 'Imbues bare fist with flames to incinerate enemies, enhancing attack with magical power.',
     type: SkillTypes.ATTACK,
     cmdLvls: [
-      '8 Magic Damage + Base Damage',
-      '16 Magic Damage + Base Damage',
-      '24 Magic Damage + Base Damage',
+      '8 Magic Damage + Attack Power',
+      '16 Magic Damage + Attack Power',
+      '24 Magic Damage + Attack Power',
     ],
     code: getOperationsFromCode(
       '05 00 00 00 ' + // mana
@@ -85,9 +85,9 @@ export const innateSkills: Skill[] = [
   },
   {
     name: 'Focus',
-    desc: 'Unleashes inner strength, increasing attack damage.',
+    desc: 'Unleashes inner strength, increasing attack power.',
     type: SkillTypes.SUPPORT,
-    cmdLvls: ['+1 Base Damage', '+2 Base Damage', '+3 Base Damage'],
+    cmdLvls: ['+1 Attack Power', '+2 Attack Power', '+3 Attack Power'],
     code: getOperationsFromCode(
       '03 00 00 00 ' + // mana
         '00 ' + //        version

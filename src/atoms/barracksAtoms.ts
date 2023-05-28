@@ -1,6 +1,10 @@
 import { JsonMetadata, Metadata, Nft, Sft } from '@metaplex-foundation/js'
 import { atom } from 'jotai'
 import { pathnameAtom } from './pathnameAtom'
+import { heroFromPublicKey } from '@/game/gameFunctions'
+import { SkillTypes } from '@/enums/SkillTypes'
+import { innateSkills } from '@/utils/innateSkills'
+import { Hero } from '@/game/gameFunctions'
 
 export const userNftCollectionAtom = atom<(Metadata | Nft | Sft)[]>([])
 export const gridContainerPosAtom = atom<{ top: number; left: number } | null>(
@@ -10,6 +14,24 @@ export const selectedNftAtom = atom<{
   address: string
   metadata: JsonMetadata
 } | null>(null)
+
+export const selectedHeroAtom = atom<Hero | null>((get) => {
+  const nft = get(selectedNftAtom)
+  if (!nft?.address) return null
+
+  return heroFromPublicKey(nft.address)
+})
+
+export const selectedHeroSkillsAtom = atom((get) => {
+  const hero = get(selectedHeroAtom)
+  if (!hero) return null
+
+  return {
+    [SkillTypes.ATTACK]: innateSkills[hero.offensiveSkill],
+    [SkillTypes.SUPPORT]: innateSkills[hero.supportiveSkill],
+    [SkillTypes.SPECIAL]: innateSkills[hero.specialSkill],
+  }
+})
 
 // TODO: needs refactor
 export const barracksPathFlagsAtom = atom((get) => {

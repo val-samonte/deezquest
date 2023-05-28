@@ -51,12 +51,12 @@ export default function AttributeDescription({
         <div className='flex flex-col gap-2'>
           <p>
             Affects the{' '}
-            <span className='italic font-bold'>Base Attack Damage</span> and{' '}
+            <span className='italic font-bold'>Base Attack Power</span> and{' '}
             <span className='italic font-bold'>Weight Capacity</span> of the
             hero.
           </p>
           <p>
-            Base Attack Damage has initial value of 1 plus additional point per
+            Base Attack Power has initial value of 1 plus additional point per
             each 3 points of STR, starting from STR 4.
           </p>
         </div>

@@ -1,10 +1,16 @@
-import { barracksPathFlagsAtom } from '@/atoms/barracksAtoms'
+import {
+  barracksPathFlagsAtom,
+  selectedHeroSkillsAtom,
+} from '@/atoms/barracksAtoms'
 import Center from '@/components/Center'
 import CornerDecors from '@/components/CornerDecors'
+import { HeroSkillDisplay } from '@/components/HeroSkillDisplay'
 import Panel from '@/components/Panel'
+import { SkillTypes } from '@/enums/SkillTypes'
 import { Transition } from '@headlessui/react'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useSelectedLayoutSegments } from 'next/navigation'
 import { Fragment, useMemo } from 'react'
@@ -12,9 +18,10 @@ import { Fragment, useMemo } from 'react'
 export default function Loadout() {
   const segments = useSelectedLayoutSegments()
   const path = useMemo(() => `/heroes/${segments[0]}`, [segments])
-  const { loadout, weapon, armor, accessory, items } = useAtomValue(
+  const { level3, loadout, weapon, armor, accessory, items } = useAtomValue(
     barracksPathFlagsAtom,
   )
+  const skills = useAtomValue(selectedHeroSkillsAtom)
 
   return (
     <Transition
@@ -26,11 +33,11 @@ export default function Loadout() {
           <Transition.Child
             as={Fragment}
             enter='ease-out duration-300 delay-300'
-            enterFrom='opacity-0 -translate-x-10 scale-105'
-            enterTo='opacity-100 translate-x-0 scale-100'
+            enterFrom='opacity-0 -translate-x-10'
+            enterTo='opacity-100 translate-x-0'
             leave='ease-out duration-200 delay-100'
-            leaveFrom='opacity-100 translate-x-0 scale-100'
-            leaveTo='opacity-0 -translate-x-10 scale-105'
+            leaveFrom='opacity-100 translate-x-0'
+            leaveTo='opacity-0 -translate-x-10'
           >
             <div className='flex-none w-10 border-y border-l border-amber-400/50'>
               <CornerDecors className='w-6 h-6' right={false} />
@@ -56,16 +63,29 @@ export default function Loadout() {
                 leaveTo='opacity-0 translate-y-10'
                 className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5'
               >
-                <div className='w-40 xl:w-60 aspect-[3/4] pointer-events-none'>
+                <div className='w-60 aspect-[3/4] pointer-events-none'>
                   <Panel
                     title='Unarmed'
                     className={classNames(
                       'transition-all duration-300',
-                      // selected ? 'bg-indigo-700/50' : 'bg-black/50',
-                      'w-40 xl:w-60 aspect-[3/4] ',
+                      level3 ? 'bg-indigo-700/50' : 'bg-black/50',
+                      'w-60 aspect-[3/4] ',
                     )}
                   >
-                    <div className='w-full aspect-square border-b border-amber-400/20'></div>
+                    <div className='w-full aspect-square border-b border-amber-400/20 relative'>
+                      <Image
+                        fill={true}
+                        alt='Unarmed'
+                        src={`${process.env.NEXT_PUBLIC_CDN}/unarmed.png`}
+                        className='brightness-50'
+                      />
+                    </div>
+                    {skills && (
+                      <HeroSkillDisplay
+                        skill={skills[SkillTypes.ATTACK]}
+                        size='sm'
+                      />
+                    )}
                   </Panel>
                 </div>
               </Transition>
@@ -79,16 +99,29 @@ export default function Loadout() {
                 leaveTo='opacity-0 translate-y-10'
                 className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5'
               >
-                <div className='w-40 xl:w-60 aspect-[3/4] pointer-events-none'>
+                <div className='w-60 aspect-[3/4] pointer-events-none'>
                   <Panel
                     title='No Armor'
                     className={classNames(
                       'transition-all duration-300',
-                      // selected ? 'bg-indigo-700/50' : 'bg-black/50',
-                      'w-40 xl:w-60 aspect-[3/4] ',
+                      level3 ? 'bg-indigo-700/50' : 'bg-black/50',
+                      'w-60 aspect-[3/4] ',
                     )}
                   >
-                    <div className='w-full aspect-square border-b border-amber-400/20'></div>
+                    <div className='w-full aspect-square border-b border-amber-400/20 relative'>
+                      <Image
+                        fill={true}
+                        alt='Unarmed'
+                        src={`${process.env.NEXT_PUBLIC_CDN}/unarmed.png`}
+                        className='brightness-50'
+                      />
+                    </div>
+                    {skills && (
+                      <HeroSkillDisplay
+                        skill={skills[SkillTypes.SUPPORT]}
+                        size='sm'
+                      />
+                    )}
                   </Panel>
                 </div>
               </Transition>
@@ -102,16 +135,29 @@ export default function Loadout() {
                 leaveTo='opacity-0 translate-y-10'
                 className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5'
               >
-                <div className='w-40 xl:w-60 aspect-[3/4] pointer-events-none'>
+                <div className='w-60 aspect-[3/4] pointer-events-none'>
                   <Panel
                     title='No Accessory'
                     className={classNames(
                       'transition-all duration-300',
-                      // selected ? 'bg-indigo-700/50' : 'bg-black/50',
-                      'w-40 xl:w-60 aspect-[3/4] ',
+                      level3 ? 'bg-indigo-700/50' : 'bg-black/50',
+                      'w-60 aspect-[3/4] ',
                     )}
                   >
-                    <div className='w-full aspect-square border-b border-amber-400/20'></div>
+                    <div className='w-full aspect-square border-b border-amber-400/20 relative'>
+                      <Image
+                        fill={true}
+                        alt='Unarmed'
+                        src={`${process.env.NEXT_PUBLIC_CDN}/unarmed.png`}
+                        className='brightness-50'
+                      />
+                    </div>
+                    {skills && (
+                      <HeroSkillDisplay
+                        skill={skills[SkillTypes.SPECIAL]}
+                        size='sm'
+                      />
+                    )}
                   </Panel>
                 </div>
               </Transition>
@@ -140,11 +186,11 @@ export default function Loadout() {
           <Transition.Child
             as={Fragment}
             enter='ease-out duration-300 delay-300'
-            enterFrom='opacity-0 translate-x-10 scale-110'
-            enterTo='opacity-100 translate-x-0 scale-100'
+            enterFrom='opacity-0 translate-x-10'
+            enterTo='opacity-100 translate-x-0'
             leave='ease-out duration-200'
-            leaveFrom='opacity-100 translate-x-0 scale-100'
-            leaveTo='opacity-0 translate-x-10 scale-110'
+            leaveFrom='opacity-100 translate-x-0'
+            leaveTo='opacity-0 translate-x-10'
           >
             <div className='flex-none w-10 border-y border-r border-amber-400/50'>
               <CornerDecors className='w-6 h-6' left={false} />
@@ -171,7 +217,7 @@ export default function Loadout() {
             <li className='mx-1' />
             <li
               className={classNames(
-                'transition-all cursor-pointer',
+                'transition-all duration-300 cursor-pointer',
                 weapon ? 'opacity-100' : 'opacity-20',
               )}
             >
@@ -180,7 +226,7 @@ export default function Loadout() {
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
             <li
               className={classNames(
-                'transition-all cursor-pointer',
+                'transition-all duration-300 cursor-pointer',
                 armor ? 'opacity-100' : 'opacity-20',
               )}
             >
@@ -189,7 +235,7 @@ export default function Loadout() {
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
             <li
               className={classNames(
-                'transition-all cursor-pointer',
+                'transition-all duration-300 cursor-pointer',
                 accessory ? 'opacity-100' : 'opacity-20',
               )}
             >
@@ -198,7 +244,7 @@ export default function Loadout() {
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
             <li
               className={classNames(
-                'transition-all cursor-pointer',
+                'transition-all duration-300 cursor-pointer',
                 items ? 'opacity-100' : 'opacity-20',
               )}
             >

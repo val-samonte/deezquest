@@ -1,16 +1,18 @@
-import { barracksPathFlagsAtom, selectedNftAtom } from '@/atoms/barracksAtoms'
+import {
+  barracksPathFlagsAtom,
+  selectedHeroAtom,
+  selectedHeroSkillsAtom,
+  selectedNftAtom,
+} from '@/atoms/barracksAtoms'
 import AttributesDisplay from '@/components/AttributesDisplay'
 import { HeroSkillDisplay } from '@/components/HeroSkillDisplay'
 import Panel from '@/components/Panel'
 import SpinnerIcon from '@/components/SpinnerIcon'
 import { SkillTypes } from '@/enums/SkillTypes'
-import { heroFromPublicKey } from '@/game/gameFunctions'
-import { innateSkills } from '@/utils/innateSkills'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import { IM_Fell_DW_Pica } from 'next/font/google'
 import { useRouter } from 'next/navigation'
-import { useMemo } from 'react'
 
 const font = IM_Fell_DW_Pica({
   weight: '400',
@@ -28,21 +30,10 @@ export default function HeroPreview({ className }: { className?: string }) {
     barracksPathFlagsAtom,
   )
 
-  const hero = useMemo(() => {
-    if (!selected?.address) return null
-    return heroFromPublicKey(selected.address)
-  }, [selected])
+  const hero = useAtomValue(selectedHeroAtom)
+  const skills = useAtomValue(selectedHeroSkillsAtom)
 
-  const skills = useMemo(() => {
-    if (!hero) return null
-    return {
-      [SkillTypes.ATTACK]: innateSkills[hero.offensiveSkill],
-      [SkillTypes.SUPPORT]: innateSkills[hero.supportiveSkill],
-      [SkillTypes.SPECIAL]: innateSkills[hero.specialSkill],
-    }
-  }, [hero])
-
-  if (!selected || !hero) return null
+  if (!selected || !hero || !skills) return null
 
   return (
     <div className='h-full flex flex-col relative pointer-events-auto'>
@@ -102,7 +93,7 @@ export default function HeroPreview({ className }: { className?: string }) {
               }
               skill={skills[SkillTypes.ATTACK]}
               className={classNames(
-                'transition-all',
+                'transition-all duration-300',
                 loadout && !weapon && !items ? 'opacity-20' : 'opacity-100',
               )}
             >
@@ -118,7 +109,7 @@ export default function HeroPreview({ className }: { className?: string }) {
               }
               skill={skills[SkillTypes.SUPPORT]}
               className={classNames(
-                'transition-all',
+                'transition-all duration-300',
                 loadout && !armor && !items ? 'opacity-20' : 'opacity-100',
               )}
             >
@@ -134,7 +125,7 @@ export default function HeroPreview({ className }: { className?: string }) {
               }
               skill={skills[SkillTypes.SPECIAL]}
               className={classNames(
-                'transition-all',
+                'transition-all duration-300',
                 loadout && !accessory && !items ? 'opacity-20' : 'opacity-100',
               )}
             >
