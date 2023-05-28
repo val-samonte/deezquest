@@ -1,6 +1,8 @@
 'use client'
 
+import { barracksPathFlagsAtom } from '@/atoms/barracksAtoms'
 import classNames from 'classnames'
+import { useAtomValue } from 'jotai'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
@@ -9,6 +11,13 @@ const commonClasses =
 
 export default function Backgrounds() {
   const pathname = usePathname()
+  const {
+    level1: barracks1,
+    level2: barracks2,
+    loadout,
+    mission,
+  } = useAtomValue(barracksPathFlagsAtom)
+
   return (
     <div className='fixed inset-0'>
       <Image
@@ -27,11 +36,7 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_barracks.png`}
         className={classNames(
           commonClasses,
-          pathname?.includes('/heroes') &&
-            !pathname?.includes('/mission') &&
-            !pathname?.includes('/loadout')
-            ? 'opacity-100'
-            : 'opacity-0',
+          !barracks2 ? 'opacity-100' : 'opacity-0',
           'blur-sm brightness-50',
         )}
       />
@@ -71,7 +76,7 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_mission.png`}
         className={classNames(
           commonClasses,
-          pathname?.includes('/mission') ? 'opacity-100' : 'opacity-0',
+          mission ? 'opacity-100' : 'opacity-0',
           'blur-sm brightness-75',
         )}
       />
@@ -81,7 +86,7 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_loadout.png`}
         className={classNames(
           commonClasses,
-          pathname?.includes('/loadout') ? 'opacity-100' : 'opacity-0',
+          loadout ? 'opacity-100' : 'opacity-0',
           'blur-sm brightness-75',
         )}
       />

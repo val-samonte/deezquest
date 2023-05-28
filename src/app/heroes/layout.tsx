@@ -13,13 +13,15 @@ import WalletGuard from '@/components/WalletGuard'
 import { useAtom, useAtomValue } from 'jotai'
 import { usePathname, useRouter } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
-import { flagsAtom, userNftCollectionAtom } from '@/atoms/barracksAtoms'
+import {
+  barracksPathFlagsAtom,
+  userNftCollectionAtom,
+} from '@/atoms/barracksAtoms'
 import HeroesGrid from './HeroesGrid'
 import classNames from 'classnames'
 import HeroPreview from './HeroPreview'
 import BackIcon from '@/components/BackIcon'
 import Image from 'next/image'
-import CornerDecors from '@/components/CornerDecors'
 import Loadout from './Loadout'
 
 export default function BarracksLayout({
@@ -36,7 +38,9 @@ export default function BarracksLayout({
   const publicKey = wallet?.publicKey ?? null
   const controller = useRef(new AbortController())
   const isXNft = useAtomValue(isXNftAtom)
-  const { level1, level2, mission, loadout } = useAtomValue(flagsAtom)
+  const { level1, level2, mission, loadout } = useAtomValue(
+    barracksPathFlagsAtom,
+  )
 
   // TODO: convert this to atom
   const loadNfts = useCallback(async () => {
@@ -207,8 +211,7 @@ export default function BarracksLayout({
                       onClick={() =>
                         router.push(
                           // TODO: LOL
-                          pathname.split('/').slice(0, 3).join('/') +
-                            '/loadout',
+                          pathname.split('/').slice(0, 3).join('/') + '/weapon',
                         )
                       }
                       className={classNames(
@@ -261,10 +264,9 @@ export default function BarracksLayout({
                 </div>
               </div>
             </div>
-            <div className='flex-auto relative py-5 pr-5 flex gap-5'>
-              <Loadout />
-              {/* {children} */}
-            </div>
+
+            <Loadout />
+            {/* {children} */}
           </div>
         </div>
       </PageContainer>

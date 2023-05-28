@@ -11,24 +11,25 @@ export const selectedNftAtom = atom<{
   metadata: JsonMetadata
 } | null>(null)
 
-export const flagsAtom = atom((get) => {
+// TODO: needs refactor
+export const barracksPathFlagsAtom = atom((get) => {
   const pathname = get(pathnameAtom)
+  const segments = pathname.split('/')
 
   const level1 = pathname !== '/heroes'
-  const loadout = pathname.includes('/loadout')
   const mission = pathname.includes('/mission')
-  const level2 = loadout || mission
-  // future updates - we need to check the NFT using the address
-  const weapon = pathname.includes('/unarmed')
-  const armor = pathname.includes('/noarmor')
-  const accessory = pathname.includes('/noaccessory')
+  const weapon = pathname.includes('/weapon')
+  const armor = pathname.includes('/armor')
+  const accessory = pathname.includes('/accessory')
   const items = pathname.includes('/items')
-  const level3 = weapon || armor || accessory || items
+  const loadout = weapon || armor || accessory || items
+  const level2 = loadout || mission
+  const level3 = level2 && segments.length === 5
 
   return {
     level1, // show hero preview
     level2, // show mission / loadout
-    level3, // show item NFT details panel
+    level3, // item details
     mission,
     loadout,
     weapon,

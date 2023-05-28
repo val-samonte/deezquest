@@ -28,7 +28,7 @@ export default function Panel({
     <PanelComponent
       className={classNames(
         'flex flex-col',
-        'p-1 backdrop-grayscale shadow-md w-full h-full rounded border border-neutral-400/10',
+        'p-1 shadow-md w-full h-full rounded border border-neutral-400/10',
         className,
       )}
     >
