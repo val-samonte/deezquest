@@ -25,7 +25,7 @@ export default function Loadout() {
     <Transition
       show={loadout}
       className={classNames(
-        'absolute inset-x-0 top-0 bottom-14 md:bottom-0 md:relative',
+        'absolute inset-0 w-full h-full',
         'flex-auto py-5 flex',
       )}
     >

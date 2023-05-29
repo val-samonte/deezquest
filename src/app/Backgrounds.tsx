@@ -78,7 +78,7 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_map.png`}
         className={classNames(
           commonClasses,
-          mission ? 'opacity-100' : 'opacity-0',
+          mission ? 'opacity-60' : 'opacity-0',
           'brightness-50 object-top',
         )}
       />

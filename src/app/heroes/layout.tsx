@@ -23,6 +23,7 @@ import HeroPreview from './HeroPreview'
 import BackIcon from '@/components/BackIcon'
 import Image from 'next/image'
 import Loadout from './Loadout'
+import Mission from './Mission'
 
 export default function BarracksLayout({
   children,
@@ -269,8 +270,10 @@ export default function BarracksLayout({
                 </div>
               </div>
             </div>
-
-            <Loadout />
+            <div className='absolute inset-x-0 top-0 bottom-14 md:bottom-0 md:relative w-full h-full'>
+              <Loadout />
+              <Mission />
+            </div>
             {/* {children} */}
           </div>
         </div>
