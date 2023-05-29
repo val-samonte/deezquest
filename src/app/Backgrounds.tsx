@@ -10,8 +10,8 @@ const commonClasses =
   'absolute inset-0 w-full h-full object-cover transition-all duration-500'
 
 export default function Backgrounds() {
-  const pathname = usePathname()
   const {
+    pathname,
     level1: barracks1,
     level2: barracks2,
     loadout,
@@ -26,7 +26,7 @@ export default function Backgrounds() {
         fill={true}
         className={classNames(
           commonClasses,
-          pathname?.includes('/battle') ? 'opacity-100' : 'opacity-0',
+          pathname.includes('/battle') ? 'opacity-100' : 'opacity-0',
           'blur-sm object-bottom brightness-75',
         )}
       />
@@ -36,17 +36,19 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_barracks.png`}
         className={classNames(
           commonClasses,
-          !barracks2 ? 'opacity-100' : 'opacity-0',
+          pathname.includes('/heroes') && !barracks2
+            ? 'opacity-100'
+            : 'opacity-0',
           'blur-sm brightness-50',
         )}
       />
       <Image
         alt='plains'
         fill={true}
-        src={`${process.env.NEXT_PUBLIC_CDN}/bg_plains.png`}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_mission.png`}
         className={classNames(
           commonClasses,
-          pathname === '/' ? 'opacity-100' : 'opacity-0',
+          pathname === '/' || !pathname ? 'opacity-100' : 'opacity-0',
           'blur-sm object-bottom brightness-75',
         )}
       />
@@ -56,7 +58,7 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_bar.png`}
         className={classNames(
           commonClasses,
-          pathname?.includes('/tavern') ? 'opacity-100' : 'opacity-0',
+          pathname.includes('/tavern') ? 'opacity-100' : 'opacity-0',
           'blur-sm brightness-50',
         )}
       />
@@ -66,18 +68,18 @@ export default function Backgrounds() {
         src={`${process.env.NEXT_PUBLIC_CDN}/bg_library.png`}
         className={classNames(
           commonClasses,
-          pathname?.includes('/tutorial') ? 'opacity-100' : 'opacity-0',
+          pathname.includes('/tutorial') ? 'opacity-100' : 'opacity-0',
           'blur-sm brightness-50',
         )}
       />
       <Image
         alt='mission'
         fill={true}
-        src={`${process.env.NEXT_PUBLIC_CDN}/bg_mission.png`}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_map.png`}
         className={classNames(
           commonClasses,
           mission ? 'opacity-100' : 'opacity-0',
-          'blur-sm brightness-75',
+          'brightness-50 object-top',
         )}
       />
       <Image

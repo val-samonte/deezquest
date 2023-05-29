@@ -90,6 +90,7 @@ export default function MainMenuItem({
               fill={true}
               src={`${process.env.NEXT_PUBLIC_CDN}${bgImg}`}
               className='object-cover'
+              priority
             />
           </div>
         </div>

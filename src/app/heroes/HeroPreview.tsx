@@ -36,7 +36,7 @@ export default function HeroPreview({ className }: { className?: string }) {
   if (!selected || !hero || !skills) return null
 
   return (
-    <div className='h-full flex flex-col relative pointer-events-auto'>
+    <div className='h-full flex flex-col relative pointer-events-auto max-w-sm mx-auto'>
       <div
         className={classNames(
           'h-full overflow-y-scroll overflow-x-hidden absolute inset-0 p-5',

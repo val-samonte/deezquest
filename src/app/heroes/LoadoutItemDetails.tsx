@@ -68,6 +68,9 @@ export default function LoadoutItemDetails() {
             <div className='h-5' />
           </HeroSkillDisplay>
           <p className='px-5 text-sm text-neutral-400'>{selectedSkill.desc}</p>
+          <p className='px-5 text-sm text-neutral-400 capitalize italic'>
+            {selectedSkill.type} innate skill
+          </p>
           <CommandLevelsDescription skill={selectedSkill} />
         </div>
       )}

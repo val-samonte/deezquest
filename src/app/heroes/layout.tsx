@@ -132,7 +132,7 @@ export default function BarracksLayout({
           />
           <div
             className={classNames(
-              level3
+              level3 && loadout
                 ? 'opacity-0 xl:opacity-100'
                 : level1 && !level2
                 ? 'opacity-100'
