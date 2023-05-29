@@ -18,12 +18,14 @@ html {
 } 
 */
 
-.rtl {
-  direction: rtl;
-}
+@layer utilities {
+  .rtl {
+    direction: rtl;
+  }
 
-.ltr {
-  direction: ltr;
+  .ltr {
+    direction: ltr;
+  }
 }
 
 *::-webkit-scrollbar {

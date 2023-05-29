@@ -189,7 +189,7 @@ export default function BarracksLayout({
                     'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto',
                 )}
               >
-                <HeroPreview className={classNames(level2 && 'rtl')} />
+                <HeroPreview className={classNames(level2 && 'md:rtl')} />
               </div>
               <div
                 className={classNames(

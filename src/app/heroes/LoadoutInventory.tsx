@@ -40,13 +40,15 @@ export default function LoadoutInventory() {
           maskImage: mask,
         }}
       >
-        <Link href={`${level2Path}/nothing`}>
+        <Link
+          href={`${level2Path}/nothing`}
+          className='block w-60 aspect-[3/4]'
+        >
           <Panel
             title='Unarmed'
             className={classNames(
               'transition-all duration-300',
               level3 ? 'bg-indigo-700/50' : 'bg-black/50',
-              'w-60 aspect-[3/4] ',
             )}
           >
             <div className='w-full aspect-square border-b border-amber-400/20 relative'>
@@ -77,13 +79,15 @@ export default function LoadoutInventory() {
           maskImage: mask,
         }}
       >
-        <Link href={`${level2Path}/nothing`}>
+        <Link
+          href={`${level2Path}/nothing`}
+          className='block w-60 aspect-[3/4]'
+        >
           <Panel
             title='No Armor'
             className={classNames(
               'transition-all duration-300',
               level3 ? 'bg-indigo-700/50' : 'bg-black/50',
-              'w-60 aspect-[3/4] ',
             )}
           >
             <div className='w-full aspect-square border-b border-amber-400/20 relative'>
@@ -114,13 +118,15 @@ export default function LoadoutInventory() {
           maskImage: mask,
         }}
       >
-        <Link href={`${level2Path}/nothing`}>
+        <Link
+          href={`${level2Path}/nothing`}
+          className='block w-60 aspect-[3/4]'
+        >
           <Panel
             title='No Accessory'
             className={classNames(
               'transition-all duration-300',
               level3 ? 'bg-indigo-700/50' : 'bg-black/50',
-              'w-60 aspect-[3/4] ',
             )}
           >
             <div className='w-full aspect-square border-b border-amber-400/20 relative'>
