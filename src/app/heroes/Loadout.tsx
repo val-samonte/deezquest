@@ -5,9 +5,10 @@ import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import Link from 'next/link'
 import { useSelectedLayoutSegments } from 'next/navigation'
-import { Fragment, useMemo } from 'react'
+import { Fragment, useCallback, useMemo } from 'react'
 import LoadoutItemDetails from './LoadoutItemDetails'
 import LoadoutInventory from './LoadoutInventory'
+import Button from '@/components/Button'
 
 export default function Loadout() {
   const segments = useSelectedLayoutSegments()
@@ -16,16 +17,30 @@ export default function Loadout() {
     barracksPathFlagsAtom,
   )
 
+  const level2Path = `/heroes/${segments[0]}/${segments[1] ?? ''}`
+
   return (
-    <Transition show={loadout} className='flex-auto relative py-5 flex'>
+    <Transition
+      show={loadout}
+      className={classNames(
+        'absolute inset-0 md:relative',
+        'flex-auto py-5 flex',
+      )}
+    >
       <div
         className={classNames(
           'transition-all duration-500',
-          level3 ? 'pr-96' : 'pr-5',
+          level3 ? 'blur-sm xl:blur-0' : 'blur-0',
+          level3 ? 'pr-5 xl:pr-96' : 'pr-5',
           'flex-auto flex flex-col gap-5 pointer-events-auto',
         )}
       >
-        <div className='flex-auto flex items-stretch relative'>
+        <div
+          className={classNames(
+            level3 && 'pointer-events-none xl:pointer-events-auto',
+            'flex-auto flex items-stretch relative',
+          )}
+        >
           <Transition.Child
             as={Fragment}
             enter='ease-out duration-300 delay-300'
@@ -46,7 +61,7 @@ export default function Loadout() {
             leave='ease-out duration-200'
             leaveFrom='opacity-100'
             leaveTo='opacity-0'
-            className='flex-auto -mx-10 relative'
+            className={classNames('flex-auto -mx-10 relative')}
           >
             <LoadoutInventory />
           </Transition.Child>
@@ -75,7 +90,8 @@ export default function Loadout() {
         >
           <ul
             className={classNames(
-              'flex items-center justify-center py-2',
+              'hidden xl:flex',
+              'items-center justify-center py-2',
               'uppercase tracking-widest font-bold',
             )}
           >
@@ -123,8 +139,17 @@ export default function Loadout() {
           </ul>
         </Transition.Child>
       </div>
+      {level3 && (
+        <Link
+          href={level2Path}
+          className={classNames(
+            'block xl:hidden',
+            'cursor-pointer absolute inset-0 pointer-events-auto',
+          )}
+        />
+      )}
       <Transition.Child
-        key={weapon ? 'weapon' : armor ? 'armor' : 'accessory'}
+        // key={weapon ? 'weapon' : armor ? 'armor' : 'accessory'}
         enter='ease-out duration-500 delay-200'
         enterFrom='opacity-0'
         enterTo='opacity-100'
@@ -135,9 +160,60 @@ export default function Loadout() {
           'transition-all duration-500',
           !level3 ? '-mr-96' : 'mr-0',
           'absolute inset-y-0 right-0 py-5',
+          'bg-black/80 xl:bg-black/0',
         )}
       >
         <LoadoutItemDetails />
+
+        {/* <div
+          className={classNames(
+            'w-full pointer-events-auto p-5 overflow-y-scroll',
+          )}
+        >
+          <div className='ltr gap-1 grid grid-cols-4'>
+            <button
+              type='button'
+              // onClick={() =>
+              //   router.push(segments.slice(0, level3 ? -2 : -1).join('/'))
+              // }
+              className={classNames(
+                // !level2 && 'landscape:hidden portrait:sm:hidden',
+                'w-full col-span-1 flex gap-1 items-center justify-start text-sm tracking-widest uppercase',
+              )}
+            >
+              
+              Close
+            </button>
+            <div
+              className={classNames(
+                'flex items-center',
+                // !level2 && 'landscape:col-span-4 portrait:sm:col-span-4',
+                'w-full col-span-3',
+              )}
+            >
+              <div
+                className={classNames(
+                  // level2 && 'hidden',
+                  'h-6 w-6 border border-amber-400/50 rotate-45',
+                )}
+              />
+              <Button
+                // onClick={() =>
+                //   router.push(segments.slice(0, 3).join('/') + '/mission')
+                // }
+                className={classNames(
+                  // mission && 'hidden',
+                  'overflow-hidden px-0',
+                  'flex-auto transition-all',
+                  'flex items-center justify-center gap-1',
+                )}
+              >
+                
+                Unequip
+              </Button>
+            </div>
+          </div>
+        </div> */}
       </Transition.Child>
     </Transition>
   )

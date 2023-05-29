@@ -29,7 +29,7 @@ export default function LoadoutItemDetails() {
   return (
     <div
       className={classNames(
-        'w-96 px-5 h-full overflow-y-scroll overflow-x-hidden',
+        'relative w-96 px-5 h-full overflow-y-scroll overflow-x-hidden',
       )}
     >
       <div className='w-full aspect-square'>
