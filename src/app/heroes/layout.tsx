@@ -194,7 +194,7 @@ export default function BarracksLayout({
               <div
                 className={classNames(
                   level2 && 'md:rtl',
-                  'max-w-md mx-auto',
+                  'max-w-sm mx-auto',
                   'w-full pointer-events-auto p-5 overflow-y-scroll',
                 )}
               >
@@ -242,7 +242,7 @@ export default function BarracksLayout({
                     <div
                       className={classNames(
                         level2 && 'hidden',
-                        'h-6 w-6 border border-amber-400/50 rotate-45',
+                        'aspect-square w-4 border border-amber-400/50 rotate-45',
                       )}
                     />
                     <Button

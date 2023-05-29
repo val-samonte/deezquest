@@ -10,6 +10,7 @@ import LoadoutItemDetails from './LoadoutItemDetails'
 import LoadoutInventory from './LoadoutInventory'
 import Button from '@/components/Button'
 import Image from 'next/image'
+import CloseIcon from '@/components/CloseIcon'
 
 export default function Loadout() {
   const segments = useSelectedLayoutSegments()
@@ -105,7 +106,7 @@ export default function Loadout() {
               )}
             >
               <Link href={`${path}/weapon`}>
-                <span className='md:hidden'>
+                <span className='lg:hidden'>
                   <Image
                     src='/cmd_attack.svg'
                     alt='Weapon'
@@ -114,7 +115,7 @@ export default function Loadout() {
                     className='w-8 h-8'
                   />
                 </span>
-                <span className='hidden md:inline'>Weapon</span>
+                <span className='hidden lg:inline'>Weapon</span>
               </Link>
             </li>
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
@@ -125,7 +126,7 @@ export default function Loadout() {
               )}
             >
               <Link href={`${path}/armor`}>
-                <span className='md:hidden'>
+                <span className='lg:hidden'>
                   <Image
                     src='/cmd_support.svg'
                     alt='Armor'
@@ -134,7 +135,7 @@ export default function Loadout() {
                     className='w-8 h-8'
                   />
                 </span>
-                <span className='hidden md:inline'>Armor</span>
+                <span className='hidden lg:inline'>Armor</span>
               </Link>
             </li>
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
@@ -145,7 +146,7 @@ export default function Loadout() {
               )}
             >
               <Link href={`${path}/accessory`}>
-                <span className='md:hidden'>
+                <span className='lg:hidden'>
                   <Image
                     src='/cmd_special.svg'
                     alt='Accessory'
@@ -154,7 +155,7 @@ export default function Loadout() {
                     className='w-8 h-8'
                   />
                 </span>
-                <span className='hidden md:inline'>Accessory</span>
+                <span className='hidden lg:inline'>Accessory</span>
               </Link>
             </li>
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
@@ -165,7 +166,7 @@ export default function Loadout() {
               )}
             >
               <Link href={`${path}/items`}>
-                <span className='md:hidden'>
+                <span className='lg:hidden'>
                   <Image
                     src='/cmd_item.svg'
                     alt='Item'
@@ -174,7 +175,7 @@ export default function Loadout() {
                     className='w-8 h-8'
                   />
                 </span>
-                <span className='hidden md:inline'>Item</span>
+                <span className='hidden lg:inline'>Item</span>
               </Link>
             </li>
             <li className='mx-1' />
@@ -206,59 +207,34 @@ export default function Loadout() {
           'absolute inset-y-0 right-0',
           'bg-black/80 xl:bg-black/0',
           'w-screen -bottom-14 md:w-auto md:bottom-0',
+          'flex flex-col',
         )}
       >
         <LoadoutItemDetails />
-
-        {/* <div
-          className={classNames(
-            'w-full pointer-events-auto p-5 overflow-y-scroll',
-          )}
-        >
-          <div className='ltr gap-1 grid grid-cols-4'>
-            <button
-              type='button'
-              // onClick={() =>
-              //   router.push(segments.slice(0, level3 ? -2 : -1).join('/'))
-              // }
+        <div className='max-w-sm mx-auto pointer-events-auto w-full p-5 bg-gradient-to-t xl:bg-none from-black via-black/90 to-black/0'>
+          <div className='gap-1 grid grid-cols-4'>
+            <Link
+              href={level2Path}
               className={classNames(
-                // !level2 && 'landscape:hidden portrait:sm:hidden',
                 'w-full col-span-1 flex gap-1 items-center justify-start text-sm tracking-widest uppercase',
               )}
             >
-              
+              <CloseIcon />
               Close
-            </button>
-            <div
-              className={classNames(
-                'flex items-center',
-                // !level2 && 'landscape:col-span-4 portrait:sm:col-span-4',
-                'w-full col-span-3',
-              )}
-            >
-              <div
-                className={classNames(
-                  // level2 && 'hidden',
-                  'h-6 w-6 border border-amber-400/50 rotate-45',
-                )}
-              />
+            </Link>
+            <div className='flex items-center w-full col-span-3 opacity-20 pointer-events-none'>
               <Button
-                // onClick={() =>
-                //   router.push(segments.slice(0, 3).join('/') + '/mission')
-                // }
                 className={classNames(
-                  // mission && 'hidden',
                   'overflow-hidden px-0',
                   'flex-auto transition-all',
                   'flex items-center justify-center gap-1',
                 )}
               >
-                
                 Unequip
               </Button>
             </div>
           </div>
-        </div> */}
+        </div>
       </Transition.Child>
     </Transition>
   )

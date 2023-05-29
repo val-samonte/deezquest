@@ -10,15 +10,20 @@ import { Transition } from '@headlessui/react'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useSelectedLayoutSegments } from 'next/navigation'
 
 const mask =
   'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 97.5%, rgba(0,0,0,0) 100%)'
 
 export default function LoadoutInventory() {
+  const segments = useSelectedLayoutSegments()
   const { level3, weapon, armor, accessory, items } = useAtomValue(
     barracksPathFlagsAtom,
   )
   const skills = useAtomValue(selectedHeroSkillsAtom)
+  const level2Path = `/heroes/${segments[0]}/${segments[1] ?? ''}`
+
   return (
     <>
       <Transition
@@ -35,7 +40,7 @@ export default function LoadoutInventory() {
           maskImage: mask,
         }}
       >
-        <div className='w-60 aspect-[3/4] '>
+        <Link href={`${level2Path}/nothing`}>
           <Panel
             title='Unarmed'
             className={classNames(
@@ -56,7 +61,7 @@ export default function LoadoutInventory() {
               <HeroSkillDisplay skill={skills[SkillTypes.ATTACK]} size='sm' />
             )}
           </Panel>
-        </div>
+        </Link>
       </Transition>
       <Transition
         show={armor}
@@ -72,7 +77,7 @@ export default function LoadoutInventory() {
           maskImage: mask,
         }}
       >
-        <div className='w-60 aspect-[3/4] '>
+        <Link href={`${level2Path}/nothing`}>
           <Panel
             title='No Armor'
             className={classNames(
@@ -93,7 +98,7 @@ export default function LoadoutInventory() {
               <HeroSkillDisplay skill={skills[SkillTypes.SUPPORT]} size='sm' />
             )}
           </Panel>
-        </div>
+        </Link>
       </Transition>
       <Transition
         show={accessory}
@@ -109,7 +114,7 @@ export default function LoadoutInventory() {
           maskImage: mask,
         }}
       >
-        <div className='w-60 aspect-[3/4] '>
+        <Link href={`${level2Path}/nothing`}>
           <Panel
             title='No Accessory'
             className={classNames(
@@ -130,7 +135,7 @@ export default function LoadoutInventory() {
               <HeroSkillDisplay skill={skills[SkillTypes.SPECIAL]} size='sm' />
             )}
           </Panel>
-        </div>
+        </Link>
       </Transition>
       <Transition
         show={items}

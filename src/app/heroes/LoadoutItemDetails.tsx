@@ -17,6 +17,9 @@ const font = IM_Fell_DW_Pica({
   display: 'swap',
 })
 
+const mask =
+  'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 97.5%, rgba(0,0,0,0) 100%)'
+
 export default function LoadoutItemDetails() {
   const { weapon, armor } = useAtomValue(barracksPathFlagsAtom)
   const skills = useAtomValue(selectedHeroSkillsAtom)
@@ -29,8 +32,12 @@ export default function LoadoutItemDetails() {
   return (
     <div
       className={classNames(
-        'pointer-events-auto mx-auto relative w-96 p-5 h-full overflow-y-scroll overflow-x-hidden',
+        'flex-auto pointer-events-auto relative mx-auto w-96 p-5 h-full overflow-y-scroll overflow-x-hidden',
       )}
+      style={{
+        WebkitMaskImage: mask,
+        maskImage: mask,
+      }}
     >
       <div className='w-full aspect-square landscape:hidden landscape:lg:block'>
         <Panel className='bg-amber-400/20 rounded-b-none w-full relative '>
