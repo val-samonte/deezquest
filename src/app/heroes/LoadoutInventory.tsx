@@ -66,7 +66,7 @@ export default function LoadoutInventory() {
         leave='ease-out duration-200 delay-100'
         leaveFrom='opacity-100 translate-y-0'
         leaveTo='opacity-0 translate-y-10'
-        className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5'
+        className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5 overflow-y-auto overflow-x-hidden'
         style={{
           WebkitMaskImage: mask,
           maskImage: mask,
@@ -103,7 +103,7 @@ export default function LoadoutInventory() {
         leave='ease-out duration-200 delay-100'
         leaveFrom='opacity-100 translate-y-0'
         leaveTo='opacity-0 translate-y-10'
-        className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5'
+        className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5 overflow-y-auto overflow-x-hidden'
         style={{
           WebkitMaskImage: mask,
           maskImage: mask,

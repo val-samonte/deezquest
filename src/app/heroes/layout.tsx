@@ -193,7 +193,7 @@ export default function BarracksLayout({
               </div>
               <div
                 className={classNames(
-                  level2 && 'rtl',
+                  level2 && 'md:rtl',
                   'max-w-md mx-auto',
                   'w-full pointer-events-auto p-5 overflow-y-scroll',
                 )}

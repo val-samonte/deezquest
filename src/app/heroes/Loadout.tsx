@@ -9,6 +9,7 @@ import { Fragment, useCallback, useMemo } from 'react'
 import LoadoutItemDetails from './LoadoutItemDetails'
 import LoadoutInventory from './LoadoutInventory'
 import Button from '@/components/Button'
+import Image from 'next/image'
 
 export default function Loadout() {
   const segments = useSelectedLayoutSegments()
@@ -103,7 +104,18 @@ export default function Loadout() {
                 weapon ? 'opacity-100' : 'opacity-20',
               )}
             >
-              <Link href={`${path}/weapon`}>Weapon</Link>
+              <Link href={`${path}/weapon`}>
+                <span className='md:hidden'>
+                  <Image
+                    src='/cmd_attack.svg'
+                    alt='Weapon'
+                    width={121}
+                    height={121}
+                    className='w-8 h-8'
+                  />
+                </span>
+                <span className='hidden md:inline'>Weapon</span>
+              </Link>
             </li>
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
             <li
@@ -112,7 +124,18 @@ export default function Loadout() {
                 armor ? 'opacity-100' : 'opacity-20',
               )}
             >
-              <Link href={`${path}/armor`}>Armor</Link>
+              <Link href={`${path}/armor`}>
+                <span className='md:hidden'>
+                  <Image
+                    src='/cmd_support.svg'
+                    alt='Armor'
+                    width={121}
+                    height={121}
+                    className='w-8 h-8'
+                  />
+                </span>
+                <span className='hidden md:inline'>Armor</span>
+              </Link>
             </li>
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
             <li
@@ -121,7 +144,18 @@ export default function Loadout() {
                 accessory ? 'opacity-100' : 'opacity-20',
               )}
             >
-              <Link href={`${path}/accessory`}>Accessory</Link>
+              <Link href={`${path}/accessory`}>
+                <span className='md:hidden'>
+                  <Image
+                    src='/cmd_special.svg'
+                    alt='Accessory'
+                    width={121}
+                    height={121}
+                    className='w-8 h-8'
+                  />
+                </span>
+                <span className='hidden md:inline'>Accessory</span>
+              </Link>
             </li>
             <li className='h-2 w-2 border mx-3 border-amber-400/50 rotate-45' />
             <li
@@ -130,7 +164,18 @@ export default function Loadout() {
                 items ? 'opacity-100' : 'opacity-20',
               )}
             >
-              <Link href={`${path}/items`}>Items</Link>
+              <Link href={`${path}/items`}>
+                <span className='md:hidden'>
+                  <Image
+                    src='/cmd_item.svg'
+                    alt='Item'
+                    width={121}
+                    height={121}
+                    className='w-8 h-8'
+                  />
+                </span>
+                <span className='hidden md:inline'>Item</span>
+              </Link>
             </li>
             <li className='mx-1' />
             <li className='h-4 w-4 border-t-2 border-r-2 border-amber-400/50 rotate-45' />
@@ -157,7 +202,7 @@ export default function Loadout() {
         leaveTo='opacity-0'
         className={classNames(
           'transition-all duration-500',
-          !level3 ? '-mr-96' : 'mr-0',
+          !level3 ? '-mr-[100vw] md:-mr-96' : 'mr-0',
           'absolute inset-y-0 right-0',
           'bg-black/80 xl:bg-black/0',
           'w-screen -bottom-14 md:w-auto md:bottom-0',
