@@ -122,7 +122,7 @@ export default function BarracksLayout({
         <div className='flex-auto relative'>
           <div
             className={classNames(
-              level2 ? 'opacity-100' : 'opacity-0',
+              level2 ? 'opacity-0 md:opacity-100' : 'opacity-0',
               'pointer-events-none',
               'transition-all duration-300',
               'absolute inset-y-0 w-96 left-0',
@@ -176,16 +176,25 @@ export default function BarracksLayout({
             <div
               className={classNames(
                 'w-screen',
-                'landscape:w-96 portrait:sm:w-96',
+                level2
+                  ? 'landscape:md:w-96 portrait:md:w-96'
+                  : 'landscape:w-96 portrait:sm:w-96',
                 'h-full flex-none flex flex-col',
               )}
             >
-              <div className='flex-auto'>
+              <div
+                className={classNames(
+                  'flex-auto transition-all',
+                  level2 &&
+                    'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto',
+                )}
+              >
                 <HeroPreview className={classNames(level2 && 'rtl')} />
               </div>
               <div
                 className={classNames(
                   level2 && 'rtl',
+                  'max-w-md mx-auto',
                   'w-full pointer-events-auto p-5 overflow-y-scroll',
                 )}
               >

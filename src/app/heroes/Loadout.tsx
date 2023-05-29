@@ -23,7 +23,7 @@ export default function Loadout() {
     <Transition
       show={loadout}
       className={classNames(
-        'absolute inset-0 md:relative',
+        'absolute inset-x-0 top-0 bottom-14 md:bottom-0 md:relative',
         'flex-auto py-5 flex',
       )}
     >
@@ -32,7 +32,7 @@ export default function Loadout() {
           'transition-all duration-500',
           level3 ? 'blur-sm xl:blur-0' : 'blur-0',
           level3 ? 'pr-5 xl:pr-96' : 'pr-5',
-          'flex-auto flex flex-col gap-5 pointer-events-auto',
+          'pl-5 md:pl-0 flex-auto flex flex-col gap-5 pointer-events-auto',
         )}
       >
         <div
@@ -61,7 +61,7 @@ export default function Loadout() {
             leave='ease-out duration-200'
             leaveFrom='opacity-100'
             leaveTo='opacity-0'
-            className={classNames('flex-auto -mx-10 relative')}
+            className={classNames('flex-auto -mx-10 relative overflow-hidden')}
           >
             <LoadoutInventory />
           </Transition.Child>
@@ -90,8 +90,7 @@ export default function Loadout() {
         >
           <ul
             className={classNames(
-              'hidden xl:flex',
-              'items-center justify-center py-2',
+              'flex items-center justify-center py-2',
               'uppercase tracking-widest font-bold',
             )}
           >
@@ -159,8 +158,9 @@ export default function Loadout() {
         className={classNames(
           'transition-all duration-500',
           !level3 ? '-mr-96' : 'mr-0',
-          'absolute inset-y-0 right-0 py-5',
+          'absolute inset-y-0 right-0',
           'bg-black/80 xl:bg-black/0',
+          'w-screen -bottom-14 md:w-auto md:bottom-0',
         )}
       >
         <LoadoutItemDetails />

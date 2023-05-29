@@ -29,11 +29,11 @@ export default function LoadoutItemDetails() {
   return (
     <div
       className={classNames(
-        'relative w-96 px-5 h-full overflow-y-scroll overflow-x-hidden',
+        'pointer-events-auto mx-auto relative w-96 p-5 h-full overflow-y-scroll overflow-x-hidden',
       )}
     >
-      <div className='w-full aspect-square'>
-        <Panel className='bg-amber-400/20 rounded-b-none w-full relative'>
+      <div className='w-full aspect-square landscape:hidden landscape:lg:block'>
+        <Panel className='bg-amber-400/20 rounded-b-none w-full relative '>
           <Image
             fill={true}
             alt='Unarmed'
@@ -43,7 +43,7 @@ export default function LoadoutItemDetails() {
         </Panel>
       </div>
       <div className='ltr sticky -top-5 z-10 w-full'>
-        <h2 className='text-left px-5 py-2 transition-colors bg-black/80 backdrop-grayscale flex items-center justify-between w-full'>
+        <h2 className='text-left px-5 py-2 transition-colors bg-black backdrop-grayscale flex items-center justify-between w-full'>
           <div
             className={classNames(
               'text-2xl overflow-hidden w-48 whitespace-nowrap overflow-ellipsis',

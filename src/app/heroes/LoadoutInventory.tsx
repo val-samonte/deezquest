@@ -29,13 +29,13 @@ export default function LoadoutInventory() {
         leave='ease-out duration-200 delay-100'
         leaveFrom='opacity-100 translate-y-0'
         leaveTo='opacity-0 translate-y-10'
-        className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5'
+        className='absolute inset-0 flex flex-wrap justify-center items-start p-5 gap-3 xl:gap-5 overflow-y-auto overflow-x-hidden'
         style={{
           WebkitMaskImage: mask,
           maskImage: mask,
         }}
       >
-        <div className='w-60 aspect-[3/4] pointer-events-none'>
+        <div className='w-60 aspect-[3/4] '>
           <Panel
             title='Unarmed'
             className={classNames(
@@ -72,7 +72,7 @@ export default function LoadoutInventory() {
           maskImage: mask,
         }}
       >
-        <div className='w-60 aspect-[3/4] pointer-events-none'>
+        <div className='w-60 aspect-[3/4] '>
           <Panel
             title='No Armor'
             className={classNames(
@@ -109,7 +109,7 @@ export default function LoadoutInventory() {
           maskImage: mask,
         }}
       >
-        <div className='w-60 aspect-[3/4] pointer-events-none'>
+        <div className='w-60 aspect-[3/4] '>
           <Panel
             title='No Accessory'
             className={classNames(

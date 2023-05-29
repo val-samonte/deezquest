@@ -47,7 +47,7 @@ export default function HeroPreview({ className }: { className?: string }) {
           maskImage: mask,
         }}
       >
-        <div className='ltr w-full aspect-square'>
+        <div className='ltr w-full aspect-square landscape:hidden landscape:lg:block'>
           <Panel className='bg-amber-400/20 rounded-b-none'>
             {selected.metadata?.image ? (
               <img
@@ -64,7 +64,7 @@ export default function HeroPreview({ className }: { className?: string }) {
         </div>
 
         <div className='ltr sticky -top-5 z-10 w-full'>
-          <h2 className='text-left px-5 py-2 transition-colors bg-black/80 backdrop-grayscale flex items-center justify-between w-full'>
+          <h2 className='text-left px-5 py-2 transition-colors bg-black backdrop-grayscale flex items-center justify-between w-full'>
             <div
               className={classNames(
                 'text-2xl overflow-hidden w-48 whitespace-nowrap overflow-ellipsis',
