@@ -75,11 +75,11 @@ export default function Backgrounds() {
       <Image
         alt='mission'
         fill={true}
-        src={`${process.env.NEXT_PUBLIC_CDN}/bg_map.png`}
+        src={`${process.env.NEXT_PUBLIC_CDN}/bg_mission.png`}
         className={classNames(
           commonClasses,
-          mission ? 'opacity-60' : 'opacity-0',
-          'brightness-50 object-top',
+          mission ? 'opacity-100' : 'opacity-0',
+          'brightness-50',
         )}
       />
       <Image
