@@ -50,6 +50,16 @@ html {
   color: white;
 }
 
+.mission-item .m-shadow {
+  opacity: 0;
+  @apply translate-y-0;
+}
+
+.mission-item:hover .m-shadow {
+  opacity: 0.35;
+  @apply translate-y-5;
+}
+
 .mission-item .actual {
   transition: all 300ms ease-out;
   opacity: 0;
@@ -66,4 +76,5 @@ html {
 
 .mission-item:hover .ribbon {
   opacity: 1;
+  @apply backdrop-blur-sm;
 }

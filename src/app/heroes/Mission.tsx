@@ -85,7 +85,7 @@ export default function Mission() {
         </div>
         <div
           className={classNames(
-            'mission-item cursor-pointer',
+            'mission-item cursor-pointer hover:scale-105 transition-all',
             'flex flex-row-reverse items-center gap-5',
             'relative col-span-3 row-span-2 col-start-4',
           )}
@@ -112,11 +112,16 @@ export default function Mission() {
           <div className='h-full aspect-square relative'>
             <Image
               alt='plains'
+              src={`${process.env.NEXT_PUBLIC_CDN}/iso_plains.png`}
+              fill={true}
+              className='m-shadow object-contain brightness-0 blur-sm transition-all duration-300'
+            />
+            <Image
+              alt='plains'
               src={`${process.env.NEXT_PUBLIC_CDN}/iso_plains_sketch.png`}
               fill={true}
               className='object-contain'
             />
-
             <Image
               alt='plains'
               src={`${process.env.NEXT_PUBLIC_CDN}/iso_plains.png`}
@@ -127,7 +132,7 @@ export default function Mission() {
         </div>
         <div
           className={classNames(
-            'mission-item cursor-pointer',
+            'mission-item cursor-pointer hover:scale-105 transition-all',
             'flex items-center gap-5',
             'relative col-span-3 row-span-2 col-start-4',
           )}
@@ -150,6 +155,12 @@ export default function Mission() {
             </p>
           </div>
           <div className='h-full aspect-square relative'>
+            <Image
+              alt='arena'
+              src={`${process.env.NEXT_PUBLIC_CDN}/iso_arena.png`}
+              fill={true}
+              className='m-shadow object-contain brightness-0 blur-sm transition-all duration-300'
+            />
             <Image
               alt='arena'
               src={`${process.env.NEXT_PUBLIC_CDN}/iso_arena_sketch.png`}
