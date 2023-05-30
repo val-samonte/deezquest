@@ -27,7 +27,7 @@ export default function Mission() {
       )}
     >
       <Transition.Child
-        enter='ease-out duration-300 delay-100'
+        enter='ease-out duration-300'
         enterFrom='opacity-0 translate-y-10'
         enterTo='opacity-100 translate-y-0'
         leave='ease-out duration-200 delay-100'
@@ -53,7 +53,13 @@ export default function Mission() {
           font.className,
         )}
       >
-        <div
+        <Transition.Child
+          enter='ease-out duration-300 delay-100'
+          enterFrom='opacity-0 scale-110'
+          enterTo='opacity-100 scale-100'
+          leave='ease-out duration-200'
+          leaveFrom='opacity-100 scale-100'
+          leaveTo='opacity-0 scale-90'
           className={classNames(
             'flex flex-col items-center justify-center gap-5',
             'relative col-span-3 row-span-4',
@@ -66,14 +72,6 @@ export default function Mission() {
               fill={true}
               className='object-contain'
             />
-            {/* 
-            <Image
-              alt='colosseum'
-              src={`${process.env.NEXT_PUBLIC_CDN}/iso_colosseum.png`}
-              fill={true}
-              className='object-contain'
-            /> 
-            */}
           </div>
           <div className='max-w-sm mx-auto'>
             <h2 className={classNames('text-4xl')}>Ranked Match</h2>
@@ -82,8 +80,14 @@ export default function Mission() {
               win the match (Coming Soon).
             </p>
           </div>
-        </div>
-        <div
+        </Transition.Child>
+        <Transition.Child
+          enter='ease-out duration-300 delay-300'
+          enterFrom='opacity-0 scale-110'
+          enterTo='opacity-100 scale-100'
+          leave='ease-out duration-200'
+          leaveFrom='opacity-100 scale-100'
+          leaveTo='opacity-0 scale-90'
           className={classNames(
             'mission-item cursor-pointer hover:scale-105 transition-all',
             'flex flex-row-reverse items-center gap-5',
@@ -129,8 +133,14 @@ export default function Mission() {
               className='actual object-contain'
             />
           </div>
-        </div>
-        <div
+        </Transition.Child>
+        <Transition.Child
+          enter='ease-out duration-300 delay-500'
+          enterFrom='opacity-0 scale-110'
+          enterTo='opacity-100 scale-100'
+          leave='ease-out duration-200'
+          leaveFrom='opacity-100 scale-100'
+          leaveTo='opacity-0 scale-90'
           className={classNames(
             'mission-item cursor-pointer hover:scale-105 transition-all',
             'flex items-center gap-5',
@@ -174,7 +184,7 @@ export default function Mission() {
               className='actual object-contain'
             />
           </div>
-        </div>
+        </Transition.Child>
       </div>
     </Transition>
   )
