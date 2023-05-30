@@ -270,7 +270,7 @@ export default function BarracksLayout({
                 </div>
               </div>
             </div>
-            <div className='absolute inset-x-0 top-0 bottom-14 md:bottom-0 md:relative w-full h-full'>
+            <div className='absolute inset-x-0 top-0 bottom-14 md:bottom-0 md:relative w-full'>
               <Loadout />
               <Mission />
             </div>
