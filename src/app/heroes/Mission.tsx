@@ -42,12 +42,15 @@ export default function Mission() {
           alt='mission'
           fill={true}
           src={`${process.env.NEXT_PUBLIC_CDN}/bg_map_alpha.png`}
-          className={classNames('object-cover object-top md:object-left-top')}
+          className={classNames(
+            'object-cover object-top landscape:object-center landscape:md:object-left-top portrait:md:object-left-top',
+          )}
         />
       </Transition.Child>
       <div
         className={classNames(
           'w-full h-full py-16 landscape:py-5 landscape:lg:py-16 landscape:xl:py-28',
+          'landscape:gap-x-2',
           'grid grid-cols-12 grid-rows-6',
           'xl:text-xl text-amber-950 leading-4',
           font.className,
@@ -61,9 +64,12 @@ export default function Mission() {
           leaveFrom='opacity-100 scale-100'
           leaveTo='opacity-0 scale-90'
           className={classNames(
-            'relative bg-red-500',
-            'flex flex-col items-center justify-center gap-5',
+            'relative',
+            // 'bg-red-500',
+            'flex items-center justify-center gap-2',
             // phone
+            'portrait:flex-row-reverse',
+            'landscape:flex-col-reverse',
             'row-span-2 row-start-1 landscape:row-span-5 landscape:row-start-2',
             'col-span-10 col-start-2 landscape:col-span-4 landscape:col-start-2',
             // tablet portrait
@@ -75,21 +81,35 @@ export default function Mission() {
             'landscape:lg:col-span-5 landscape:lg:row-span-6 landscape:lg:col-start-2 landscape:lg:row-start-1',
           )}
         >
-          <div className='w-full aspect-[2/1] relative'>
+          <div
+            className={classNames(
+              'mr-auto',
+              // 'relative max-w-sm mx-auto'
+            )}
+          >
+            <h2
+              className={classNames(
+                'text-2xl',
+                // 'text-base sm:text-3xl xl:text-4xl'
+              )}
+            >
+              Ranked Match
+            </h2>
+            <p className={classNames('')}>Fight on-chain & earn DeezCoins.</p>
+          </div>
+          <div
+            className={classNames(
+              'relative',
+              'portrait:h-full portrait:aspect-square portrait:max-w-[50%]',
+              'landscape:w-full landscape:aspect-[2/1]',
+            )}
+          >
             <Image
               alt='colosseum'
               src={`${process.env.NEXT_PUBLIC_CDN}/iso_colosseum_sketch.png`}
               fill={true}
               className='object-contain'
             />
-          </div>
-
-          <div className='max-w-sm mx-auto px-5'>
-            <h2 className={classNames('text-3xl xl:text-4xl')}>Ranked Match</h2>
-            <p className={classNames('text-lg xl:text-xl')}>
-              Challenge other players on-chain and earn DeezCoins whenever you
-              win the match (Coming Soon).
-            </p>
           </div>
         </Transition.Child>
         <Transition.Child
@@ -100,10 +120,13 @@ export default function Mission() {
           leaveFrom='opacity-100 scale-100'
           leaveTo='opacity-0 scale-90'
           className={classNames(
-            'relative bg-blue-500',
+            'relative',
+            // 'bg-blue-500',
             'mission-item cursor-pointer hover:scale-105 transition-all',
-            'flex flex-row-reverse items-center justify-center gap-5',
+            'flex items-center justify-center gap-2',
             // phone
+            'portrait:flex-row-reverse',
+            'landscape:flex-col-reverse',
             'row-span-2 row-start-3 landscape:row-span-5 landscape:row-start-2',
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-6',
             // tablet portrait
@@ -115,7 +138,106 @@ export default function Mission() {
             'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-1',
           )}
         >
-          {/* 
+          <div
+            className={classNames(
+              'mr-auto',
+              // 'relative max-w-sm mx-auto'
+            )}
+          >
+            <h2
+              className={classNames(
+                'text-2xl',
+                // 'text-base sm:text-3xl xl:text-4xl'
+              )}
+            >
+              Practice
+            </h2>
+            <p className={classNames('')}>Play against NPCs.</p>
+          </div>
+
+          <LocationPicture name='plains' />
+        </Transition.Child>
+        <Transition.Child
+          enter='ease-out duration-300 delay-500'
+          enterFrom='opacity-0 scale-110'
+          enterTo='opacity-100 scale-100'
+          leave='ease-out duration-200'
+          leaveFrom='opacity-100 scale-100'
+          leaveTo='opacity-0 scale-90'
+          className={classNames(
+            'relative',
+            // 'bg-green-500',
+            'mission-item cursor-pointer hover:scale-105 transition-all',
+            'flex items-center justify-center gap-2',
+            // phone
+            'portrait:flex-row-reverse',
+            'landscape:flex-col-reverse',
+            'row-span-2 row-start-5 landscape:row-span-5 landscape:row-start-2',
+            'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-9',
+            // tablet portrait
+            'portrait:md:col-span-9 portrait:md:col-start-3',
+            // tablet landscape
+            'landscape:row-span-6 landscape:row-start-1',
+            // desktop
+            'portrait:lg:col-span-5 portrait:lg:row-span-2 portrait:lg:col-start-7 portrait:lg:row-start-3',
+            'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-4',
+          )}
+        >
+          <div
+            className={classNames(
+              'mr-auto',
+              // 'relative max-w-sm mx-auto'
+            )}
+          >
+            <h2
+              className={classNames(
+                'text-2xl',
+                // 'text-base sm:text-3xl xl:text-4xl'
+              )}
+            >
+              Friendly
+            </h2>
+            <p className={classNames('')}>Play against friends.</p>
+          </div>
+
+          <LocationPicture name='arena' />
+        </Transition.Child>
+      </div>
+    </Transition>
+  )
+}
+
+function LocationPicture({ name }: { name: string }) {
+  return (
+    <div
+      className={classNames(
+        'portrait:h-full portrait:max-w-[50%] landscape:w-full aspect-square relative',
+      )}
+    >
+      <Image
+        alt={name}
+        src={`${process.env.NEXT_PUBLIC_CDN}/iso_${name}.png`}
+        fill={true}
+        className='m-shadow object-contain brightness-0 blur-sm transition-all duration-300'
+      />
+      <Image
+        alt={name}
+        src={`${process.env.NEXT_PUBLIC_CDN}/iso_${name}_sketch.png`}
+        fill={true}
+        className='object-contain'
+      />
+      <Image
+        alt={name}
+        src={`${process.env.NEXT_PUBLIC_CDN}/iso_${name}.png`}
+        fill={true}
+        className='location-picture object-contain'
+      />
+    </div>
+  )
+}
+
+{
+  /* 
           <div
             className={classNames(
               'absolute -inset-x-5 w-full py-5 pl-5 pr-[50%] flex justify-end ',
@@ -135,33 +257,11 @@ export default function Mission() {
               </p>
             </div>
           </div> 
-          */}
-          <LocationPicture name='plains' />
-        </Transition.Child>
-        <Transition.Child
-          enter='ease-out duration-300 delay-500'
-          enterFrom='opacity-0 scale-110'
-          enterTo='opacity-100 scale-100'
-          leave='ease-out duration-200'
-          leaveFrom='opacity-100 scale-100'
-          leaveTo='opacity-0 scale-90'
-          className={classNames(
-            'relative bg-green-500',
-            'mission-item cursor-pointer hover:scale-105 transition-all',
-            'flex items-center justify-center gap-5',
-            // phone
-            'row-span-2 row-start-5 landscape:row-span-5 landscape:row-start-2',
-            'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-9',
-            // tablet portrait
-            'portrait:md:col-span-9 portrait:md:col-start-3',
-            // tablet landscape
-            'landscape:row-span-6 landscape:row-start-1',
-            // desktop
-            'portrait:lg:col-span-5 portrait:lg:row-span-2 portrait:lg:col-start-7 portrait:lg:row-start-3',
-            'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-4',
-          )}
-        >
-          {/* 
+          */
+}
+
+{
+  /* 
           <div
             className={classNames(
               'absolute -inset-x-5 w-full py-5 pr-5 pl-[60%]',
@@ -185,35 +285,5 @@ export default function Mission() {
               Play against friends.
             </p>
           </div> 
-          */}
-          <LocationPicture name='arena' />
-        </Transition.Child>
-      </div>
-    </Transition>
-  )
-}
-
-function LocationPicture({ name }: { name: string }) {
-  return (
-    <div className='h-full aspect-square relative'>
-      <Image
-        alt={name}
-        src={`${process.env.NEXT_PUBLIC_CDN}/iso_${name}.png`}
-        fill={true}
-        className='m-shadow object-contain brightness-0 blur-sm transition-all duration-300'
-      />
-      <Image
-        alt={name}
-        src={`${process.env.NEXT_PUBLIC_CDN}/iso_${name}_sketch.png`}
-        fill={true}
-        className='object-contain'
-      />
-      <Image
-        alt={name}
-        src={`${process.env.NEXT_PUBLIC_CDN}/iso_${name}.png`}
-        fill={true}
-        className='location-picture object-contain'
-      />
-    </div>
-  )
+          */
 }
