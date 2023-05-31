@@ -47,9 +47,9 @@ export default function Mission() {
       </Transition.Child>
       <div
         className={classNames(
-          'relative w-[80%] aspect-[1/2] max-h-[80%] xl:aspect-[2/1]',
-          'grid grid-cols-6 grid-rows-4',
-          'text-lg xl:text-xl text-amber-950',
+          'w-full h-full py-16 landscape:py-5',
+          'grid grid-cols-12 grid-rows-6',
+          'xl:text-xl text-amber-950 leading-4',
           font.className,
         )}
       >
@@ -61,9 +61,15 @@ export default function Mission() {
           leaveFrom='opacity-100 scale-100'
           leaveTo='opacity-0 scale-90'
           className={classNames(
+            'relative bg-red-500',
             'flex flex-col items-center justify-center gap-5',
-            'relative xl:col-span-3 xl:row-span-4',
-            'col-span-6 row-span-2',
+            // phone
+            'row-span-2 row-start-1 landscape:row-span-5 landscape:row-start-2',
+            'col-span-10 col-start-2 landscape:col-span-4 landscape:col-start-2',
+            // tablet portrait
+            'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            // desktop
+            'xl:col-span-5 xl:row-span-4 xl:col-start-2 xl:row-start-1',
           )}
         >
           <div className='w-full aspect-[2/1] relative'>
@@ -74,7 +80,7 @@ export default function Mission() {
               className='object-contain'
             />
           </div>
-          {/* 
+
           <div className='max-w-sm mx-auto px-5'>
             <h2 className={classNames('text-3xl xl:text-4xl')}>Ranked Match</h2>
             <p className={classNames('text-lg xl:text-xl')}>
@@ -82,7 +88,6 @@ export default function Mission() {
               win the match (Coming Soon).
             </p>
           </div>
-           */}
         </Transition.Child>
         <Transition.Child
           enter='ease-out duration-300 delay-300'
@@ -92,10 +97,16 @@ export default function Mission() {
           leaveFrom='opacity-100 scale-100'
           leaveTo='opacity-0 scale-90'
           className={classNames(
+            'relative bg-blue-500',
             'mission-item cursor-pointer hover:scale-105 transition-all',
-            'flex flex-row-reverse items-center gap-5',
-            'relative xl:col-span-3 xl:row-span-2 xl:col-start-4',
-            'col-span-6 row-span-1',
+            'flex flex-row-reverse items-center justify-center gap-5',
+            // phone
+            'row-span-2 row-start-3 landscape:row-span-5 landscape:row-start-2',
+            'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-6',
+            // tablet portrait
+            'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            // desktop
+            'xl:col-span-5 xl:row-span-2 xl:col-start-7 xl:row-start-1',
           )}
         >
           {/* 
@@ -129,10 +140,16 @@ export default function Mission() {
           leaveFrom='opacity-100 scale-100'
           leaveTo='opacity-0 scale-90'
           className={classNames(
+            'relative bg-green-500',
             'mission-item cursor-pointer hover:scale-105 transition-all',
-            'flex items-center gap-5',
-            'relative xl:col-span-3 xl:row-span-2 xl:col-start-4',
-            'col-span-6 row-span-1',
+            'flex items-center justify-center gap-5',
+            // phone
+            'row-span-2 row-start-5 landscape:row-span-5 landscape:row-start-2',
+            'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-9',
+            // tablet portrait
+            'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            // desktop
+            'xl:col-span-5 xl:row-span-2 xl:col-start-7 xl:row-start-3',
           )}
         >
           {/* 
