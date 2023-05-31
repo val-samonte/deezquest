@@ -47,7 +47,7 @@ export default function Mission() {
       </Transition.Child>
       <div
         className={classNames(
-          'w-full h-full py-16 landscape:py-5 landscape:lg:py-16',
+          'w-full h-full py-16 landscape:py-5 landscape:lg:py-16 landscape:xl:py-28',
           'grid grid-cols-12 grid-rows-6',
           'xl:text-xl text-amber-950 leading-4',
           font.className,
@@ -67,7 +67,7 @@ export default function Mission() {
             'row-span-2 row-start-1 landscape:row-span-5 landscape:row-start-2',
             'col-span-10 col-start-2 landscape:col-span-4 landscape:col-start-2',
             // tablet portrait
-            'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            'portrait:md:col-span-9 portrait:md:col-start-3',
             // tablet landscape
             'landscape:row-span-6 landscape:row-start-1',
             // desktop
@@ -107,7 +107,7 @@ export default function Mission() {
             'row-span-2 row-start-3 landscape:row-span-5 landscape:row-start-2',
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-6',
             // tablet portrait
-            'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            'portrait:md:col-span-9 portrait:md:col-start-3',
             // tablet landscape
             'landscape:row-span-6 landscape:row-start-1',
             // desktop
@@ -153,7 +153,7 @@ export default function Mission() {
             'row-span-2 row-start-5 landscape:row-span-5 landscape:row-start-2',
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-9',
             // tablet portrait
-            'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            'portrait:md:col-span-9 portrait:md:col-start-3',
             // tablet landscape
             'landscape:row-span-6 landscape:row-start-1',
             // desktop
