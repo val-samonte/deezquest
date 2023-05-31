@@ -47,7 +47,7 @@ export default function Mission() {
       </Transition.Child>
       <div
         className={classNames(
-          'w-full h-full py-16 landscape:py-5',
+          'w-full h-full py-16 landscape:py-5 landscape:lg:py-16',
           'grid grid-cols-12 grid-rows-6',
           'xl:text-xl text-amber-950 leading-4',
           font.className,
@@ -68,8 +68,11 @@ export default function Mission() {
             'col-span-10 col-start-2 landscape:col-span-4 landscape:col-start-2',
             // tablet portrait
             'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            // tablet landscape
+            'landscape:row-span-6 landscape:row-start-1',
             // desktop
-            'xl:col-span-5 xl:row-span-4 xl:col-start-2 xl:row-start-1',
+            'portrait:lg:col-span-5 portrait:lg:row-span-6 portrait:lg:col-start-2 portrait:lg:row-start-1',
+            'landscape:lg:col-span-5 landscape:lg:row-span-6 landscape:lg:col-start-2 landscape:lg:row-start-1',
           )}
         >
           <div className='w-full aspect-[2/1] relative'>
@@ -105,8 +108,11 @@ export default function Mission() {
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-6',
             // tablet portrait
             'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            // tablet landscape
+            'landscape:row-span-6 landscape:row-start-1',
             // desktop
-            'xl:col-span-5 xl:row-span-2 xl:col-start-7 xl:row-start-1',
+            'portrait:lg:col-span-5 portrait:lg:row-span-2 portrait:lg:col-start-7 portrait:lg:row-start-1',
+            'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-1',
           )}
         >
           {/* 
@@ -148,8 +154,11 @@ export default function Mission() {
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-9',
             // tablet portrait
             'portrait:sm:col-span-9 portrait:sm:col-start-3',
+            // tablet landscape
+            'landscape:row-span-6 landscape:row-start-1',
             // desktop
-            'xl:col-span-5 xl:row-span-2 xl:col-start-7 xl:row-start-3',
+            'portrait:lg:col-span-5 portrait:lg:row-span-2 portrait:lg:col-start-7 portrait:lg:row-start-3',
+            'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-4',
           )}
         >
           {/* 
