@@ -60,12 +60,12 @@ html {
   @apply translate-y-5;
 }
 
-.mission-item .actual {
+.mission-item .location-picture {
   transition: all 300ms ease-out;
   opacity: 0;
 }
 
-.mission-item:hover .actual {
+.mission-item:hover .location-picture {
   opacity: 1;
 }
 
