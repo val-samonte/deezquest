@@ -51,6 +51,7 @@ export default function Mission() {
         className={classNames(
           'w-full h-full py-16 landscape:py-5 landscape:lg:py-16 landscape:xl:py-28',
           'landscape:gap-x-2',
+          'portrait:md:gap-y-5 portrait:md:py-28',
           'grid grid-cols-12 grid-rows-6',
           'xl:text-xl text-amber-950 leading-4',
           font.className,
@@ -73,6 +74,7 @@ export default function Mission() {
             'row-span-2 row-start-1 landscape:row-span-5 landscape:row-start-2',
             'col-span-10 col-start-2 landscape:col-span-4 landscape:col-start-2',
             // tablet portrait
+            'portrait:md:flex-col-reverse',
             'portrait:md:col-span-9 portrait:md:col-start-3',
             // tablet landscape
             'landscape:row-span-6 landscape:row-start-1',
@@ -83,25 +85,29 @@ export default function Mission() {
         >
           <div
             className={classNames(
-              'mr-auto',
+              // 'mr-auto',
+              'md:mr-0',
               // 'relative max-w-sm mx-auto'
             )}
           >
             <h2
               className={classNames(
-                'text-2xl',
+                'text-2xl lg:text-4xl',
                 // 'text-base sm:text-3xl xl:text-4xl'
               )}
             >
               Ranked Match
             </h2>
-            <p className={classNames('')}>Fight on-chain & earn DeezCoins.</p>
+            <p className={classNames('whitespace-nowrap')}>
+              Battle on-chain & earn DeezCoins.
+            </p>
           </div>
           <div
             className={classNames(
               'relative',
               'portrait:h-full portrait:aspect-square portrait:max-w-[50%]',
               'landscape:w-full landscape:aspect-[2/1]',
+              'portrait:md:w-full portrait:md:aspect-[2/1] portrait:md:max-w-none',
             )}
           >
             <Image
@@ -130,29 +136,42 @@ export default function Mission() {
             'row-span-2 row-start-3 landscape:row-span-5 landscape:row-start-2',
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-6',
             // tablet portrait
+            'portrait:md:flex-col-reverse',
             'portrait:md:col-span-9 portrait:md:col-start-3',
             // tablet landscape
             'landscape:row-span-6 landscape:row-start-1',
             // desktop
+            'portrait:xl:flex-row landscape:xl:flex-row',
             'portrait:lg:col-span-5 portrait:lg:row-span-2 portrait:lg:col-start-7 portrait:lg:row-start-1',
             'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-1',
           )}
         >
           <div
             className={classNames(
-              'mr-auto',
+              'ribbon absolute inset-x-0 inset-y-[30%]',
+              'bg-gradient-to-br from-black/0 via-black to-black/0 w-full',
+              'border-y-2 border-amber-400/50 shadow-lg',
+            )}
+          />
+          <div
+            className={classNames(
+              // 'mr-auto',
+              'relative',
+              'md:mr-0',
               // 'relative max-w-sm mx-auto'
             )}
           >
             <h2
               className={classNames(
-                'text-2xl',
+                'text-2xl lg:text-4xl',
                 // 'text-base sm:text-3xl xl:text-4xl'
               )}
             >
               Practice
             </h2>
-            <p className={classNames('')}>Play against NPCs.</p>
+            <p className={classNames('whitespace-nowrap')}>
+              Play against NPCs.
+            </p>
           </div>
 
           <LocationPicture name='plains' />
@@ -175,31 +194,43 @@ export default function Mission() {
             'row-span-2 row-start-5 landscape:row-span-5 landscape:row-start-2',
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-9',
             // tablet portrait
+            'portrait:md:flex-col-reverse',
             'portrait:md:col-span-9 portrait:md:col-start-3',
             // tablet landscape
             'landscape:row-span-6 landscape:row-start-1',
             // desktop
+            'portrait:xl:flex-row-reverse landscape:xl:flex-row-reverse',
             'portrait:lg:col-span-5 portrait:lg:row-span-2 portrait:lg:col-start-7 portrait:lg:row-start-3',
             'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-4',
           )}
         >
           <div
             className={classNames(
-              'mr-auto',
+              'ribbon absolute inset-x-0 inset-y-[30%]',
+              'bg-gradient-to-br from-black/0 via-black to-black/0 w-full',
+              'border-y-2 border-amber-400/50 shadow-lg',
+            )}
+          />
+          <div
+            className={classNames(
+              // 'mr-auto',
+              'relative',
+              'md:mr-0',
               // 'relative max-w-sm mx-auto'
             )}
           >
             <h2
               className={classNames(
-                'text-2xl',
+                'text-2xl lg:text-4xl',
                 // 'text-base sm:text-3xl xl:text-4xl'
               )}
             >
               Friendly
             </h2>
-            <p className={classNames('')}>Play against friends.</p>
+            <p className={classNames('whitespace-nowrap')}>
+              Play against friends.
+            </p>
           </div>
-
           <LocationPicture name='arena' />
         </Transition.Child>
       </div>
@@ -211,7 +242,10 @@ function LocationPicture({ name }: { name: string }) {
   return (
     <div
       className={classNames(
-        'portrait:h-full portrait:max-w-[50%] landscape:w-full aspect-square relative',
+        'aspect-square relative md:p-10',
+        'portrait:h-full portrait:max-w-[50%] landscape:w-full',
+        'portrait:md:w-full portrait:md:max-w-none',
+        'portrait:xl:h-full landscape:xl:h-full landscape:xl:w-auto',
       )}
     >
       <Image

@@ -76,5 +76,4 @@ html {
 
 .mission-item:hover .ribbon {
   opacity: 1;
-  @apply backdrop-blur-sm;
 }
