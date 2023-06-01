@@ -1,4 +1,5 @@
 import { barracksPathFlagsAtom } from '@/atoms/barracksAtoms'
+import Panel from '@/components/Panel'
 import { Transition } from '@headlessui/react'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
@@ -49,7 +50,7 @@ export default function Mission() {
       </Transition.Child>
       <div
         className={classNames(
-          'w-full h-full py-16 landscape:py-5 landscape:lg:py-16 landscape:xl:py-28',
+          'w-full h-full py-16 landscape:py-5 landscape:lg:py-28',
           'landscape:gap-x-2',
           'portrait:md:gap-y-5 portrait:md:py-28',
           'grid grid-cols-12 grid-rows-6',
@@ -71,7 +72,7 @@ export default function Mission() {
             // phone
             'portrait:flex-row-reverse',
             'landscape:flex-col-reverse',
-            'row-span-2 row-start-1 landscape:row-span-5 landscape:row-start-2',
+            'row-span-2 row-start-1 landscape:row-span-6 landscape:row-start-1',
             'col-span-10 col-start-2 landscape:col-span-4 landscape:col-start-2',
             // tablet portrait
             'portrait:md:flex-col-reverse',
@@ -85,22 +86,11 @@ export default function Mission() {
         >
           <div
             className={classNames(
-              // 'mr-auto',
-              'md:mr-0',
-              // 'relative max-w-sm mx-auto'
+              'landscape:text-center landscape:md:text-left',
             )}
           >
-            <h2
-              className={classNames(
-                'text-2xl lg:text-4xl',
-                // 'text-base sm:text-3xl xl:text-4xl'
-              )}
-            >
-              Ranked Match
-            </h2>
-            <p className={classNames('whitespace-nowrap')}>
-              Battle on-chain & earn DeezCoins.
-            </p>
+            <h2 className={classNames('text-2xl xl:text-4xl')}>Ranked Match</h2>
+            <p className={classNames('')}>Battle on-chain & earn DeezCoins.</p>
           </div>
           <div
             className={classNames(
@@ -129,11 +119,11 @@ export default function Mission() {
             'relative',
             // 'bg-blue-500',
             'mission-item cursor-pointer hover:scale-105 transition-all',
-            'flex items-center justify-center gap-2',
+            'flex items-center justify-center gap-2 py-5',
             // phone
             'portrait:flex-row-reverse',
             'landscape:flex-col-reverse',
-            'row-span-2 row-start-3 landscape:row-span-5 landscape:row-start-2',
+            'row-span-2 row-start-3 landscape:row-span-6 landscape:row-start-1',
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-6',
             // tablet portrait
             'portrait:md:flex-col-reverse',
@@ -146,32 +136,20 @@ export default function Mission() {
             'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-1',
           )}
         >
-          <div
+          <Panel
             className={classNames(
-              'ribbon absolute inset-x-0 inset-y-[30%]',
-              'bg-gradient-to-br from-black/0 via-black to-black/0 w-full',
-              'border-y-2 border-amber-400/50 shadow-lg',
+              'ribbon absolute inset-0 bg-black/80',
+              'xl:inset-y-[30%] xl:h-[40%]',
             )}
           />
           <div
             className={classNames(
-              // 'mr-auto',
-              'relative',
-              'md:mr-0',
-              // 'relative max-w-sm mx-auto'
+              'relative px-5',
+              'landscape:text-center landscape:md:text-left',
             )}
           >
-            <h2
-              className={classNames(
-                'text-2xl lg:text-4xl',
-                // 'text-base sm:text-3xl xl:text-4xl'
-              )}
-            >
-              Practice
-            </h2>
-            <p className={classNames('whitespace-nowrap')}>
-              Play against NPCs.
-            </p>
+            <h2 className={classNames('text-2xl xl:text-4xl')}>Practice</h2>
+            <p className={classNames('')}>Play against NPCs.</p>
           </div>
 
           <LocationPicture name='plains' />
@@ -187,11 +165,11 @@ export default function Mission() {
             'relative',
             // 'bg-green-500',
             'mission-item cursor-pointer hover:scale-105 transition-all',
-            'flex items-center justify-center gap-2',
+            'flex items-center justify-center gap-2 py-5',
             // phone
             'portrait:flex-row-reverse',
             'landscape:flex-col-reverse',
-            'row-span-2 row-start-5 landscape:row-span-5 landscape:row-start-2',
+            'row-span-2 row-start-5 landscape:row-span-6 landscape:row-start-1',
             'col-span-10 col-start-2 landscape:col-span-3 landscape:col-start-9',
             // tablet portrait
             'portrait:md:flex-col-reverse',
@@ -204,32 +182,20 @@ export default function Mission() {
             'landscape:lg:col-span-5 landscape:lg:row-span-3 landscape:lg:col-start-7 landscape:lg:row-start-4',
           )}
         >
-          <div
+          <Panel
             className={classNames(
-              'ribbon absolute inset-x-0 inset-y-[30%]',
-              'bg-gradient-to-br from-black/0 via-black to-black/0 w-full',
-              'border-y-2 border-amber-400/50 shadow-lg',
+              'ribbon absolute inset-0 bg-black/80',
+              'xl:inset-y-[30%] xl:h-[40%]',
             )}
           />
           <div
             className={classNames(
-              // 'mr-auto',
-              'relative',
-              'md:mr-0',
-              // 'relative max-w-sm mx-auto'
+              'relative px-5',
+              'landscape:text-center landscape:md:text-left',
             )}
           >
-            <h2
-              className={classNames(
-                'text-2xl lg:text-4xl',
-                // 'text-base sm:text-3xl xl:text-4xl'
-              )}
-            >
-              Friendly
-            </h2>
-            <p className={classNames('whitespace-nowrap')}>
-              Play against friends.
-            </p>
+            <h2 className={classNames('text-2xl xl:text-4xl')}>Friendly</h2>
+            <p className={classNames('')}>Play against friends.</p>
           </div>
           <LocationPicture name='arena' />
         </Transition.Child>
@@ -268,56 +234,4 @@ function LocationPicture({ name }: { name: string }) {
       />
     </div>
   )
-}
-
-{
-  /* 
-          <div
-            className={classNames(
-              'absolute -inset-x-5 w-full py-5 pl-5 pr-[50%] flex justify-end ',
-            )}
-          >
-            <div
-              className={classNames(
-                'ribbon absolute inset-0',
-                'bg-gradient-to-r from-black/0 via-black to-black/0 w-full',
-                'border-y-2 border-amber-400/50 shadow-lg',
-              )}
-            />
-            <div className='relative'>
-              <h2 className={classNames('text-3xl xl:text-4xl')}>Practice</h2>
-              <p className={classNames('text-lg xl:text-xl whitespace-nowrap')}>
-                Play against NPCs.
-              </p>
-            </div>
-          </div> 
-          */
-}
-
-{
-  /* 
-          <div
-            className={classNames(
-              'absolute -inset-x-5 w-full py-5 pr-5 pl-[60%]',
-            )}
-          >
-            <div
-              className={classNames(
-                'ribbon absolute inset-0',
-                'bg-gradient-to-r from-black/0 via-black to-black/0 w-full',
-                'border-y-2 border-amber-400/50 shadow-lg',
-              )}
-            />
-            <h2 className={classNames('relative text-3xl xl:text-4xl')}>
-              Friendly
-            </h2>
-            <p
-              className={classNames(
-                'relative text-lg xl:text-xl whitespace-nowrap',
-              )}
-            >
-              Play against friends.
-            </p>
-          </div> 
-          */
 }

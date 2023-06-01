@@ -10,7 +10,7 @@ export interface PanelProps {
   className?: string
   subtitle?: string
   asDialog?: boolean
-  children: ReactNode
+  children?: ReactNode
 }
 
 export default function Panel({
