@@ -4,6 +4,7 @@ import { Dialog } from '@headlessui/react'
 import classNames from 'classnames'
 import { ReactNode, useMemo } from 'react'
 import CornerDecors from './CornerDecors'
+import CloseIcon from './CloseIcon'
 
 export interface PanelProps {
   title?: string
@@ -11,6 +12,7 @@ export interface PanelProps {
   subtitle?: string
   asDialog?: boolean
   children?: ReactNode
+  onClose?: () => unknown
 }
 
 export default function Panel({
@@ -19,6 +21,7 @@ export default function Panel({
   title,
   subtitle,
   asDialog,
+  onClose,
 }: PanelProps) {
   const [PanelComponent, PanelTitleComponent] = useMemo(() => {
     return asDialog ? [Dialog.Panel, Dialog.Title] : ['div', 'h3']
@@ -35,7 +38,7 @@ export default function Panel({
       {title && (
         <PanelTitleComponent
           className={classNames(
-            'flex-none',
+            'flex-none relative',
             'uppercase text-sm text-neutral-200 mb-1 font-bold',
             'tracking-widest',
           )}
@@ -43,6 +46,15 @@ export default function Panel({
           <Decor>
             <div className='pointer-events-none flex-none mx-2'>{title}</div>
           </Decor>
+          {onClose && (
+            <button
+              type='button'
+              onClick={onClose}
+              className='absolute right-0 top-0 h-full aspect-square flex items-center justify-center'
+            >
+              <CloseIcon className='h-4 w-4' />
+            </button>
+          )}
         </PanelTitleComponent>
       )}
       <div

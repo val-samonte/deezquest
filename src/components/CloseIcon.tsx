@@ -8,7 +8,7 @@ export default function CloseIcon({ className }: { className?: string }) {
       viewBox='0 0 24 24'
       strokeWidth={1.5}
       stroke='currentColor'
-      className={classNames('w-6 h-6', className)}
+      className={classNames(className ?? 'w-6 h-6')}
     >
       <path
         strokeLinecap='round'

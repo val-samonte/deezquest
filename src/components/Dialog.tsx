@@ -39,7 +39,7 @@ export default function Dialog({ show, onClose, ...props }: DialogProps) {
         >
           <div className='fixed inset-0'>
             <Center>
-              <Panel {...props} asDialog />
+              <Panel {...props} asDialog onClose={onClose} />
             </Center>
           </div>
         </Transition.Child>
