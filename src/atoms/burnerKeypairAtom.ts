@@ -27,3 +27,22 @@ export const burnerNonceAtom = atomWithStorage<string | null>(
   createJSONStorage<string | null>(() => window.localStorage),
 )
 export const burnerKeypairAtom = atom<Keypair | null>(null)
+
+// const totalRequiredSigs = useRef(0)
+// const requiredSignatures = useMemo(() => {
+//   if (!publicKey) {
+//     totalRequiredSigs.current = 0
+//     return 0
+//   }
+//   let ctr = 0
+
+//   if (!dappSeed) ctr++
+
+//   if (!burner) ctr++
+
+//   if (totalRequiredSigs.current === 0 && ctr > 0) {
+//     totalRequiredSigs.current = ctr
+//   }
+
+//   return ctr
+// }, [publicKey, burner, dappSeed])

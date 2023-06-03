@@ -1,7 +1,15 @@
 import { Transition } from '@headlessui/react'
+import { ReactNode } from 'react'
 import Image from 'next/image'
+import classNames from 'classnames'
 
-export default function PreloaderAnimation() {
+export default function PreloaderAnimation({
+  children,
+  className,
+}: {
+  children?: ReactNode
+  className?: string
+}) {
   return (
     <Transition
       appear={true}
@@ -9,7 +17,10 @@ export default function PreloaderAnimation() {
       enter='transition-opacity duration-500'
       enterFrom='opacity-0'
       enterTo='opacity-100'
-      className='absolute inset-0 flex flex-col items-center justify-center backdrop-grayscale'
+      className={classNames(
+        'absolute inset-0 flex flex-col items-center justify-center backdrop-grayscale',
+        className,
+      )}
     >
       <div className='absolute inset-0 flex items-center justify-center animate-pulse'>
         <div className='landscape:max-h-sm portrait:max-w-sm landscape:h-[60vh] portrait:w-[60vw] aspect-square opacity-5 animate-spin-slow relative'>
@@ -57,8 +68,8 @@ export default function PreloaderAnimation() {
           />
         </div>
       </div>
-      <p className='text-center sm:text-lg xl:text-xl absolute inset-0 flex items-center justify-center'>
-        Loading
+      <p className='text-center sm:text-lg xl:text-xl absolute inset-0 flex flex-col items-center justify-center'>
+        {children ?? 'Loading'}
       </p>
     </Transition>
   )

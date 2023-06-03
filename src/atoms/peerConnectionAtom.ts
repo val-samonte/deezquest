@@ -5,6 +5,18 @@ import bs58 from 'bs58'
 import { PeerInstance } from './peerAtom'
 import Peer, { DataConnection } from 'peerjs'
 import { burnerKeypairAtom } from './burnerKeypairAtom'
+import { Keypair } from '@solana/web3.js'
+
+// Dummy Keypair:
+// Used for off-chain matches so that players will not be required
+// to do the annoying required signature popups
+
+export const dummyKeypairAtom = atom<Keypair>(Keypair.generate())
+export const peerKeypairAtom = atom((get) => {
+  const burner = get(burnerKeypairAtom)
+  const dummy = get(dummyKeypairAtom)
+  return burner || dummy
+})
 
 export const peerNonceAtom = atomWithStorage<string | null>(
   'peer_nonce',
@@ -13,7 +25,7 @@ export const peerNonceAtom = atomWithStorage<string | null>(
 )
 
 export const peerIdAtom = atom((get) => {
-  const kp = get(burnerKeypairAtom)
+  const kp = get(peerKeypairAtom)
   const nonce = get(peerNonceAtom)
   return kp && nonce
     ? bs58.encode(hashv([kp.publicKey.toBytes(), bs58.decode(nonce)]))

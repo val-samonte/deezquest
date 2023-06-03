@@ -6,6 +6,7 @@ import Backgrounds from './Backgrounds'
 import BgmManager from './BgmManager'
 import DependenciesContainer from './DependenciesContainer'
 import MainMenu from './MainMenu'
+import PeerConnectionManager from './PeerConnectionManager'
 
 export const metadata: Metadata = {
   title: 'DeezQuest',
@@ -36,6 +37,7 @@ export default function RootLayout({
           </div>
           <MainMenu />
         </DependenciesContainer>
+        <PeerConnectionManager />
       </body>
     </html>
   )

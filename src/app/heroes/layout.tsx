@@ -277,6 +277,21 @@ export default function BarracksLayout({
             {/* {children} */}
           </div>
         </div>
+        {/* 
+        <PreloaderAnimation className='bg-black/80 flex-col'>
+          <div className='landscape:max-h-sm portrait:max-w-sm landscape:h-[30vh] portrait:w-[30vw] aspect-square relative'>
+            <Image
+              alt={'plains'}
+              src={`${process.env.NEXT_PUBLIC_CDN}/iso_plains.png`}
+              fill={true}
+              className='object-contain'
+            />
+          </div>
+          <p className={classNames('text-2xl md:text-4xl', font.className)}>
+            Practice Match
+          </p>
+        </PreloaderAnimation> 
+        */}
       </PageContainer>
     )
   }

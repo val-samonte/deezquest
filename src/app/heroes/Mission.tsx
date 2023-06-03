@@ -148,11 +148,10 @@ export default function Mission() {
               'landscape:text-center landscape:md:text-left',
             )}
           >
-            <h2 className={classNames('text-2xl xl:text-4xl')}>Practice</h2>
-            <p className={classNames('')}>Play against NPCs.</p>
+            <h2 className={classNames('text-2xl xl:text-4xl')}>Friendly</h2>
+            <p className={classNames('')}>Play against friends.</p>
           </div>
-
-          <LocationPicture name='plains' />
+          <LocationPicture name='arena' />
         </Transition.Child>
         <Transition.Child
           enter='ease-out duration-300 delay-500'
@@ -194,10 +193,10 @@ export default function Mission() {
               'landscape:text-center landscape:md:text-left',
             )}
           >
-            <h2 className={classNames('text-2xl xl:text-4xl')}>Friendly</h2>
-            <p className={classNames('')}>Play against friends.</p>
+            <h2 className={classNames('text-2xl xl:text-4xl')}>Practice</h2>
+            <p className={classNames('')}>Play against NPCs.</p>
           </div>
-          <LocationPicture name='arena' />
+          <LocationPicture name='plains' />
         </Transition.Child>
       </div>
     </Transition>

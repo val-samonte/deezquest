@@ -74,7 +74,8 @@ export default function HeroPreview({ className }: { className?: string }) {
               {selected.metadata.name}
             </div>
             <div className='text-sm tracking-widest flex items-center justify-center whitespace-nowrap'>
-              Lv&nbsp;<span className='font-bold'>32</span>
+              <span className='uppercase'>Unregistered</span>
+              {/* Lv&nbsp;<span className='font-bold'>32</span> */}
             </div>
           </h2>
           <div className='h-1 w-full mb-2 bg-gradient-to-r from-amber-400/50 to-amber-400/0' />
