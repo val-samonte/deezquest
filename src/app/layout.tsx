@@ -6,7 +6,11 @@ import Backgrounds from './Backgrounds'
 import BgmManager from './BgmManager'
 import DependenciesContainer from './DependenciesContainer'
 import MainMenu from './MainMenu'
-import PeerConnectionManager from './PeerConnectionManager'
+import dynamic from 'next/dynamic'
+
+const PeerConnectionManager = dynamic(() => import('./PeerConnectionManager'), {
+  ssr: false,
+})
 
 export const metadata: Metadata = {
   title: 'DeezQuest',

@@ -128,10 +128,10 @@ export default function BurnerAccountManager() {
 
     setBusy(false)
   }, [
-    isXNft,
+    // isXNft,
     publicKey,
     burnerNonce,
-    burner,
+    // burner,
     dappSeed,
     signMessage,
     setBurner,

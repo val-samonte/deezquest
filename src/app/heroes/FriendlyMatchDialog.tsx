@@ -20,7 +20,7 @@ import {
   PeerMessage,
   peerNonceAtom,
 } from '@/atoms/peerConnectionAtom'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Keypair, PublicKey } from '@solana/web3.js'
 import bs58 from 'bs58'
 import { hashv } from '@/utils/hashv'
@@ -128,7 +128,7 @@ export default function FriendlyMatchDialog({
         }
       }
     }
-  }, [router, messages, peerInstance, keypair, peerNonce, nftAddress])
+  }, [router, messages, peerInstance, keypair, peerNonce, nftAddress, setMatch])
 
   return (
     <Dialog
@@ -331,7 +331,7 @@ function AsJoiner(props: Parts) {
         setBusy(false)
       }
     },
-    [code, peerInstance, props, setBusy, setErrorMsg],
+    [code, peerInstance, props, setBusy, setErrorMsg, setMatch],
   )
 
   return (

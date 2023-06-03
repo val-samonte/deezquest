@@ -89,7 +89,7 @@ export function AtomsInitializer() {
   const setPathname = useSetAtom(pathnameAtom)
   useEffect(() => {
     setPathname(pathname)
-  }, [pathname])
+  }, [pathname, setPathname])
 
   return null
 }
