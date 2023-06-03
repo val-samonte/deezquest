@@ -16,6 +16,7 @@ import {
   renewEnabledAtom,
 } from '@/atoms/peerConnectionAtom'
 import Dialog from '@/components/Dialog'
+import Button from '@/components/Button'
 
 // Peer Connection:
 // for p2p, we need another nonce as well, which is colocated in the same PDA with
@@ -75,7 +76,7 @@ export default function PeerConnectionManager() {
 
   return (
     <Dialog show={showReloadModal && !!keypair} className='max-w-sm'>
-      <p className='text-center px-5 mb-5'>
+      <p className='text-center p-5'>
         There is an issue with your peer connection. If you are playing from
         another device, please close the game from that device first then press{' '}
         <span className='font-bold'>Reload</span>.{' '}
@@ -87,30 +88,24 @@ export default function PeerConnectionManager() {
         )}
       </p>
       <div className='flex-auto' />
-      <div className='flex gap-3 justify-center pt-5 border-t border-t-white/5 px-5'>
-        <button
-          type='button'
-          className={classNames(
-            'px-3 py-2 bg-neutral-700 hover:bg-neutral-600 rounded flex items-center',
-          )}
+      <div className='flex gap-3 justify-center p-5'>
+        {renewEnabled && (
+          <Button
+            onClick={() => {
+              // TODO: renew
+            }}
+          >
+            Renew
+          </Button>
+        )}
+        <Button
+          className='flex-auto'
           onClick={() => {
-            // TODO: renew
-          }}
-        >
-          Renew
-        </button>
-        <button
-          type='button'
-          className={classNames(
-            'flex items-center justify-center',
-            'flex-auto px-3 py-2 bg-purple-700 hover:bg-purple-600 rounded',
-          )}
-          onClick={() => {
-            // window.location.reload()
+            window.location.reload()
           }}
         >
           Reload
-        </button>
+        </Button>
       </div>
     </Dialog>
   )
