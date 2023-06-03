@@ -41,6 +41,7 @@ export default function Mission() {
           )}
         >
           <Image
+            priority
             alt='mission'
             fill={true}
             src={`${process.env.NEXT_PUBLIC_CDN}/bg_map_alpha.png`}
@@ -114,6 +115,7 @@ export default function Mission() {
             </div>
           </Transition.Child>
           <Transition.Child
+            as={'button'}
             onClick={() => setShowFriendlyDialog(true)}
             enter='ease-out duration-300 delay-300'
             enterFrom='opacity-0 scale-110'
