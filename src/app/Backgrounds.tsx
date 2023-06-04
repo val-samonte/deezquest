@@ -18,6 +18,8 @@ export default function Backgrounds() {
     mission,
   } = useAtomValue(barracksPathFlagsAtom)
 
+  return null
+
   return (
     <div className='fixed inset-0'>
       <Image

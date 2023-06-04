@@ -11,7 +11,7 @@ import Panel from '@/components/Panel'
 import PreloaderAnimation from '@/components/PreloaderAnimation'
 import WalletGuard from '@/components/WalletGuard'
 import { useAtom, useAtomValue } from 'jotai'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import {
   barracksPathFlagsAtom,
