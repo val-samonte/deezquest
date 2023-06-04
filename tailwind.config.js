@@ -31,6 +31,7 @@ module.exports = {
       },
     },
     screens: {
+      xxs: '375px',
       xs: '390px',
       xm: '512px', // galaxy fold
       sm: '640px',

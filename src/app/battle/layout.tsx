@@ -90,6 +90,8 @@ export default function BattleLayout() {
 }
 
 // Note: portrait:xm is landscape
+const mask =
+  'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%)'
 
 function HeroCard({ className, flip }: { className?: string; flip?: boolean }) {
   return (
@@ -100,24 +102,29 @@ function HeroCard({ className, flip }: { className?: string; flip?: boolean }) {
         className,
       )}
     >
-      <div className='flex-auto overflow-hidden flex items-center justify-center relative'>
+      <div
+        className='flex-auto -mb-5 portrait:xm:-mb-32 overflow-hidden flex items-center justify-center relative'
+        style={{
+          WebkitMaskImage: mask,
+          maskImage: mask,
+        }}
+      >
         <Image
           src={`${process.env.NEXT_PUBLIC_CDN}/enemy_goblin.png`}
           alt='Hero'
           fill={true}
-          className='object-cover object-center'
+          className={classNames(
+            flip && '-scale-x-[100%]',
+            'object-cover object-center',
+          )}
         />
       </div>
-      <div className='flex-none w-full'>
+      <div className='flex-none w-full relative flex flex-col gap-2 pb-2 px-2'>
         <HeroLifebar flip={flip} />
-        <div className='flex-none grid grid-cols-12'>
-          <div className='col-span-3 portrait:xm:col-span-2 aspect-square bg-purple-500 p-2'></div>
-        </div>
-        <div className='flex-none grid grid-cols-12 bg-slate-900'>
-          <div className='col-span-3 portrait:xm:col-span-2 aspect-square bg-purple-500 p-2'></div>
-        </div>
-        <div className='flex-none grid grid-cols-12'>
-          <div className='col-span-3 portrait:xm:col-span-2 aspect-square bg-purple-500 p-2'></div>
+        <div className='grid grid-cols-12 gap-2'>
+          <HeroSkill flip={flip} />
+          <HeroSkill flip={flip} />
+          <HeroSkill flip={flip} />
         </div>
       </div>
     </div>
@@ -130,6 +137,9 @@ function HeroLifebar({ flip }: { flip?: boolean }) {
       <div
         className={classNames(
           'col-span-4 portrait:xm:col-span-3 aspect-square p-2',
+          flip
+            ? 'col-start-9 portrait:xm:col-start-10 row-start-1'
+            : 'col-start-1 portrait:xm:col-start-1 row-start-1',
           // 'bg-purple-500',
         )}
       >
@@ -173,20 +183,71 @@ function HeroLifebar({ flip }: { flip?: boolean }) {
           </div>
         </div>
       </div>
-      <div className='col-span-8 grid grid-rows-6 w-full h-full pr-2 overflow-visible'>
-        <div className='row-span-2'>
+      <div
+        className={classNames(
+          'col-span-8 portrait:xm:col-span-9 grid grid-rows-6 w-full h-full overflow-visible',
+          flip ? 'pr-1 pl-2' : 'pr-2 pl-1',
+        )}
+      >
+        <div
+          className={classNames(
+            'flex items-end relative',
+            flip && 'flex-row-reverse',
+            'row-span-2',
+          )}
+        >
           <span>255</span>
           <span>255</span>
           <span>255</span>
         </div>
-        <div className='row-span-1 w-full h-full bg-green-800 skew-x-[45deg]'></div>
-        <div className='row-span-1 w-full h-full bg-gray-800 skew-x-[-45deg]'></div>
-        <div className='row-span-2'>
+        <div
+          className={classNames(
+            'row-span-1 w-full h-full bg-lime-500',
+            // 'border-amber-400 border-b',
+            flip ? 'skew-x-[-45deg]' : 'skew-x-[45deg]',
+          )}
+        ></div>
+        <div
+          className={classNames(
+            'row-span-1 w-full h-full bg-pink-200',
+            // 'border-amber-400 border-t',
+            flip ? 'skew-x-[45deg]' : 'skew-x-[-45deg]',
+          )}
+        ></div>
+        <div
+          className={classNames(
+            'flex items-start relative',
+            flip && 'flex-row-reverse',
+            'row-span-2',
+          )}
+        >
           <span>255</span>
           <span>255</span>
           <span>255</span>
         </div>
       </div>
+    </div>
+  )
+}
+
+function HeroSkill({ flip }: { flip?: boolean }) {
+  return (
+    <div
+      className={classNames(
+        'col-span-4 xs:col-span-12 portrait:xm:col-span-4',
+        'flex-none grid grid-cols-12 px-2',
+        'portrait:xm:aspect-[5/3] portrait:xm:w-full',
+      )}
+    >
+      <div
+        className={classNames(
+          'aspect-square portrait:xm:h-full',
+          // 'portrait:xm:aspect-[3/1]',
+          'col-span-3 row-start-1 portrait:xm:col-span-2 p-2',
+          flip ? 'col-start-10 portrait:xm:col-start-11' : 'col-start-1',
+          'bg-purple-500',
+        )}
+      ></div>
     </div>
   )
 }
