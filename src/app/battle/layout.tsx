@@ -103,7 +103,7 @@ function HeroCard({ className, flip }: { className?: string; flip?: boolean }) {
       )}
     >
       <div
-        className='flex-auto -mb-5 portrait:xm:-mb-32 overflow-hidden flex items-center justify-center relative'
+        className='flex-auto -mb-5 portrait:xm:-mb-28 portrait:sm:-mb-40 overflow-hidden flex items-center justify-center relative'
         style={{
           WebkitMaskImage: mask,
           maskImage: mask,
@@ -235,19 +235,26 @@ function HeroSkill({ flip }: { flip?: boolean }) {
     <div
       className={classNames(
         'col-span-4 xs:col-span-12 portrait:xm:col-span-4',
-        'flex-none grid grid-cols-12 px-2',
-        'portrait:xm:aspect-[5/3] portrait:xm:w-full',
+        'flex-none grid grid-cols-12',
+        'w-full',
+        'bg-pink-500',
       )}
     >
       <div
         className={classNames(
+          'w-full',
+          'aspect-[1/10] xs:aspect-auto portrait:xm:aspect-[1/5]',
+        )}
+      ></div>
+      {/* <div
+        className={classNames(
           'aspect-square portrait:xm:h-full',
           // 'portrait:xm:aspect-[3/1]',
-          'col-span-3 row-start-1 portrait:xm:col-span-2 p-2',
+          'col-span-3 row-start-1 portrait:xm:col-span-2',
           flip ? 'col-start-10 portrait:xm:col-start-11' : 'col-start-1',
           'bg-purple-500',
         )}
-      ></div>
+      ></div> */}
     </div>
   )
 }
