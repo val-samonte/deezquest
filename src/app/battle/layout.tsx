@@ -253,16 +253,33 @@ function HeroSkill({ flip, expand }: { flip?: boolean; expand?: boolean }) {
           <div className='absolute inset-1 -rotate-45'>
             <div
               className={classNames(
-                'absolute top-0 left-0 w-3 h-3',
+                'absolute top-0 left-0 w-[30%] h-[30%]',
                 'border-t border-l border-amber-400/50',
               )}
             />
             <div
               className={classNames(
-                'absolute bottom-0 right-0 w-3 h-3',
+                'absolute bottom-0 right-0 w-[30%] h-[30%]',
                 'border-b border-r border-amber-400/50',
               )}
             />
+          </div>
+          <div className='absolute inset-0 -rotate-45'>
+            {flip ? (
+              <div
+                className={classNames(
+                  'absolute top-0 left-0 w-[15%] h-[15%]',
+                  'border-t border-l border-amber-400/50',
+                )}
+              />
+            ) : (
+              <div
+                className={classNames(
+                  'absolute bottom-0 right-0 w-[15%] h-[15%]',
+                  'border-b border-r border-amber-400/50',
+                )}
+              />
+            )}
           </div>
           <div
             className={classNames(
@@ -275,12 +292,26 @@ function HeroSkill({ flip, expand }: { flip?: boolean; expand?: boolean }) {
         </div>
         <div
           className={classNames(
-            'flex items-center px-2',
+            'flex flex-col justify-center px-2',
             'col-span-9 row-start-1 relative',
             flip ? 'col-start-1' : 'col-start-4',
           )}
         >
-          <div className='w-full border-b border-amber-400/50 relative'></div>
+          <div className='w-full h-[50%]' />
+          <div className='w-full border-b border-amber-400/50'></div>
+          <div
+            className={classNames(
+              'w-full h-[50%] pt-1 pb-2 px-1',
+              flip ? 'ml-1' : '-ml-1',
+            )}
+          >
+            <div
+              className={classNames(
+                flip ? 'skew-x-[45deg]' : '-skew-x-[45deg]',
+                'w-full h-full bg-white',
+              )}
+            />
+          </div>
         </div>
       </div>
     )
