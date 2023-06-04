@@ -31,7 +31,7 @@ export default function BattleLayout() {
             {/* Player Cards */}
             <div
               className={classNames(
-                // 'flex-auto',
+                'portrait:xm:flex-auto',
                 'col-span-12 row-span-6',
                 'col-start-1 row-start-1',
                 'grid grid-cols-12 grid-rows-6',
@@ -85,9 +85,11 @@ export default function BattleLayout() {
   )
 }
 
+// Note: portrait:xm is landscape
+
 function HeroCard({ className }: { className?: string }) {
   return (
-    <div className={classNames('w-full', className)}>
+    <div className={classNames('w-full portrait:xm:bg-green-500', className)}>
       {/* Picture and health bar, armor, shell */}
       <div className='grid grid-cols-6'>
         <div className='col-span-2 aspect-square bg-purple-500'></div>
