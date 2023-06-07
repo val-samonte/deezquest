@@ -2,12 +2,19 @@
 
 import PageContainer from '@/components/PageContainer'
 import PageTitle from '@/components/PageTitle'
+import SkillIcon from '@/components/SkillIcon'
+import { Hero, heroFromPublicKey } from '@/game/gameFunctions'
+import { Skill } from '@/types/Skill'
+import { innateSkills } from '@/utils/innateSkills'
+import { Keypair } from '@solana/web3.js'
 import classNames from 'classnames'
 import Image from 'next/image'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import useMeasure from 'react-use-measure'
 
 export default function BattleLayout() {
+  const dummyHero = useRef(heroFromPublicKey(Keypair.generate().publicKey))
+
   return (
     <PageContainer>
       <PageTitle title='Battle' />
@@ -70,7 +77,7 @@ export default function BattleLayout() {
                     // 'bg-amber-500',
                   )}
                 >
-                  <HeroCard />
+                  <HeroCard hero={dummyHero.current} />
                 </div>
                 {/* Opponent */}
                 <div
@@ -82,7 +89,7 @@ export default function BattleLayout() {
                     // 'bg-orange-500',
                   )}
                 >
-                  <HeroCard flip={true} />
+                  <HeroCard hero={dummyHero.current} flip={true} />
                 </div>
               </div>
             </div>
@@ -95,9 +102,17 @@ export default function BattleLayout() {
 
 // Note: portrait:xm is landscape
 const mask =
-  'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%)'
+  'linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
 
-function HeroCard({ className, flip }: { className?: string; flip?: boolean }) {
+function HeroCard({
+  hero,
+  className,
+  flip,
+}: {
+  hero: Hero
+  className?: string
+  flip?: boolean
+}) {
   const [ref, rect] = useMeasure()
   const expand = useMemo(() => rect.width * 2 <= rect.height, [rect])
 
@@ -129,10 +144,34 @@ function HeroCard({ className, flip }: { className?: string; flip?: boolean }) {
       </div>
       <div className='flex-none w-full relative flex flex-col gap-3 pb-3 px-2'>
         <HeroLifebar flip={flip} />
-        <div className={classNames('flex gap-1', expand && 'flex-col')}>
-          <HeroSkill flip={flip} expand={expand} />
-          <HeroSkill flip={flip} expand={expand} />
-          <HeroSkill flip={flip} expand={expand} />
+        <div
+          className={classNames(
+            'flex gap-1',
+            expand
+              ? 'flex-col'
+              : [
+                  'grid grid-cols-3',
+                  'xm:-mt-3',
+                  'gap-3 xm:gap-3 sm:gap-5 px-3 xm:px-5 sm:px-10',
+                  flip ? 'xm:pr-20 sm:pr-24' : 'xm:pl-20 sm:pl-24',
+                ],
+          )}
+        >
+          <HeroSkill
+            skill={innateSkills[hero.offensiveSkill]}
+            flip={flip}
+            expand={expand}
+          />
+          <HeroSkill
+            skill={innateSkills[hero.supportiveSkill]}
+            flip={flip}
+            expand={expand}
+          />
+          <HeroSkill
+            skill={innateSkills[hero.specialSkill]}
+            flip={flip}
+            expand={expand}
+          />
         </div>
       </div>
     </div>
@@ -141,7 +180,7 @@ function HeroCard({ className, flip }: { className?: string; flip?: boolean }) {
 
 function HeroLifebar({ flip }: { flip?: boolean }) {
   return (
-    <div className='flex-none grid grid-cols-12 text-xs font-bold'>
+    <div className='flex-none grid grid-cols-12 text-xs sm:text-sm font-bold'>
       <div
         className={classNames(
           'col-span-4 portrait:xm:col-span-3 aspect-square p-2',
@@ -238,7 +277,15 @@ function HeroLifebar({ flip }: { flip?: boolean }) {
   )
 }
 
-function HeroSkill({ flip, expand }: { flip?: boolean; expand?: boolean }) {
+function HeroSkill({
+  skill,
+  flip,
+  expand,
+}: {
+  skill: Skill
+  flip?: boolean
+  expand?: boolean
+}) {
   if (expand) {
     return (
       <div className='grid grid-cols-12 px-2'>
@@ -254,45 +301,23 @@ function HeroSkill({ flip, expand }: { flip?: boolean; expand?: boolean }) {
             <div
               className={classNames(
                 'absolute top-0 left-0 w-[30%] h-[30%]',
-                'border-t border-l border-amber-400/50',
+                'border-amber-400/50',
+                !flip && 'border-t border-l',
               )}
             />
             <div
               className={classNames(
                 'absolute bottom-0 right-0 w-[30%] h-[30%]',
-                'border-b border-r border-amber-400/50',
+                'border-amber-400/50',
+                flip && 'border-b border-r',
               )}
             />
           </div>
-          <div className='absolute inset-0 -rotate-45'>
-            {flip ? (
-              <div
-                className={classNames(
-                  'absolute top-0 left-0 w-[15%] h-[15%]',
-                  'border-t border-l border-amber-400/50',
-                )}
-              />
-            ) : (
-              <div
-                className={classNames(
-                  'absolute bottom-0 right-0 w-[15%] h-[15%]',
-                  'border-b border-r border-amber-400/50',
-                )}
-              />
-            )}
-          </div>
-          <div
-            className={classNames(
-              // 'opacity-0',
-              'w-full h-full overflow-hidden aspect-square relative rotate-45',
-              'border border-amber-400/50',
-              'bg-black',
-            )}
-          ></div>
+          <SkillIcon skill={skill} flip={flip} className='scale-125' />
         </div>
         <div
           className={classNames(
-            'flex flex-col justify-center px-2',
+            'flex flex-col justify-center -mx-1',
             'col-span-9 row-start-1 relative',
             flip ? 'col-start-1' : 'col-start-4',
           )}
@@ -317,42 +342,9 @@ function HeroSkill({ flip, expand }: { flip?: boolean; expand?: boolean }) {
     )
   }
 
-  return <div></div>
-  // return (
-  //   <div
-  //     className={classNames(
-  //       'col-span-4 xs:col-span-12 portrait:xm:col-span-4',
-  //       'flex-none grid grid-cols-12',
-  //       'w-full',
-  //       // 'p-2',
-  //       'bg-pink-500',
-  //     )}
-  //   >
-  //     <div
-  //       className={classNames(
-  //         'w-full',
-  //         'aspect-[1/10] xs:aspect-auto portrait:xm:aspect-[1/5]',
-  //         'flex',
-  //         // flip && 'flex-row-reverse',
-  //       )}
-  //     >
-  //       <div
-  //         className={classNames(
-  //           'h-full flex-none aspect-square',
-  //           // 'rotate-45',
-  //           'bg-purple-500',
-  //         )}
-  //       ></div>
-  //     </div>
-  //     {/* <div
-  //       className={classNames(
-  //         'aspect-square portrait:xm:h-full',
-  //         // 'portrait:xm:aspect-[3/1]',
-  //         'col-span-3 row-start-1 portrait:xm:col-span-2',
-  //         flip ? 'col-start-10 portrait:xm:col-start-11' : 'col-start-1',
-  //         'bg-purple-500',
-  //       )}
-  //     ></div> */}
-  //   </div>
-  // )
+  return (
+    <div className='h-full aspect-square'>
+      <SkillIcon skill={skill} flip={flip} showCount />
+    </div>
+  )
 }

@@ -4,7 +4,6 @@ import { barracksPathFlagsAtom } from '@/atoms/barracksAtoms'
 import classNames from 'classnames'
 import { useAtomValue } from 'jotai'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
 
 const commonClasses =
   'absolute inset-0 w-full h-full object-cover transition-all duration-500'
