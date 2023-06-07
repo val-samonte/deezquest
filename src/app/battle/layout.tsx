@@ -126,7 +126,7 @@ function HeroCard({
       )}
     >
       <div
-        className='flex-auto -mb-5 portrait:xm:-mb-28 portrait:sm:-mb-40 overflow-hidden flex items-center justify-center relative'
+        className='flex-auto -mb-20 portrait:xm:-mb-28 portrait:sm:-mb-40 overflow-hidden flex items-center justify-center relative'
         style={{
           WebkitMaskImage: mask,
           maskImage: mask,
@@ -142,11 +142,11 @@ function HeroCard({
           )}
         />
       </div>
-      <div className='flex-none w-full relative flex flex-col gap-3 pb-3 px-2'>
+      <div className='flex-none w-full relative flex flex-col gap-2 pb-3 px-2'>
         <HeroLifebar flip={flip} />
         <div
           className={classNames(
-            'flex gap-1',
+            'flex',
             expand
               ? 'flex-col'
               : [
