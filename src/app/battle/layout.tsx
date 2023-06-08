@@ -9,11 +9,26 @@ import { innateSkills } from '@/utils/innateSkills'
 import { Keypair } from '@solana/web3.js'
 import classNames from 'classnames'
 import Image from 'next/image'
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import useMeasure from 'react-use-measure'
 
 export default function BattleLayout() {
-  const dummyHero = useRef(heroFromPublicKey(Keypair.generate().publicKey))
+  const hero1 = useMemo(() => {
+    const hero = heroFromPublicKey(Keypair.generate().publicKey)
+    hero.fireMp = Math.floor(Math.random() * hero.maxMp)
+    hero.windMp = Math.floor(Math.random() * hero.maxMp)
+    hero.watrMp = Math.floor(Math.random() * hero.maxMp)
+    hero.eartMp = Math.floor(Math.random() * hero.maxMp)
+    return hero
+  }, [])
+  const hero2 = useMemo(() => {
+    const hero = heroFromPublicKey(Keypair.generate().publicKey)
+    hero.fireMp = Math.floor(Math.random() * hero.maxMp)
+    hero.windMp = Math.floor(Math.random() * hero.maxMp)
+    hero.watrMp = Math.floor(Math.random() * hero.maxMp)
+    hero.eartMp = Math.floor(Math.random() * hero.maxMp)
+    return hero
+  }, [])
 
   return (
     <PageContainer>
@@ -77,7 +92,7 @@ export default function BattleLayout() {
                     // 'bg-amber-500',
                   )}
                 >
-                  <HeroCard hero={dummyHero.current} />
+                  <HeroCard hero={hero1} />
                 </div>
                 {/* Opponent */}
                 <div
@@ -89,7 +104,7 @@ export default function BattleLayout() {
                     // 'bg-orange-500',
                   )}
                 >
-                  <HeroCard hero={dummyHero.current} flip={true} />
+                  <HeroCard hero={hero2} flip={true} />
                 </div>
               </div>
             </div>
@@ -143,7 +158,7 @@ function HeroCard({
         />
       </div>
       <div className='flex-none w-full relative flex flex-col gap-2 pb-3 px-2'>
-        <HeroLifebar flip={flip} />
+        <HeroLifebar hero={hero} flip={flip} />
         <div
           className={classNames(
             'flex',
@@ -151,7 +166,7 @@ function HeroCard({
               ? 'flex-col'
               : [
                   'grid grid-cols-3',
-                  'xm:-mt-3',
+                  // 'xm:-mt-2',
                   'gap-3 xm:gap-3 sm:gap-5 px-3 xm:px-5 sm:px-10',
                   flip ? 'xm:pr-20 sm:pr-24' : 'xm:pl-20 sm:pl-24',
                 ],
@@ -178,9 +193,9 @@ function HeroCard({
   )
 }
 
-function HeroLifebar({ flip }: { flip?: boolean }) {
+function HeroLifebar({ hero, flip }: { hero: Hero; flip?: boolean }) {
   return (
-    <div className='flex-none grid grid-cols-12 text-xs sm:text-sm font-bold'>
+    <div className='flex-none grid grid-cols-12 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-bold'>
       <div
         className={classNames(
           'col-span-4 portrait:xm:col-span-3 aspect-square p-2',
@@ -193,41 +208,14 @@ function HeroLifebar({ flip }: { flip?: boolean }) {
         <div
           className={classNames(
             'w-full h-full grid grid-cols-2 grid-rows-2 rotate-45 text-white',
-            'border border-amber-400',
+            'border border-amber-400/50',
+            'p-px',
           )}
         >
-          <div
-            className={classNames(
-              'bg-fire-400 flex items-center justify-center',
-              'border border-amber-400',
-            )}
-          >
-            <span className='-rotate-45'>99</span>
-          </div>
-          <div
-            className={classNames(
-              'bg-wind-400 flex items-center justify-center',
-              'border border-amber-400',
-            )}
-          >
-            <span className='-rotate-45'>99</span>
-          </div>
-          <div
-            className={classNames(
-              'bg-water-400 flex items-center justify-center',
-              'border border-amber-400',
-            )}
-          >
-            <span className='-rotate-45'>99</span>
-          </div>
-          <div
-            className={classNames(
-              'bg-earth-400 flex items-center justify-center',
-              'border border-amber-400',
-            )}
-          >
-            <span className='-rotate-45'>99</span>
-          </div>
+          <HeroMana hero={hero} elemIndex={0} />
+          <HeroMana hero={hero} elemIndex={1} />
+          <HeroMana hero={hero} elemIndex={2} />
+          <HeroMana hero={hero} elemIndex={3} />
         </div>
       </div>
       <div
@@ -273,6 +261,55 @@ function HeroLifebar({ flip }: { flip?: boolean }) {
           <span>255</span>
         </div>
       </div>
+    </div>
+  )
+}
+
+function HeroMana({
+  hero,
+  elemIndex,
+  className,
+}: {
+  hero: Hero
+  elemIndex: number
+  className?: string
+}) {
+  const bg = useMemo(
+    () =>
+      ['bg-fire-400', 'bg-wind-400', 'bg-water-400', 'bg-earth-400'][elemIndex],
+    [elemIndex],
+  )
+
+  const mana = useMemo(
+    () => [hero.fireMp, hero.windMp, hero.watrMp, hero.eartMp][elemIndex],
+    [elemIndex],
+  )
+
+  const ratio = useMemo(() => mana / hero.maxMp, [hero.maxMp, mana])
+
+  return (
+    <div
+      className={classNames(
+        'relative overflow-hidden',
+        'flex items-center justify-center bg-opacity-50',
+        bg,
+        className,
+      )}
+    >
+      <div
+        className={classNames(
+          'absolute inset-0',
+          'w-full h-full -rotate-45 scale-150',
+        )}
+      >
+        <div
+          className='bg-black/80 w-full'
+          style={{ height: (1 - ratio) * 100 + '%' }}
+        />
+      </div>
+      <span className='-rotate-45 mt-px ml-px text-center font-bold'>
+        {mana}
+      </span>
     </div>
   )
 }

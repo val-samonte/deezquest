@@ -44,7 +44,7 @@ export default function SkillIcon({
       {showCount && (
         <div
           className={classNames(
-            'text-xs sm:text-sm absolute bottom-0',
+            'text-xs sm:text-sm absolute bottom-0 font-bold',
             flip ? 'left-0' : 'right-0',
           )}
         >
