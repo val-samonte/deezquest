@@ -1,5 +1,10 @@
 import { AnchorWallet } from '@solana/wallet-adapter-react'
-import { Keypair, PublicKey, Transaction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  VersionedTransaction,
+} from '@solana/web3.js'
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { atom } from 'jotai'
 import { connectionAtom } from './connectionAtom'
@@ -10,14 +15,23 @@ import { anchorWalletAtom } from './anchorWalletAtom'
 export class KeypairWallet implements AnchorWallet {
   constructor(readonly payer: Keypair) {}
 
-  async signTransaction(tx: Transaction): Promise<Transaction> {
-    tx.partialSign(this.payer)
+  async signTransaction<T extends Transaction | VersionedTransaction>(
+    tx: T,
+  ): Promise<T> {
+    if (tx instanceof Transaction) {
+      tx.partialSign(this.payer)
+    }
+
     return tx
   }
 
-  async signAllTransactions(txs: Transaction[]): Promise<Transaction[]> {
+  async signAllTransactions<T extends Transaction | VersionedTransaction>(
+    txs: T[],
+  ): Promise<T[]> {
     return txs.map((tx) => {
-      tx.partialSign(this.payer)
+      if (tx instanceof Transaction) {
+        tx.partialSign(this.payer)
+      }
       return tx
     })
   }
